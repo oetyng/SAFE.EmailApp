@@ -1,0 +1,27 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:viewModels="clr-namespace:SafeAuthenticator.ViewModels;assembly=SafeAuthenticator.Portable"
+             x:Class="SafeAuthenticator.Views.CreateAcctPage" Title="Create Account" IsEnabled="{Binding IsUiEnabled}">
+  <ContentPage.BindingContext>
+    <viewModels:CreateAcctViewModel />
+  </ContentPage.BindingContext>
+  <ContentPage.Content>
+    <ScrollView BackgroundColor="#efeff4">
+      <StackLayout VerticalOptions="Center">
+        <Entry Placeholder="Invitation" Margin="20,0,20,25"
+               Text="{Binding Invitation}" IsEnabled="{Binding IsUiEnabled}" />
+        <Entry Placeholder="Secret" Margin="20,5,20,5"
+               IsPassword="True" Text="{Binding AcctSecret}" IsEnabled="{Binding IsUiEnabled}" />
+        <Entry Placeholder="Password" Margin="20,5,20,5"
+               IsPassword="True" Text="{Binding AcctPassword}" IsEnabled="{Binding IsUiEnabled}" />
+        <StackLayout Margin="20" HeightRequest="{StaticResource ButtonHeightRequest}" VerticalOptions="Center">
+          <ActivityIndicator IsRunning="True"
+                             IsVisible="{Binding IsUiEnabled, Converter={StaticResource InverseBooleanConverter}}" />
+          <Button Text="Create Account"
+                  TextColor="White" Command="{Binding CreateAcctCommand}" IsVisible="{Binding IsUiEnabled}" />
+        </StackLayout>
+      </StackLayout>
+    </ScrollView>
+  </ContentPage.Content>
+</ContentPage>

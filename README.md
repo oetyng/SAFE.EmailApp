@@ -1,2 +1,1 @@
-# safe_mobile
-Mobile Examples
+# SAFE Mobile Examples

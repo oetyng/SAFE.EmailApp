@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="SafeMessages.Views.SendMessageView">
+  <ContentPage.Content>
+    <StackLayout Spacing="10" Padding="15">
+      <Label Text="To" Font="Small" TextColor="DarkGray" />
+      <Entry Text="{Binding To}" FontSize="Small" />
+      <Label Text="Subject" Font="Small" TextColor="DarkGray" />
+      <Entry Text="{Binding Subject}" FontSize="Small" />
+      <Label Text="Message" Font="Small" TextColor="DarkGray" Margin="0,10,0,0" />
+      <OnPlatform x:TypeArguments="View">
+        <OnPlatform.iOS>
+          <Frame CornerRadius="5"
+                 OutlineColor="#E6E6E6"
+                 HasShadow="False"
+                 Padding="1">
+            <Editor BackgroundColor="White" Text="{Binding Body}" FontSize="Small" HeightRequest="120"
+                    Keyboard="Chat" />
+          </Frame>
+        </OnPlatform.iOS>
+        <OnPlatform.Android>
+          <Editor Text="{Binding Body}" FontSize="Small" HeightRequest="140"
+                  Keyboard="Chat" />
+        </OnPlatform.Android>
+      </OnPlatform>
+      <StackLayout Margin="0,15,0,15"
+                   HeightRequest="{StaticResource ButtonHeightRequest}" VerticalOptions="Center">
+        <ActivityIndicator IsRunning="True"
+                           IsVisible="{Binding IsUiEnabled, Converter={StaticResource InverseBooleanConverter}}" />
+        <Button Text="Send"
+                TextColor="White" Command="{Binding SendCommand}" IsVisible="{Binding IsUiEnabled}" />
+      </StackLayout>
+    </StackLayout>
+  </ContentPage.Content>
+</ContentPage>
