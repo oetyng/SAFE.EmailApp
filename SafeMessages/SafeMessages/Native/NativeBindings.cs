@@ -521,10 +521,10 @@ namespace SafeMessages.Native {
     public void MDataEntriesForEach(
       IntPtr appPtr,
       ulong entriesHandle,
-      MDataEntriesForEachCb forEachCallback,
       IntPtr self,
+      MDataEntriesForEachCb forEachCallback,
       MDataEntriesForEachResCb resultCallback) {
-      MDataEntriesForEachNative(appPtr, entriesHandle, forEachCallback, self, resultCallback);
+      MDataEntriesForEachNative(appPtr, entriesHandle, self, forEachCallback, resultCallback);
     }
 
 #if __IOS__
@@ -535,8 +535,8 @@ namespace SafeMessages.Native {
     public static extern void MDataEntriesForEachNative(
       IntPtr appPtr,
       ulong entriesHandle,
-      MDataEntriesForEachCb forEachCallback,
       IntPtr self,
+      MDataEntriesForEachCb forEachCallback,
       MDataEntriesForEachResCb resultCallback);
 
     #endregion
@@ -892,21 +892,6 @@ namespace SafeMessages.Native {
 
     #endregion
 
-    #region MDataPermissionSetNew
-
-    public void MDataPermissionSetNew(IntPtr appPtr, IntPtr self, MDataPermissionSetNewCb callback) {
-      MDataPermissionSetNewNative(appPtr, self, callback);
-    }
-
-#if __IOS__
-    [DllImport("__Internal", EntryPoint = "mdata_permission_set_new")]
-#elif __ANDROID__
-    [DllImport("safe_app", EntryPoint = "mdata_permission_set_new")]
-#endif
-    public static extern void MDataPermissionSetNewNative(IntPtr appPtr, IntPtr self, MDataPermissionSetNewCb callback);
-
-    #endregion
-
     #region MDataPermissionsFree
 
     public void MDataPermissionsFree(IntPtr appPtr, ulong permissionsHandle, IntPtr self, MDataPermissionsFreeCb callback) {
@@ -968,47 +953,58 @@ namespace SafeMessages.Native {
 
     #endregion
 
-    #region MDataPermissionsSetAllow
+    #region MDataPermissionSetNew
 
-    public void MDataPermissionsSetAllow(
-      IntPtr appPtr,
-      ulong setHandle,
-      MDataAction action,
-      IntPtr self,
-      MDataPermissionsSetAllowCb callback) {
-      MDataPermissionsSetAllowNative(appPtr, setHandle, action, self, callback);
+    public void MDataPermissionSetNew(IntPtr appPtr, IntPtr self, MDataPermissionSetNewCb callback) {
+      MDataPermissionSetNewNative(appPtr, self, callback);
     }
 
 #if __IOS__
-    [DllImport("__Internal", EntryPoint = "mdata_permissions_set_allow")]
+    [DllImport("__Internal", EntryPoint = "mdata_permission_set_new")]
 #elif __ANDROID__
-    [DllImport("safe_app", EntryPoint = "mdata_permissions_set_allow")]
+    [DllImport("safe_app", EntryPoint = "mdata_permission_set_new")]
 #endif
-    public static extern void MDataPermissionsSetAllowNative(
-      IntPtr appPtr,
-      ulong setHandle,
-      MDataAction action,
-      IntPtr self,
-      MDataPermissionsSetAllowCb callback);
+    public static extern void MDataPermissionSetNewNative(IntPtr appPtr, IntPtr self, MDataPermissionSetNewCb callback);
 
     #endregion
 
-    #region MDataPermissionsSetFree
+    #region MDataPermissionSetAllow
 
-    public void MDataPermissionsSetFree(IntPtr appPtr, ulong setHandle, IntPtr self, MDataPermissionsSetFreeCb callback) {
-      MDataPermissionsSetFreeNative(appPtr, setHandle, self, callback);
+    public void MDataPermissionSetAllow(
+      IntPtr appPtr,
+      ulong setHandle,
+      MDataAction action,
+      IntPtr self,
+      MDataPermissionSetAllowCb callback) {
+      MDataPermissionSetAllowNative(appPtr, setHandle, action, self, callback);
     }
 
 #if __IOS__
-    [DllImport("__Internal", EntryPoint = "mdata_permissions_set_free")]
+    [DllImport("__Internal", EntryPoint = "mdata_permission_set_allow")]
 #elif __ANDROID__
-    [DllImport("safe_app", EntryPoint = "mdata_permissions_set_free")]
+    [DllImport("safe_app", EntryPoint = "mdata_permission_set_allow")]
 #endif
-    public static extern void MDataPermissionsSetFreeNative(
+    public static extern void MDataPermissionSetAllowNative(
       IntPtr appPtr,
       ulong setHandle,
+      MDataAction action,
       IntPtr self,
-      MDataPermissionsSetFreeCb callback);
+      MDataPermissionSetAllowCb callback);
+
+    #endregion
+
+    #region MDataPermissionSetFree
+
+    public void MDataPermissionSetFree(IntPtr appPtr, ulong setHandle, IntPtr self, MDataPermissionSetFreeCb callback) {
+      MDataPermissionSetFreeNative(appPtr, setHandle, self, callback);
+    }
+
+#if __IOS__
+    [DllImport("__Internal", EntryPoint = "mdata_permission_set_free")]
+#elif __ANDROID__
+    [DllImport("safe_app", EntryPoint = "mdata_permission_set_free")]
+#endif
+    public static extern void MDataPermissionSetFreeNative(IntPtr appPtr, ulong setHandle, IntPtr self, MDataPermissionSetFreeCb callback);
 
     #endregion
 
@@ -1080,8 +1076,8 @@ namespace SafeMessages.Native {
 
     #region MDataKeysForEach
 
-    public void MDataKeysForEach(IntPtr appPtr, ulong keysHandle, MDataKeysForEachCb forEachCb, IntPtr self, MDataKeysForEachResCb resCb) {
-      MDataKeysForEachNative(appPtr, keysHandle, forEachCb, self, resCb);
+    public void MDataKeysForEach(IntPtr appPtr, ulong keysHandle, IntPtr self, MDataKeysForEachCb forEachCb, MDataKeysForEachResCb resCb) {
+      MDataKeysForEachNative(appPtr, keysHandle, self, forEachCb, resCb);
     }
 
 #if __IOS__
@@ -1092,8 +1088,8 @@ namespace SafeMessages.Native {
     public static extern void MDataKeysForEachNative(
       IntPtr appPtr,
       ulong keysHandle,
-      MDataKeysForEachCb forEachCb,
       IntPtr self,
+      MDataKeysForEachCb forEachCb,
       MDataKeysForEachResCb resCb);
 
     #endregion

@@ -39,7 +39,7 @@ namespace SafeMessages.Native.MData {
       };
 
       CallbackManager.Register(forEachResCb);
-      NativeBindings.MDataEntriesForEach(Session.AppPtr, entH, forEachCb, Session.UserData, forEachResCb);
+      NativeBindings.MDataEntriesForEach(Session.AppPtr, entH, Session.UserData, forEachCb, forEachResCb);
 
       return tcs.Task;
     }
@@ -239,7 +239,7 @@ namespace SafeMessages.Native.MData {
       };
 
       CallbackManager.Register(forEachResCb);
-      NativeBindings.MDataKeysForEach(Session.AppPtr, entKeysH, forEachCb, Session.UserData, forEachResCb);
+      NativeBindings.MDataKeysForEach(Session.AppPtr, entKeysH, Session.UserData, forEachCb, forEachResCb);
 
       return tcs.Task;
     }

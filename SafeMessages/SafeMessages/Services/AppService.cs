@@ -53,7 +53,7 @@ namespace SafeMessages.Services {
       if (userId.Contains(".") || userId.Contains("@")) {
         throw new NotSupportedException("Unsupported characters '.' and '@'.");
       }
-      
+
       // Check if account exits first and return error
       var dstPubIdDigest = await NativeUtils.Sha3HashAsync(userId.ToUtfBytes());
       var dstPubIdMDataInfoH = await MDataInfo.MDataInfoNewPublicAsync(dstPubIdDigest, 15001);
@@ -70,10 +70,10 @@ namespace SafeMessages.Services {
 
       // Create Self Permissions to Inbox and Archive
       var inboxSelfPermSetH = await MDataPermissions.MDataPermissionSetNewAsync();
-      await MDataPermissions.MDataPermissionsSetAllowAsync(inboxSelfPermSetH, MDataAction.kInsert);
-      await MDataPermissions.MDataPermissionsSetAllowAsync(inboxSelfPermSetH, MDataAction.kUpdate);
-      await MDataPermissions.MDataPermissionsSetAllowAsync(inboxSelfPermSetH, MDataAction.kDelete);
-      await MDataPermissions.MDataPermissionsSetAllowAsync(inboxSelfPermSetH, MDataAction.kManagePermissions);
+      await MDataPermissions.MDataPermissionSetAllowAsync(inboxSelfPermSetH, MDataAction.kInsert);
+      await MDataPermissions.MDataPermissionSetAllowAsync(inboxSelfPermSetH, MDataAction.kUpdate);
+      await MDataPermissions.MDataPermissionSetAllowAsync(inboxSelfPermSetH, MDataAction.kDelete);
+      await MDataPermissions.MDataPermissionSetAllowAsync(inboxSelfPermSetH, MDataAction.kManagePermissions);
 
       var appSignPk = await Crypto.AppPubSignKeyAsync();
       var inboxPermH = await MDataPermissions.MDataPermissionsNewAsync();
@@ -85,7 +85,7 @@ namespace SafeMessages.Services {
 
       // Update Inbox permisions to allow anyone to insert
       var inboxAnyonePermSetH = await MDataPermissions.MDataPermissionSetNewAsync();
-      await MDataPermissions.MDataPermissionsSetAllowAsync(inboxAnyonePermSetH, MDataAction.kInsert);
+      await MDataPermissions.MDataPermissionSetAllowAsync(inboxAnyonePermSetH, MDataAction.kInsert);
       await MDataPermissions.MDataPermissionsInsertAsync(inboxPermH, Session.UserAnyoneSignPk, inboxAnyonePermSetH);
 
       // Create Inbox MD
@@ -96,7 +96,7 @@ namespace SafeMessages.Services {
       await MDataEntries.MDataEntriesInsertAsync(inboxEntriesH, inboxEmailPkEntryKey, inboxEncPk.ToHexString().ToUtfBytes());
       var inboxMDataInfoH = await MDataInfo.MDataInfoRandomPublicAsync(15001);
       await MData.MDataPutAsync(inboxMDataInfoH, inboxPermH, inboxEntriesH);
-      
+
       var serInboxMdInfo = await MDataInfo.MDataInfoSerialiseAsync(inboxMDataInfoH);
       var serArchiveMdInfo = await MDataInfo.MDataInfoSerialiseAsync(archiveMDataInfoH);
 
@@ -117,11 +117,10 @@ namespace SafeMessages.Services {
 
       // Finally update App Container
       var inboxEncSk = await Crypto.EncSecretKeyGetAsync(inboxEncKeysH.Item2);
-      var msgBox = new MessageBox
-      {
+      var msgBox = new MessageBox {
         EmailId = userId,
-        Inbox = new DataArray { Type = "Buffer", Data = serInboxMdInfo },
-        Archive = new DataArray { Type = "Buffer", Data = serArchiveMdInfo },
+        Inbox = new DataArray {Type = "Buffer", Data = serInboxMdInfo},
+        Archive = new DataArray {Type = "Buffer", Data = serArchiveMdInfo},
         EmailEncPk = inboxEncPk.ToHexString(),
         EmailEncSk = inboxEncSk.ToHexString()
       };
@@ -136,8 +135,8 @@ namespace SafeMessages.Services {
 
       // Free Native Handles
       var taskHandles = new List<Task> {
-        MDataPermissions.MDataPermissionsSetFreeAsync(inboxSelfPermSetH),
-        MDataPermissions.MDataPermissionsSetFreeAsync(inboxAnyonePermSetH),
+        MDataPermissions.MDataPermissionSetFreeAsync(inboxSelfPermSetH),
+        MDataPermissions.MDataPermissionSetFreeAsync(inboxAnyonePermSetH),
         MDataEntries.MDataEntriesFreeAsync(inboxEntriesH),
         MDataEntries.MDataEntriesFreeAsync(pubIdEntriesH),
         Crypto.EncPubKeyFreeAsync(inboxEncKeysH.Item1),

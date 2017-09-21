@@ -21,10 +21,6 @@ namespace SafeAuthenticator.Services {
       InitLoggingAsync();
     }
 
-    public void FreeState() {
-      Session.FreeAuth();
-    }
-
     public void Dispose() {
       FreeState();
       GC.SuppressFinalize(this);
@@ -37,6 +33,10 @@ namespace SafeAuthenticator.Services {
 
     ~AuthService() {
       FreeState();
+    }
+
+    public void FreeState() {
+      Session.FreeAuth();
     }
 
     public async Task<Tuple<int, int>> GetAccountInfoAsync() {

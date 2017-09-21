@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.IO;
 using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 using CommonUtils;
@@ -153,6 +152,8 @@ namespace SafeMessages.Native.App {
       return Task.Run(
         () => {
           var tcs = new TaskCompletionSource<bool>();
+          var fileOps = DependencyService.Get<IFileOps>();
+
           InitLoggingCb cb2 = null;
           cb2 = (ptr, result) => {
             if (result.ErrorCode != 0) {
@@ -164,10 +165,9 @@ namespace SafeMessages.Native.App {
             tcs.SetResult(true);
             CallbackManager.Unregister(cb2);
           };
-          CallbackManager.Register(cb2);
 
-          AppOutputLogPathCallback cb1 = null;
-          cb1 = async (ptr, result, path) => {
+          AppSetAdditionalSearchPathCb cb1 = null;
+          cb1 = async (ptr, result) => {
             if (result.ErrorCode != 0) {
               tcs.SetException(result.ToException());
               CallbackManager.Unregister(cb1);
@@ -175,19 +175,18 @@ namespace SafeMessages.Native.App {
               return;
             }
 
-            var appPath = Path.GetDirectoryName(path);
-            var fileList = new List<Tuple<string, string>> {Tuple.Create("log.toml", Path.Combine(appPath, "log.toml"))};
+            var fileList = new List<Tuple<string, string>> {Tuple.Create("log.toml", "log.toml")};
 
-            var fileOps = DependencyService.Get<IFileOps>();
             await fileOps.TransferAssetsAsync(fileList);
-
             Debug.WriteLine("Assets Transferred");
+
             NativeBindings.AppInitLogging(null, UserData, cb2);
             CallbackManager.Unregister(cb1);
           };
 
           CallbackManager.Register(cb1);
-          NativeBindings.AppOutputLogPath("test_file", UserData, cb1);
+          CallbackManager.Register(cb2);
+          NativeBindings.AppSetAdditionalSearchPath(fileOps.ConfigFilesPath, UserData, cb1);
           return tcs.Task;
         });
     }

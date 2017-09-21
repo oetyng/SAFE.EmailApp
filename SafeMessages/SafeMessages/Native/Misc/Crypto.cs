@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 using CommonUtils;
 using SafeMessages.Native.App;
@@ -37,7 +38,6 @@ namespace SafeMessages.Native.Misc {
       var cipherPtr = cipherText.ToIntPtr();
       DecryptSealedBoxCb callback = null;
       callback = (self, result, dataPtr, dataLen) => {
-        // Marshal.FreeHGlobal(cipherPtr); // TODO: Temp soln
         if (result.ErrorCode != 0) {
           tcs.SetException(result.ToException());
           CallbackManager.Unregister(callback);
@@ -52,7 +52,7 @@ namespace SafeMessages.Native.Misc {
 
       CallbackManager.Register(callback);
       NativeBindings.DecryptSealedBox(Session.AppPtr, cipherPtr, (IntPtr)cipherText.Count, pkHandle, skHandle, Session.UserData, callback);
-      // Marshal.FreeHGlobal(cipherPtr);
+      Marshal.FreeHGlobal(cipherPtr);
 
       return tcs.Task;
     }
@@ -134,7 +134,7 @@ namespace SafeMessages.Native.Misc {
 
       CallbackManager.Register(callback);
       NativeBindings.EncPubKeyNew(Session.AppPtr, asymPublicKeyPtr, Session.UserData, callback);
-      // Marshal.FreeHGlobal(asymPublicKeyPtr);
+      Marshal.FreeHGlobal(asymPublicKeyPtr);
 
       return tcs.Task;
     }
@@ -156,7 +156,7 @@ namespace SafeMessages.Native.Misc {
 
       CallbackManager.Register(callback);
       NativeBindings.EncryptSealedBox(Session.AppPtr, inputDataPtr, (IntPtr)inputData.Count, pkHandle, Session.UserData, callback);
-      // Marshal.FreeHGlobal(inputDataPtr);
+      Marshal.FreeHGlobal(inputDataPtr);
 
       return tcs.Task;
     }

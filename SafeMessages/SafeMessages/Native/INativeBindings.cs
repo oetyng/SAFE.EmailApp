@@ -110,9 +110,9 @@ namespace SafeMessages.Native {
 
   public delegate void MDataPermissionsNewCb(IntPtr self, FfiResult result, ulong mDataPermissionsHandle);
 
-  public delegate void MDataPermissionsSetAllowCb(IntPtr self, FfiResult result);
+  public delegate void MDataPermissionSetAllowCb(IntPtr self, FfiResult result);
 
-  public delegate void MDataPermissionsSetFreeCb(IntPtr self, FfiResult result);
+  public delegate void MDataPermissionSetFreeCb(IntPtr self, FfiResult result);
 
   public delegate void MDataPutCb(IntPtr self, FfiResult result);
 
@@ -218,8 +218,8 @@ namespace SafeMessages.Native {
     void MDataEntriesForEach(
       IntPtr appPtr,
       ulong entriesHandle,
-      MDataEntriesForEachCb forEachCallback,
       IntPtr self,
+      MDataEntriesForEachCb forEachCallback,
       MDataEntriesForEachResCb resultCallback);
 
     void MDataEntriesFree(IntPtr appPtr, ulong entriesHandle, IntPtr self, MDataEntriesFreeCb callback);
@@ -274,7 +274,7 @@ namespace SafeMessages.Native {
     void MDataInfoRandomPrivate(IntPtr appPtr, ulong typeTag, IntPtr self, MDataInfoRandomPrivateCb callback);
     void MDataInfoRandomPublic(IntPtr appPtr, ulong typeTag, IntPtr self, MDataInfoRandomPublicCb callback);
     void MDataInfoSerialise(IntPtr appPtr, ulong infoHandle, IntPtr self, MDataInfoSerialiseCb callback);
-    void MDataKeysForEach(IntPtr appPtr, ulong keysHandle, MDataKeysForEachCb forEachCb, IntPtr self, MDataKeysForEachResCb resCb);
+    void MDataKeysForEach(IntPtr appPtr, ulong keysHandle, IntPtr self, MDataKeysForEachCb forEachCb, MDataKeysForEachResCb resCb);
 
     void MDataKeysFree(IntPtr appPtr, ulong keysHandle, IntPtr self, MDataKeysFreeCb callback);
 
@@ -282,6 +282,8 @@ namespace SafeMessages.Native {
     void MDataListEntries(IntPtr appPtr, ulong infoHandle, IntPtr self, MDataListEntriesCb callback);
     void MDataListKeys(IntPtr appPtr, ulong infoHandle, IntPtr self, MDataListKeysCb callback);
     void MDataMutateEntries(IntPtr appPtr, ulong infoHandle, ulong actionsHandle, IntPtr self, MDataMutateEntriesCb callback);
+    void MDataPermissionSetAllow(IntPtr appPtr, ulong setHandle, MDataAction action, IntPtr self, MDataPermissionSetAllowCb callback);
+    void MDataPermissionSetFree(IntPtr appPtr, ulong setHandle, IntPtr self, MDataPermissionSetFreeCb callback);
     void MDataPermissionSetNew(IntPtr appPtr, IntPtr self, MDataPermissionSetNewCb callback);
     void MDataPermissionsFree(IntPtr appPtr, ulong permissionsHandle, IntPtr self, MDataPermissionsFreeCb callback);
 
@@ -294,8 +296,6 @@ namespace SafeMessages.Native {
       MDataPermissionsInsertCb callback);
 
     void MDataPermissionsNew(IntPtr appPtr, IntPtr self, MDataPermissionsNewCb callback);
-    void MDataPermissionsSetAllow(IntPtr appPtr, ulong setHandle, MDataAction action, IntPtr self, MDataPermissionsSetAllowCb callback);
-    void MDataPermissionsSetFree(IntPtr appPtr, ulong setHandle, IntPtr self, MDataPermissionsSetFreeCb callback);
     void MDataPut(IntPtr appPtr, ulong infoHandle, ulong permissionsHandle, ulong entriesHandle, IntPtr self, MDataPutCb callback);
     void Sha3Hash(IntPtr data, IntPtr len, IntPtr self, Sha3HashCb callback);
   }

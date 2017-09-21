@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Threading.Tasks;
@@ -193,46 +192,58 @@ namespace SafeAuthenticator.Native {
       return Task.Run(
         () => {
           var tcs = new TaskCompletionSource<bool>();
-          InitLoggingCb cb2 = null;
-          cb2 = (ptr, result) => {
+          InitLoggingCb cb3 = null;
+          cb3 = (ptr, result) => {
             if (result.ErrorCode != 0) {
               tcs.SetException(result.ToException());
-              CallbackManager.Unregister(cb2);
+              CallbackManager.Unregister(cb3);
               return;
             }
 
             tcs.SetResult(true);
+            CallbackManager.Unregister(cb3);
+          };
+
+          AuthSetAdditionalSearchPathCb cb2 = null;
+          cb2 = (ptr, result) => {
+            if (result.ErrorCode != 0) {
+              tcs.SetException(result.ToException());
+              CallbackManager.Unregister(cb2);
+              CallbackManager.Unregister(cb3);
+              return;
+            }
+
+            NativeBindings.AuthInitLogging(null, UserData, cb3);
             CallbackManager.Unregister(cb2);
           };
-          CallbackManager.Register(cb2);
 
-          AuthLogPathCb cb1 = null;
-          cb1 = async (ptr, result, path) => {
+          AuthExeFileStemCb cb1 = null;
+          cb1 = async (self, result, appName) => {
             if (result.ErrorCode != 0) {
               tcs.SetException(result.ToException());
               CallbackManager.Unregister(cb1);
               CallbackManager.Unregister(cb2);
+              CallbackManager.Unregister(cb3);
               return;
             }
 
-            var appPath = Path.GetDirectoryName(path);
             var fileList = new List<Tuple<string, string>> {
-              Tuple.Create(
-                "crust.config",
-                Path.Combine(appPath, $"{Path.GetFileName(appPath).Replace(".app", "")}.crust.config")),
-              Tuple.Create("log.toml", Path.Combine(appPath, Path.Combine(appPath, "log.toml")))
+              Tuple.Create("crust.config", $"{appName}.crust.config"),
+              Tuple.Create("log.toml", "log.toml")
             };
 
             var fileOps = DependencyService.Get<IFileOps>();
             await fileOps.TransferAssetsAsync(fileList);
 
             Debug.WriteLine("Assets Transferred");
-            NativeBindings.AuthInitLogging(null, UserData, cb2);
+            NativeBindings.AuthSetAdditionalSearchPath(fileOps.ConfigFilesPath, UserData, cb2);
             CallbackManager.Unregister(cb1);
           };
 
           CallbackManager.Register(cb1);
-          NativeBindings.AuthOutputLogPath("test_file", UserData, cb1);
+          CallbackManager.Register(cb2);
+          CallbackManager.Register(cb3);
+          NativeBindings.AuthExeFileStem(UserData, cb1);
           return tcs.Task;
         });
     }
