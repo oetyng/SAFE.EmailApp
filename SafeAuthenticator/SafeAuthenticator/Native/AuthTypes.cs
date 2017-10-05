@@ -18,6 +18,6 @@ namespace SafeAuthenticator.Native {
     public AuthReq? AuthReq;
     public uint? UnRegAppReq;
     public IntPtr? ContReq;
-    public Tuple<IntPtr, IntPtr> ShareMDataReq;
+    public (IntPtr, IntPtr) ShareMDataReq;
   }
 }

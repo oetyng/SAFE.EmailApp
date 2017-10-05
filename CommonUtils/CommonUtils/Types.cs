@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Runtime.InteropServices;
 
 namespace CommonUtils {
-  //TODO: Make sure Marshal is ok
   public enum MDataAction {
     kInsert,
     kUpdate,

@@ -34,7 +34,7 @@ namespace SafeMessages.Native {
 
   public struct DecodeIpcResult {
     public AuthGranted? AuthGranted;
-    public Tuple<IntPtr, IntPtr> UnRegAppInfo;
+    public (IntPtr, IntPtr) UnRegAppInfo;
     public uint? ContReqId;
     public uint? ShareMData;
     public bool? Revoked;

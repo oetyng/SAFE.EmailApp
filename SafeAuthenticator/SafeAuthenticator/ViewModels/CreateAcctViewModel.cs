@@ -19,6 +19,17 @@ namespace SafeAuthenticator.ViewModels {
 
     public bool IsUiEnabled { get => _isUiEnabled; set => SetProperty(ref _isUiEnabled, value); }
 
+    public bool AuthReconnect {
+      get => Authenticator.AuthReconnect;
+      set {
+        if (Authenticator.AuthReconnect != value) {
+          Authenticator.AuthReconnect = value;
+        }
+
+        OnPropertyChanged();
+      }
+    }
+
     public CreateAcctViewModel() {
       Authenticator.PropertyChanged += (s, e) => {
         if (e.PropertyName == nameof(Authenticator.IsLogInitialised)) {

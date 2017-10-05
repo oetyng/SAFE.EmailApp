@@ -12,205 +12,164 @@ namespace SafeMessages.Native.MData {
   internal static class MDataInfo {
     private static readonly INativeBindings NativeBindings = DependencyService.Get<INativeBindings>();
 
-    public static Task<List<byte>> MDataInfoDecryptAsync(ulong mDataInfoH, List<byte> cipherText) {
+    public static Task<List<byte>> DecryptAsync(NativeHandle mDataInfoH, List<byte> cipherText) {
       var tcs = new TaskCompletionSource<List<byte>>();
       var cipherPtr = cipherText.ToIntPtr();
       var cipherLen = (IntPtr)cipherText.Count;
 
-      MDataInfoDecryptCb callback = null;
-      callback = (pVoid, result, plainText, len) => {
+      MDataInfoDecryptCb callback = (_, result, plainText, len) => {
         if (result.ErrorCode != 0) {
           tcs.SetException(result.ToException());
-          CallbackManager.Unregister(callback);
           return;
         }
 
         var byteList = plainText.ToList<byte>(len);
         tcs.SetResult(byteList);
-        CallbackManager.Unregister(callback);
       };
 
-      CallbackManager.Register(callback);
-      NativeBindings.MDataInfoDecrypt(Session.AppPtr, mDataInfoH, cipherPtr, cipherLen, Session.UserData, callback);
+      NativeBindings.MDataInfoDecrypt(Session.AppPtr, mDataInfoH, cipherPtr, cipherLen, callback);
       Marshal.FreeHGlobal(cipherPtr);
 
       return tcs.Task;
     }
 
-    public static Task<ulong> MDataInfoDeserialiseAsync(List<byte> serialisedData) {
-      var tcs = new TaskCompletionSource<ulong>();
-      MDataInfoDeserialiseCb callback = null;
-      callback = (pVoid, result, mdataInfoH) => {
+    public static Task<NativeHandle> DeserialiseAsync(List<byte> serialisedData) {
+      var tcs = new TaskCompletionSource<NativeHandle>();
+      MDataInfoDeserialiseCb callback = (_, result, mdataInfoH) => {
         if (result.ErrorCode != 0) {
           tcs.SetException(result.ToException());
-          CallbackManager.Unregister(callback);
           return;
         }
 
-        tcs.SetResult(mdataInfoH);
-        CallbackManager.Unregister(callback);
+        tcs.SetResult(new NativeHandle(mdataInfoH, FreeAsync));
       };
 
-      CallbackManager.Register(callback);
-
       var serialisedDataPtr = serialisedData.ToIntPtr();
-
-      NativeBindings.MDataInfoDeserialise(Session.AppPtr, serialisedDataPtr, (IntPtr)serialisedData.Count, Session.UserData, callback);
+      NativeBindings.MDataInfoDeserialise(Session.AppPtr, serialisedDataPtr, (IntPtr)serialisedData.Count, callback);
 
       Marshal.FreeHGlobal(serialisedDataPtr);
 
       return tcs.Task;
     }
 
-    public static Task<List<byte>> MDataInfoEncryptEntryKeyAsync(ulong infoH, List<byte> inputBytes) {
+    public static Task<List<byte>> EncryptEntryKeyAsync(NativeHandle infoH, List<byte> inputBytes) {
       var tcs = new TaskCompletionSource<List<byte>>();
       var inputBytesPtr = inputBytes.ToIntPtr();
-      MDataInfoEncryptEntryKeyCb callback = null;
-      callback = (self, result, dataPtr, dataLen) => {
+      MDataInfoEncryptEntryKeyCb callback = (_, result, dataPtr, dataLen) => {
         if (result.ErrorCode != 0) {
           tcs.SetException(result.ToException());
-          CallbackManager.Unregister(callback);
           return;
         }
         var data = dataPtr.ToList<byte>(dataLen);
         tcs.SetResult(data);
-        CallbackManager.Unregister(callback);
       };
 
-      CallbackManager.Register(callback);
-      NativeBindings.MDataInfoEncryptEntryKey(Session.AppPtr, infoH, inputBytesPtr, (IntPtr)inputBytes.Count, Session.UserData, callback);
+      NativeBindings.MDataInfoEncryptEntryKey(Session.AppPtr, infoH, inputBytesPtr, (IntPtr)inputBytes.Count, callback);
       Marshal.FreeHGlobal(inputBytesPtr);
 
       return tcs.Task;
     }
 
-    public static Task<List<byte>> MDataInfoEncryptEntryValueAsync(ulong infoH, List<byte> inputBytes) {
+    public static Task<List<byte>> EncryptEntryValueAsync(NativeHandle infoH, List<byte> inputBytes) {
       var tcs = new TaskCompletionSource<List<byte>>();
       var inputBytesPtr = inputBytes.ToIntPtr();
-      MDataInfoEncryptEntryValueCb callback = null;
-      callback = (self, result, dataPtr, dataLen) => {
+      MDataInfoEncryptEntryValueCb callback = (_, result, dataPtr, dataLen) => {
         if (result.ErrorCode != 0) {
           tcs.SetException(result.ToException());
-          CallbackManager.Unregister(callback);
           return;
         }
         var data = dataPtr.ToList<byte>(dataLen);
         tcs.SetResult(data);
-        CallbackManager.Unregister(callback);
       };
 
-      CallbackManager.Register(callback);
-      NativeBindings.MDataInfoEncryptEntryValue(Session.AppPtr, infoH, inputBytesPtr, (IntPtr)inputBytes.Count, Session.UserData, callback);
+      NativeBindings.MDataInfoEncryptEntryValue(Session.AppPtr, infoH, inputBytesPtr, (IntPtr)inputBytes.Count, callback);
       Marshal.FreeHGlobal(inputBytesPtr);
 
       return tcs.Task;
     }
 
-    public static Task MDataInfoFreeAsync(ulong mDataInfoH) {
+    public static Task FreeAsync(ulong mDataInfoH) {
       var tcs = new TaskCompletionSource<object>();
 
-      MDataInfoFreeCb callback = null;
-      callback = (pVoid, result) => {
+      MDataInfoFreeCb callback = (_, result) => {
         if (result.ErrorCode != 0) {
           tcs.SetException(result.ToException());
-          CallbackManager.Unregister(callback);
           return;
         }
 
         tcs.SetResult(null);
-        CallbackManager.Unregister(callback);
       };
 
-      CallbackManager.Register(callback);
-      NativeBindings.MDataInfoFree(Session.AppPtr, mDataInfoH, Session.UserData, callback);
+      NativeBindings.MDataInfoFree(Session.AppPtr, mDataInfoH, callback);
 
       return tcs.Task;
     }
 
-    public static Task<ulong> MDataInfoNewPublicAsync(List<byte> xorName, ulong typeTag) {
-      var tcs = new TaskCompletionSource<ulong>();
+    public static Task<NativeHandle> NewPublicAsync(List<byte> xorName, ulong typeTag) {
+      var tcs = new TaskCompletionSource<NativeHandle>();
 
-      MDataInfoNewPublicCb callback = null;
-      callback = (pVoid, result, pubMDataInfoH) => {
+      MDataInfoNewPublicCb callback = (_, result, pubMDataInfoH) => {
         if (result.ErrorCode != 0) {
           tcs.SetException(result.ToException());
-          CallbackManager.Unregister(callback);
           return;
         }
 
-        tcs.SetResult(pubMDataInfoH);
-        CallbackManager.Unregister(callback);
+        tcs.SetResult(new NativeHandle(pubMDataInfoH, FreeAsync));
       };
 
-      CallbackManager.Register(callback);
-
       var xorNamePtr = xorName.ToIntPtr();
-
-      NativeBindings.MDataInfoNewPublic(Session.AppPtr, xorNamePtr, typeTag, Session.UserData, callback);
-
+      NativeBindings.MDataInfoNewPublic(Session.AppPtr, xorNamePtr, typeTag, callback);
       Marshal.FreeHGlobal(xorNamePtr);
 
       return tcs.Task;
     }
 
-    public static Task<ulong> MDataInfoRandomPrivateAsync(ulong typeTag) {
-      var tcs = new TaskCompletionSource<ulong>();
+    public static Task<NativeHandle> RandomPrivateAsync(ulong typeTag) {
+      var tcs = new TaskCompletionSource<NativeHandle>();
 
-      MDataInfoRandomPrivateCb callback = null;
-      callback = (pVoid, result, privateMDataInfoH) => {
+      MDataInfoRandomPrivateCb callback = (_, result, privateMDataInfoH) => {
         if (result.ErrorCode != 0) {
           tcs.SetException(result.ToException());
-          CallbackManager.Unregister(callback);
           return;
         }
 
-        tcs.SetResult(privateMDataInfoH);
-        CallbackManager.Unregister(callback);
+        tcs.SetResult(new NativeHandle(privateMDataInfoH, FreeAsync));
       };
 
-      CallbackManager.Register(callback);
-      NativeBindings.MDataInfoRandomPrivate(Session.AppPtr, typeTag, Session.UserData, callback);
+      NativeBindings.MDataInfoRandomPrivate(Session.AppPtr, typeTag, callback);
 
       return tcs.Task;
     }
 
-    public static Task<ulong> MDataInfoRandomPublicAsync(ulong typeTag) {
-      var tcs = new TaskCompletionSource<ulong>();
+    public static Task<NativeHandle> RandomPublicAsync(ulong typeTag) {
+      var tcs = new TaskCompletionSource<NativeHandle>();
 
-      MDataInfoRandomPublicCb callback = null;
-      callback = (pVoid, result, pubMDataInfoH) => {
+      MDataInfoRandomPublicCb callback = (_, result, pubMDataInfoH) => {
         if (result.ErrorCode != 0) {
           tcs.SetException(result.ToException());
-          CallbackManager.Unregister(callback);
           return;
         }
 
-        tcs.SetResult(pubMDataInfoH);
-        CallbackManager.Unregister(callback);
+        tcs.SetResult(new NativeHandle(pubMDataInfoH, FreeAsync));
       };
 
-      CallbackManager.Register(callback);
-      NativeBindings.MDataInfoRandomPublic(Session.AppPtr, typeTag, Session.UserData, callback);
+      NativeBindings.MDataInfoRandomPublic(Session.AppPtr, typeTag, callback);
 
       return tcs.Task;
     }
 
-    public static Task<List<byte>> MDataInfoSerialiseAsync(ulong mdataInfoH) {
+    public static Task<List<byte>> SerialiseAsync(NativeHandle mdataInfoH) {
       var tcs = new TaskCompletionSource<List<byte>>();
-      MDataInfoSerialiseCb callback = null;
-      callback = (pVoid, result, bytesPtr, len) => {
+      MDataInfoSerialiseCb callback = (_, result, bytesPtr, len) => {
         if (result.ErrorCode != 0) {
           tcs.SetException(result.ToException());
-          CallbackManager.Unregister(callback);
           return;
         }
 
         tcs.SetResult(bytesPtr.ToList<byte>(len));
-        CallbackManager.Unregister(callback);
       };
 
-      CallbackManager.Register(callback);
-      NativeBindings.MDataInfoSerialise(Session.AppPtr, mdataInfoH, Session.UserData, callback);
+      NativeBindings.MDataInfoSerialise(Session.AppPtr, mdataInfoH, callback);
 
       return tcs.Task;
     }

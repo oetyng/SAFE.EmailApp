@@ -4,71 +4,63 @@ using CommonUtils;
 namespace SafeAuthenticator.Native {
   #region Native Delegates
 
-  public delegate void AuthExeFileStemCb(IntPtr self, FfiResult result, string exeFileStem);
-
   public delegate void AuthSetAdditionalSearchPathCb(IntPtr self, FfiResult result);
 
-  public delegate void EncodeAuthRspCb(IntPtr a, FfiResult result, string encodedRsp);
+  public delegate void AuthExeFileStemCb(IntPtr self, FfiResult result, string exeFileStem);
 
-  public delegate void NetObsCb(IntPtr a, int errorCode, int eventType);
+  public delegate void EncodeAuthRspCb(IntPtr self, FfiResult result, string encodedRsp);
 
-  public delegate void CreateAccountCb(IntPtr a, FfiResult result, IntPtr authPtr);
+  public delegate void NetObsCb(IntPtr self, int errorCode, int eventType);
 
-  public delegate void AppAuthReqCb(IntPtr a, uint reqId, IntPtr authReq);
+  public delegate void CreateAccountCb(IntPtr self, FfiResult result, IntPtr authPtr);
 
-  public delegate void AppContReqCb(IntPtr a, uint reqId, IntPtr ffiContainersReq);
+  public delegate void AppAuthReqCb(IntPtr self, uint reqId, IntPtr authReq);
 
-  public delegate void AppUnregAppReqCb(IntPtr a, uint reqId);
+  public delegate void AppContReqCb(IntPtr self, uint reqId, IntPtr ffiContainersReq);
 
-  public delegate void AppShareMDataReqCb(IntPtr a, uint reqId, IntPtr ffiShareMDataReq, IntPtr ffiUserMetaData);
+  public delegate void AppUnregAppReqCb(IntPtr self, uint reqId);
 
-  public delegate void AppReqOnErrorCb(IntPtr a, FfiResult result, string encodedString);
+  public delegate void AppShareMDataReqCb(IntPtr self, uint reqId, IntPtr ffiShareMDataReq, IntPtr ffiUserMetaData);
 
-  public delegate void AuthLogPathCb(IntPtr a, FfiResult result, string path);
+  public delegate void AppReqOnErrorCb(IntPtr self, FfiResult result, string encodedString);
 
-  public delegate void InitLoggingCb(IntPtr a, FfiResult result);
+  public delegate void AuthLogPathCb(IntPtr self, FfiResult result, string path);
 
-  public delegate void LoginCb(IntPtr a, FfiResult result, IntPtr authPtr);
+  public delegate void InitLoggingCb(IntPtr self, FfiResult result);
 
-  public delegate void AuthRegisteredAppsCb(IntPtr a, FfiResult result, IntPtr registeredAppFfiPtr, IntPtr len);
+  public delegate void LoginCb(IntPtr self, FfiResult result, IntPtr authPtr);
 
-  public delegate void AuthAccountInfoCb(IntPtr a, FfiResult result, IntPtr accountInfoPtr);
+  public delegate void AuthRegisteredAppsCb(IntPtr self, FfiResult result, IntPtr registeredAppFfiPtr, IntPtr len);
+
+  public delegate void AuthAccountInfoCb(IntPtr self, FfiResult result, IntPtr accountInfoPtr);
 
   #endregion
 
   public interface INativeBindings {
-    void AuthAccountInfo(IntPtr authPtr, IntPtr self, AuthAccountInfoCb callback);
+    void AuthAccountInfo(IntPtr authPtr, AuthAccountInfoCb callback);
 
     void AuthDecodeIpcMsg(
       IntPtr authPtr,
       string encodedString,
-      IntPtr self,
       AppAuthReqCb appAuthCb,
       AppContReqCb appContCb,
       AppUnregAppReqCb appUnregCb,
       AppShareMDataReqCb appShareMDataCb,
       AppReqOnErrorCb appReqOnErrorCb);
 
-    void AuthExeFileStem(IntPtr self, AuthExeFileStemCb callback);
-    void AuthInitLogging(string fileName, IntPtr userDataPtr, InitLoggingCb callback);
-    void AuthOutputLogPath(string fileName, IntPtr userDataPtr, AuthLogPathCb callback);
+    void AuthExeFileStem(AuthExeFileStemCb callback);
+    void AuthInitLogging(string fileName, InitLoggingCb callback);
+    void AuthOutputLogPath(string fileName, AuthLogPathCb callback);
 
-    void AuthRegisteredApps(IntPtr authPtr, IntPtr self, AuthRegisteredAppsCb callback);
-    void AuthSetAdditionalSearchPath(string path, IntPtr self, AuthSetAdditionalSearchPathCb callback);
+    void AuthRegisteredApps(IntPtr authPtr, AuthRegisteredAppsCb callback);
+    void AuthSetAdditionalSearchPath(string path, AuthSetAdditionalSearchPathCb callback);
 
-    void CreateAccount(
-      string location,
-      string password,
-      string invitation,
-      IntPtr netCbPtr,
-      IntPtr userDataPtr,
-      NetObsCb netobs,
-      CreateAccountCb createAcctCb);
+    void CreateAccount(string location, string password, string invitation, NetObsCb netobs, CreateAccountCb createAcctCb);
 
-    void EncodeAuthRsp(IntPtr authPtr, IntPtr authReq, uint reqId, bool isGranted, IntPtr self, EncodeAuthRspCb callback);
+    void EncodeAuthRsp(IntPtr authPtr, IntPtr authReq, uint reqId, bool isGranted, EncodeAuthRspCb callback);
 
     void FreeAuth(IntPtr authPtr);
 
-    void Login(string location, string password, IntPtr netCbPtr, IntPtr userDataPtr, NetObsCb netobs, LoginCb loginAcctCb);
+    void Login(string location, string password, NetObsCb netobs, LoginCb loginAcctCb);
   }
 }

@@ -12,7 +12,7 @@ using Xamarin.Forms;
 
 namespace CommonUtils {
   public class FileOps : IFileOps {
-    public async Task TransferAssetsAsync(List<Tuple<string, string>> fileList) {
+    public async Task TransferAssetsAsync(List<(string, string)> fileList) {
       foreach (var tuple in fileList) {
 #if __IOS__
         using (var reader = new StreamReader(Path.Combine(".", tuple.Item1))) {
@@ -39,7 +39,6 @@ namespace CommonUtils {
         // Personal -> /data/data/@PACKAGE_NAME@/files
         path = Environment.GetFolderPath(Environment.SpecialFolder.Personal);
 #endif
-        Debug.WriteLine($"ConfigFilesPath - {path}");
         return path;
       }
     }

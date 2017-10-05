@@ -16,6 +16,7 @@
 
       <OnPlatform x:TypeArguments="system:Double" Android="50" iOS="45" x:Key="ButtonHeightRequest" />
       <OnPlatform x:TypeArguments="system:Double" Android="45" iOS="40" x:Key="EntryHeightRequest" />
+      <OnPlatform x:TypeArguments="system:Double" Android="45" iOS="30" x:Key="SendMsgEntryHeightRequest" />
 
       <Color x:Key="ButtonNormal">#2A5789</Color>
       <Color x:Key="ButtonDisabled">#8aa5c0</Color>

@@ -9,42 +9,34 @@ namespace SafeMessages.Native.Misc {
   internal static class CipherOpt {
     private static readonly INativeBindings NativeBindings = DependencyService.Get<INativeBindings>();
 
-    public static Task CipherOptFreeAsync(ulong cipherOptHandle) {
+    public static Task FreeAsync(ulong cipherOptHandle) {
       var tcs = new TaskCompletionSource<object>();
-      CipherOptFreeCb callback = null;
-      callback = (self, result) => {
+      CipherOptFreeCb callback = (_, result) => {
         if (result.ErrorCode != 0) {
-          CallbackManager.Unregister(callback);
           tcs.SetException(result.ToException());
           return;
         }
 
         tcs.SetResult(null);
-        CallbackManager.Unregister(callback);
       };
 
-      CallbackManager.Register(callback);
-      NativeBindings.CipherOptFree(Session.AppPtr, cipherOptHandle, Session.UserData, callback);
+      NativeBindings.CipherOptFree(Session.AppPtr, cipherOptHandle, callback);
 
       return tcs.Task;
     }
 
-    public static Task<ulong> CipherOptNewPlaintextAsync() {
-      var tcs = new TaskCompletionSource<ulong>();
-      CipherOptNewPlaintextCb callback = null;
-      callback = (self, result, cipherOptHandle) => {
+    public static Task<NativeHandle> NewPlaintextAsync() {
+      var tcs = new TaskCompletionSource<NativeHandle>();
+      CipherOptNewPlaintextCb callback = (_, result, cipherOptHandle) => {
         if (result.ErrorCode != 0) {
           tcs.SetException(result.ToException());
-          CallbackManager.Unregister(callback);
           return;
         }
 
-        tcs.SetResult(cipherOptHandle);
-        CallbackManager.Unregister(callback);
+        tcs.SetResult(new NativeHandle(cipherOptHandle, FreeAsync));
       };
 
-      CallbackManager.Register(callback);
-      NativeBindings.CipherOptNewPlaintext(Session.AppPtr, Session.UserData, callback);
+      NativeBindings.CipherOptNewPlaintext(Session.AppPtr, callback);
 
       return tcs.Task;
     }

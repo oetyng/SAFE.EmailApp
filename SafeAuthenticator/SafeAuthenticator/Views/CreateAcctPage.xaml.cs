@@ -1,5 +1,6 @@
 ﻿using System.Diagnostics;
 using System.Linq;
+using CommonUtils;
 using SafeAuthenticator.Helpers;
 using SafeAuthenticator.ViewModels;
 using Xamarin.Forms;
@@ -7,7 +8,7 @@ using Xamarin.Forms.Xaml;
 
 namespace SafeAuthenticator.Views {
   [XamlCompilation(XamlCompilationOptions.Compile)]
-  public partial class CreateAcctPage : ContentPage {
+  public partial class CreateAcctPage : ContentPage, ICleanup {
     public CreateAcctPage() {
       InitializeComponent();
 
@@ -15,20 +16,22 @@ namespace SafeAuthenticator.Views {
         this,
         MessengerConstants.NavHomePage,
         async _ => {
-          Debug.WriteLine("CreateAcctPage -> HomePage");
+          MessageCenterUnsubscribe();
+          if (!App.IsPageValid(this)) {
+            return;
+          }
 
           var rootPage = Navigation.NavigationStack.FirstOrDefault();
           if (rootPage == null) {
             return;
           }
-
-          MessageCenterUnsubscribe();
-          Navigation.InsertPageBefore(new HomePage(), Navigation.NavigationStack.First());
+          Debug.WriteLine("CreateAcctPage -> HomePage");
+          Navigation.InsertPageBefore(new HomePage(), rootPage);
           await Navigation.PopToRootAsync();
         });
     }
 
-    private void MessageCenterUnsubscribe() {
+    public void MessageCenterUnsubscribe() {
       MessagingCenter.Unsubscribe<CreateAcctViewModel>(this, MessengerConstants.NavHomePage);
     }
   }

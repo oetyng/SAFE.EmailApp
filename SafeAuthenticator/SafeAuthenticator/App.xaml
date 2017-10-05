@@ -37,6 +37,12 @@
         <Setter Property="FontSize" Value="20" />
         <Setter Property="HorizontalTextAlignment" Value="Center" />
       </Style>
+      <OnPlatform x:Key="PasswordEntryImageColumn" x:TypeArguments="x:Int32" iOS="0" Android="2" />
+      <OnPlatform x:Key="PasswordEntryColumnSpan" x:TypeArguments="x:Int32" iOS="3" Android="1" />
+      <OnPlatform x:Key="PasswordEntryColDefinition1" x:TypeArguments="GridLength" iOS="35" Android="*" />
+      <OnPlatform x:Key="PasswordEntryColDefinition3" x:TypeArguments="GridLength" iOS="*" Android="35" />
+      <OnPlatform x:Key="PasswordEntryImageMargin" x:TypeArguments="Thickness" iOS="10,0,0,0" Android="0,0,10,0" />
+      <OnPlatform x:Key="PasswordEntrySeperatorColor" x:TypeArguments="Color" iOS="LightGray" Android="Transparent" />
       <commonUtils:IsCollectionEmptyConverter x:Key="IsCollectionEmptyConverter" />
       <commonUtils:InverseBooleanConverter x:Key="InverseBooleanConverter" />
     </ResourceDictionary>

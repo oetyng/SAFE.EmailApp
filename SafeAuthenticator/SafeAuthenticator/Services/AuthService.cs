@@ -1,8 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Threading;
 using System.Threading.Tasks;
+using Acr.UserDialogs;
 using CommonUtils;
+using SafeAuthenticator.Helpers;
 using SafeAuthenticator.Models;
 using SafeAuthenticator.Native;
 using SafeAuthenticator.Services;
@@ -12,12 +15,35 @@ using Xamarin.Forms;
 
 namespace SafeAuthenticator.Services {
   public class AuthService : ObservableObject, IDisposable {
+    private const string AuthReconnectPropKey = nameof(AuthReconnect);
+    private readonly SemaphoreSlim _reconnectSemaphore = new SemaphoreSlim(1, 1);
     private bool _isLogInitialised;
 
     public bool IsLogInitialised { get => _isLogInitialised; set => SetProperty(ref _isLogInitialised, value); }
 
+    private CredentialCacheService CredentialCache { get; }
+
+    public bool AuthReconnect {
+      get {
+        if (!Application.Current.Properties.ContainsKey(AuthReconnectPropKey)) {
+          return false;
+        }
+
+        var val = Application.Current.Properties[AuthReconnectPropKey] as bool?;
+        return val == true;
+      }
+      set {
+        if (value == false) {
+          CredentialCache.Delete();
+        }
+
+        Application.Current.Properties[AuthReconnectPropKey] = value;
+      }
+    }
+
     public AuthService() {
       _isLogInitialised = false;
+      CredentialCache = new CredentialCacheService();
       InitLoggingAsync();
     }
 
@@ -26,9 +52,37 @@ namespace SafeAuthenticator.Services {
       GC.SuppressFinalize(this);
     }
 
-    public Task CreateAccountAsync(string location, string password, string invitation) {
+    public async Task CheckAndReconnect() {
+      await _reconnectSemaphore.WaitAsync();
+      try {
+        if (Session.IsDisconnected) {
+          if (!AuthReconnect) {
+            throw new Exception("Reconnect Disabled");
+          }
+          using (UserDialogs.Instance.Loading("Reconnecting to Network")) {
+            var (location, password) = CredentialCache.Retrieve();
+            await LoginAsync(location, password);
+          }
+          try {
+            var cts = new CancellationTokenSource(2000);
+            await UserDialogs.Instance.AlertAsync("Network connection established.", "Success", "OK", cts.Token);
+          } catch (OperationCanceledException) { }
+        }
+      } catch (Exception ex) {
+        await Application.Current.MainPage.DisplayAlert("Error", $"Unable to Reconnect: {ex.Message}", "OK");
+        FreeState();
+        MessagingCenter.Send(this, MessengerConstants.ResetAppViews);
+      } finally {
+        _reconnectSemaphore.Release(1);
+      }
+    }
+
+    public async Task CreateAccountAsync(string location, string password, string invitation) {
       Debug.WriteLine($"CreateAccountAsync {location} - {password} - {invitation.Substring(0, 5)}");
-      return Session.CreateAccountAsync(location, password, invitation);
+      await Session.CreateAccountAsync(location, password, invitation);
+      if (AuthReconnect) {
+        CredentialCache.Store(location, password);
+      }
     }
 
     ~AuthService() {
@@ -39,9 +93,9 @@ namespace SafeAuthenticator.Services {
       Session.FreeAuth();
     }
 
-    public async Task<Tuple<int, int>> GetAccountInfoAsync() {
+    public async Task<(int, int)> GetAccountInfoAsync() {
       var acctInfo = await Session.AuthAccountInfoAsync();
-      return Tuple.Create(Convert.ToInt32(acctInfo.Used), Convert.ToInt32(acctInfo.Used + acctInfo.Available));
+      return (Convert.ToInt32(acctInfo.Used), Convert.ToInt32(acctInfo.Used + acctInfo.Available));
     }
 
     public Task<List<RegisteredApp>> GetRegisteredAppsAsync() {
@@ -50,6 +104,7 @@ namespace SafeAuthenticator.Services {
 
     public async Task HandleUrlActivationAsync(string encodedUrl) {
       try {
+        await CheckAndReconnect();
         var formattedUrl = UrlFormat.Convert(encodedUrl, true);
         var decodeResult = await Session.AuthDecodeIpcMsgAsync(formattedUrl);
         if (decodeResult.AuthReq.HasValue) {
@@ -87,9 +142,12 @@ namespace SafeAuthenticator.Services {
       IsLogInitialised = true;
     }
 
-    public Task LoginAsync(string location, string password) {
+    public async Task LoginAsync(string location, string password) {
       Debug.WriteLine($"LoginAsync {location} - {password}");
-      return Session.LoginAsync(location, password);
+      await Session.LoginAsync(location, password);
+      if (AuthReconnect) {
+        CredentialCache.Store(location, password);
+      }
     }
 
     public async Task LogoutAsync() {

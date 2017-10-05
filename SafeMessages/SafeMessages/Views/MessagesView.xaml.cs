@@ -1,4 +1,5 @@
-﻿using SafeMessages.Helpers;
+﻿using CommonUtils;
+using SafeMessages.Helpers;
 using SafeMessages.Models;
 using SafeMessages.ViewModels;
 using Xamarin.Forms;
@@ -6,7 +7,7 @@ using Xamarin.Forms.Xaml;
 
 namespace SafeMessages.Views {
   [XamlCompilation(XamlCompilationOptions.Compile)]
-  public partial class MessagesView : ContentPage {
+  public partial class MessagesView : ContentPage, ICleanup {
     public DataModel AppData => DependencyService.Get<DataModel>();
 
     public MessagesView() : this(null) { }
@@ -20,7 +21,8 @@ namespace SafeMessages.Views {
         this,
         MessengerConstants.NavSendMessagePage,
         async _ => {
-          if (Navigation.NavigationStack.Count == 0) {
+          if (!App.IsPageValid(this)) {
+            MessageCenterUnsubscribe();
             return;
           }
 
@@ -31,7 +33,8 @@ namespace SafeMessages.Views {
         this,
         MessengerConstants.NavDisplayMessageView,
         async (_, message) => {
-          if (Navigation.NavigationStack.Count == 0) {
+          if (!App.IsPageValid(this)) {
+            MessageCenterUnsubscribe();
             return;
           }
 
@@ -44,6 +47,11 @@ namespace SafeMessages.Views {
       }
       AppData.ClearMessages();
       viewModel.RefreshCommand.Execute(null);
+    }
+
+    public void MessageCenterUnsubscribe() {
+      MessagingCenter.Unsubscribe<MessagesViewModel>(this, MessengerConstants.NavSendMessagePage);
+      MessagingCenter.Unsubscribe<MessagesViewModel, Message>(this, MessengerConstants.NavDisplayMessageView);
     }
   }
 }

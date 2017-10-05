@@ -4,18 +4,38 @@ using System.Diagnostics;
 using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 using CommonUtils;
+using SafeMessages.Services;
 using Xamarin.Forms;
 
 // ReSharper disable ConvertToLocalFunction
 
 namespace SafeMessages.Native.App {
   internal static class Session {
-    public const ulong UserAnyoneSignPk = 0;
+    private static IntPtr _appPtr;
+    private static volatile bool _isDisconnected;
     public static readonly INativeBindings NativeBindings = DependencyService.Get<INativeBindings>();
-    private static readonly NetObsCallback NetObs;
-    public static readonly IntPtr UserData = IntPtr.Zero;
+    private static readonly NetObsCb NetObs;
+    public static bool IsDisconnected { get => _isDisconnected; private set => _isDisconnected = value; }
 
-    public static IntPtr AppPtr { private set; get; }
+    public static IntPtr AppPtr {
+      private set {
+        if (_appPtr == value) {
+          return;
+        }
+
+        if (_appPtr != IntPtr.Zero) {
+          NativeBindings.FreeApp(_appPtr);
+        }
+
+        _appPtr = value;
+      }
+      get {
+        if (_appPtr == IntPtr.Zero) {
+          throw new ArgumentNullException(nameof(AppPtr));
+        }
+        return _appPtr;
+      }
+    }
 
     static Session() {
       AppPtr = IntPtr.Zero;
@@ -34,21 +54,18 @@ namespace SafeMessages.Native.App {
           };
           var authGrantedFfiPtr = CommonUtils.Helpers.StructToPtr(authGrantedFfi);
 
-          AppRegisteredCallback callback = null;
-          callback = (ptr, result, appPtr) => {
+          AppRegisteredCb callback = (_, result, appPtr) => {
             if (result.ErrorCode != 0) {
               tcs.SetException(result.ToException());
-              CallbackManager.Unregister(callback);
               return;
             }
 
             AppPtr = appPtr;
+            IsDisconnected = false;
             tcs.SetResult(true);
-            CallbackManager.Unregister(callback);
           };
 
-          CallbackManager.Register(callback);
-          NativeBindings.AppRegistered(appId, authGrantedFfiPtr, IntPtr.Zero, UserData, NetObs, callback);
+          NativeBindings.AppRegistered(appId, authGrantedFfiPtr, NetObs, callback);
           Marshal.FreeHGlobal(authGrantedFfi.BootStrapConfigPtr);
           Marshal.FreeHGlobal(authGrantedFfiPtr);
 
@@ -60,16 +77,9 @@ namespace SafeMessages.Native.App {
       return Task.Run(
         () => {
           var tcs = new TaskCompletionSource<DecodeIpcResult>();
-          DecodeAuthCb authCb = null;
-          DecodeUnregCb unregCb = null;
-          DecodeContCb contCb = null;
-          DecodeShareMDataCb shareMDataCb = null;
-          DecodeRevokedCb revokedCb = null;
-          DecodeErrorCb errorCb = null;
-          var callbacks = new List<object>();
 
-          authCb = (self, id, authGrantedFfiPtr) => {
-            var authGrantedFfi = (AuthGrantedFfi)Marshal.PtrToStructure(authGrantedFfiPtr, typeof(AuthGrantedFfi));
+          DecodeAuthCb authCb = (_, id, authGrantedFfiPtr) => {
+            var authGrantedFfi = Marshal.PtrToStructure<AuthGrantedFfi>(authGrantedFfiPtr);
             var authGranted = new AuthGranted {
               AppKeys = authGrantedFfi.AppKeys,
               AccessContainer = authGrantedFfi.AccessContainer,
@@ -77,32 +87,14 @@ namespace SafeMessages.Native.App {
             };
 
             tcs.SetResult(new DecodeIpcResult {AuthGranted = authGranted});
-            CallbackManager.Unregister(callbacks);
           };
-          unregCb = (self, id, config, size) => {
-            tcs.SetResult(new DecodeIpcResult {UnRegAppInfo = Tuple.Create(config, size)});
-            CallbackManager.Unregister(callbacks);
-          };
-          contCb = (self, id) => {
-            tcs.SetResult(new DecodeIpcResult {ContReqId = id});
-            CallbackManager.Unregister(callbacks);
-          };
-          shareMDataCb = (self, id) => {
-            tcs.SetResult(new DecodeIpcResult {ShareMData = id});
-            CallbackManager.Unregister(callbacks);
-          };
-          revokedCb = self => {
-            tcs.SetResult(new DecodeIpcResult {Revoked = true});
-            CallbackManager.Unregister(callbacks);
-          };
-          errorCb = (self, result) => {
-            tcs.SetException(result.ToException());
-            CallbackManager.Unregister(callbacks);
-          };
+          DecodeUnregCb unregCb = (_, id, config, size) => { tcs.SetResult(new DecodeIpcResult {UnRegAppInfo = (config, size)}); };
+          DecodeContCb contCb = (_, id) => { tcs.SetResult(new DecodeIpcResult {ContReqId = id}); };
+          DecodeShareMDataCb shareMDataCb = (_, id) => { tcs.SetResult(new DecodeIpcResult {ShareMData = id}); };
+          DecodeRevokedCb revokedCb = _ => { tcs.SetResult(new DecodeIpcResult {Revoked = true}); };
+          DecodeErrorCb errorCb = (_, result) => { tcs.SetException(result.ToException()); };
 
-          callbacks.AddRange(new List<object> {authCb, unregCb, contCb, shareMDataCb, revokedCb, errorCb});
-          CallbackManager.Register(callbacks);
-          NativeBindings.DecodeIpcMessage(encodedReq, UserData, authCb, unregCb, contCb, shareMDataCb, revokedCb, errorCb);
+          NativeBindings.DecodeIpcMessage(encodedReq, authCb, unregCb, contCb, shareMDataCb, revokedCb, errorCb);
 
           return tcs.Task;
         });
@@ -119,20 +111,16 @@ namespace SafeMessages.Native.App {
             ContainersArrayPtr = authReq.Containers.ToIntPtr()
           };
           var authReqFfiPtr = CommonUtils.Helpers.StructToPtr(authReqFfi);
-          EncodeAuthReqCb callback = null;
-          callback = (ptr, result, id, req) => {
+          EncodeAuthReqCb callback = (_, result, id, req) => {
             if (result.ErrorCode != 0) {
               tcs.SetException(result.ToException());
-              CallbackManager.Unregister(callback);
               return;
             }
 
             tcs.SetResult(req);
-            CallbackManager.Unregister(callback);
           };
 
-          CallbackManager.Register(callback);
-          NativeBindings.EncodeAuthReq(authReqFfiPtr, UserData, callback);
+          NativeBindings.EncodeAuthReq(authReqFfiPtr, callback);
           Marshal.FreeHGlobal(authReqFfi.ContainersArrayPtr);
           Marshal.FreeHGlobal(authReqFfiPtr);
 
@@ -141,10 +129,7 @@ namespace SafeMessages.Native.App {
     }
 
     public static void FreeApp() {
-      if (AppPtr == IntPtr.Zero) {
-        return;
-      }
-      NativeBindings.FreeApp(AppPtr);
+      IsDisconnected = false;
       AppPtr = IntPtr.Zero;
     }
 
@@ -154,45 +139,56 @@ namespace SafeMessages.Native.App {
           var tcs = new TaskCompletionSource<bool>();
           var fileOps = DependencyService.Get<IFileOps>();
 
-          InitLoggingCb cb2 = null;
-          cb2 = (ptr, result) => {
+          InitLoggingCb cb2 = (_, result) => {
             if (result.ErrorCode != 0) {
               tcs.SetException(result.ToException());
-              CallbackManager.Unregister(cb2);
               return;
             }
 
             tcs.SetResult(true);
-            CallbackManager.Unregister(cb2);
           };
 
-          AppSetAdditionalSearchPathCb cb1 = null;
-          cb1 = async (ptr, result) => {
+          AppSetAdditionalSearchPathCb cb1 = async (_, result) => {
             if (result.ErrorCode != 0) {
               tcs.SetException(result.ToException());
-              CallbackManager.Unregister(cb1);
-              CallbackManager.Unregister(cb2);
               return;
             }
 
-            var fileList = new List<Tuple<string, string>> {Tuple.Create("log.toml", "log.toml")};
+            var fileList = new List<(string, string)> {("log.toml", "log.toml")};
 
             await fileOps.TransferAssetsAsync(fileList);
             Debug.WriteLine("Assets Transferred");
 
-            NativeBindings.AppInitLogging(null, UserData, cb2);
-            CallbackManager.Unregister(cb1);
+            NativeBindings.AppInitLogging(null, cb2);
           };
 
-          CallbackManager.Register(cb1);
-          CallbackManager.Register(cb2);
-          NativeBindings.AppSetAdditionalSearchPath(fileOps.ConfigFilesPath, UserData, cb1);
+          NativeBindings.AppSetAdditionalSearchPath(fileOps.ConfigFilesPath, cb1);
           return tcs.Task;
         });
     }
 
+    /// <summary>
+    ///   Network State Callback
+    /// </summary>
+    /// <param name="self">Self Ptr</param>
+    /// <param name="result">Event Result</param>
+    /// <param name="eventType">0 : Connected. -1 : Disconnected</param>
     private static void OnNetworkObserverCb(IntPtr self, FfiResult result, int eventType) {
       Debug.WriteLine("Network Observer Fired");
+      if (result.ErrorCode != 0 || eventType != -1) {
+        return;
+      }
+
+      IsDisconnected = true;
+      Device.BeginInvokeOnMainThread(
+        async () => {
+          AppPtr = IntPtr.Zero;
+          if (SafeMessages.App.IsBackgrounded) {
+            return;
+          }
+          var appService = DependencyService.Get<AppService>();
+          await appService.CheckAndReconnect();
+        });
     }
   }
 }

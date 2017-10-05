@@ -9,125 +9,52 @@ namespace SafeMessages.Native.MData {
   internal static class MDataPermissions {
     private static readonly INativeBindings NativeBindings = DependencyService.Get<INativeBindings>();
 
-    public static Task MDataPermissionSetAllowAsync(ulong permissionSetH, MDataAction allowAction) {
+    public static Task FreeAsync(ulong permissionsH) {
       var tcs = new TaskCompletionSource<object>();
-      MDataPermissionSetAllowCb callback = null;
-      callback = (pVoid, result) => {
+      MDataPermissionsFreeCb callback = (_, result) => {
         if (result.ErrorCode != 0) {
           tcs.SetException(result.ToException());
-          CallbackManager.Unregister(callback);
           return;
         }
 
         tcs.SetResult(null);
-        CallbackManager.Unregister(callback);
       };
 
-      CallbackManager.Register(callback);
-      NativeBindings.MDataPermissionSetAllow(Session.AppPtr, permissionSetH, allowAction, Session.UserData, callback);
+      NativeBindings.MDataPermissionsFree(Session.AppPtr, permissionsH, callback);
 
       return tcs.Task;
     }
 
-    public static Task MDataPermissionSetFreeAsync(ulong permissionSetH) {
+    public static Task InsertAsync(NativeHandle permissionsH, NativeHandle forUserH, NativeHandle permissionSetH) {
       var tcs = new TaskCompletionSource<object>();
-      MDataPermissionSetFreeCb callback = null;
-      callback = (pVoid, result) => {
+
+      MDataPermissionsInsertCb callback = (_, result) => {
         if (result.ErrorCode != 0) {
           tcs.SetException(result.ToException());
-          CallbackManager.Unregister(callback);
           return;
         }
 
         tcs.SetResult(null);
-        CallbackManager.Unregister(callback);
       };
 
-      CallbackManager.Register(callback);
-      NativeBindings.MDataPermissionSetFree(Session.AppPtr, permissionSetH, Session.UserData, callback);
+      NativeBindings.MDataPermissionsInsert(Session.AppPtr, permissionsH, forUserH, permissionSetH, callback);
 
       return tcs.Task;
     }
 
-    public static Task<ulong> MDataPermissionSetNewAsync() {
-      var tcs = new TaskCompletionSource<ulong>();
+    public static Task<NativeHandle> NewAsync() {
+      var tcs = new TaskCompletionSource<NativeHandle>();
 
-      MDataPermissionSetNewCb callback = null;
-      callback = (pVoid, result, permissionSetH) => {
+      MDataPermissionsNewCb callback = (_, result, permissionsH) => {
         if (result.ErrorCode != 0) {
           tcs.SetException(result.ToException());
-          CallbackManager.Unregister(callback);
           return;
         }
 
-        tcs.SetResult(permissionSetH);
-        CallbackManager.Unregister(callback);
+        tcs.SetResult(new NativeHandle(permissionsH, FreeAsync));
       };
 
-      CallbackManager.Register(callback);
-      NativeBindings.MDataPermissionSetNew(Session.AppPtr, Session.UserData, callback);
-
-      return tcs.Task;
-    }
-
-    public static Task MDataPermissionsFreeAsync(ulong permissionsH) {
-      var tcs = new TaskCompletionSource<object>();
-      MDataPermissionsFreeCb callback = null;
-      callback = (pVoid, result) => {
-        if (result.ErrorCode != 0) {
-          tcs.SetException(result.ToException());
-          CallbackManager.Unregister(callback);
-          return;
-        }
-
-        tcs.SetResult(null);
-        CallbackManager.Unregister(callback);
-      };
-
-      CallbackManager.Register(callback);
-      NativeBindings.MDataPermissionsFree(Session.AppPtr, permissionsH, Session.UserData, callback);
-
-      return tcs.Task;
-    }
-
-    public static Task MDataPermissionsInsertAsync(ulong permissionsH, ulong forUserH, ulong permissionSetH) {
-      var tcs = new TaskCompletionSource<object>();
-
-      MDataPermissionsInsertCb callback = null;
-      callback = (pVoid, result) => {
-        if (result.ErrorCode != 0) {
-          tcs.SetException(result.ToException());
-          CallbackManager.Unregister(callback);
-          return;
-        }
-
-        tcs.SetResult(null);
-        CallbackManager.Unregister(callback);
-      };
-
-      CallbackManager.Register(callback);
-      NativeBindings.MDataPermissionsInsert(Session.AppPtr, permissionsH, forUserH, permissionSetH, Session.UserData, callback);
-
-      return tcs.Task;
-    }
-
-    public static Task<ulong> MDataPermissionsNewAsync() {
-      var tcs = new TaskCompletionSource<ulong>();
-
-      MDataPermissionsNewCb callback = null;
-      callback = (pVoid, result, permissionsH) => {
-        if (result.ErrorCode != 0) {
-          tcs.SetException(result.ToException());
-          CallbackManager.Unregister(callback);
-          return;
-        }
-
-        tcs.SetResult(permissionsH);
-        CallbackManager.Unregister(callback);
-      };
-
-      CallbackManager.Register(callback);
-      NativeBindings.MDataPermissionsNew(Session.AppPtr, Session.UserData, callback);
+      NativeBindings.MDataPermissionsNew(Session.AppPtr, callback);
 
       return tcs.Task;
     }

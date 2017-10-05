@@ -6,8 +6,17 @@ using System.Text;
 
 namespace CommonUtils {
   public static class Helpers {
+    public static T HandlePtrToType<T>(this IntPtr ptr, bool freePtr = true) {
+      var cbPtr = GCHandle.FromIntPtr(ptr);
+      var action = (T)cbPtr.Target;
+      if (freePtr) {
+        cbPtr.Free();
+      }
+      return action;
+    }
+
     public static IntPtr StructToPtr<T>(T obj) {
-      var ptr = Marshal.AllocHGlobal(Marshal.SizeOf(obj));
+      var ptr = Marshal.AllocHGlobal(Marshal.SizeOf<T>());
       Marshal.StructureToPtr(obj, ptr, false);
       return ptr;
     }
@@ -16,8 +25,12 @@ namespace CommonUtils {
       return new Exception($"Error Code: {result.ErrorCode}. Description: {result.Description}");
     }
 
+    public static IntPtr ToHandlePtr(this object obj) {
+      return GCHandle.ToIntPtr(GCHandle.Alloc(obj));
+    }
+
     public static IntPtr ToIntPtr<T>(this List<T> list) {
-      var structSize = Marshal.SizeOf(typeof(T));
+      var structSize = Marshal.SizeOf<T>();
       var ptr = Marshal.AllocHGlobal(structSize * list.Count);
       for (var i = 0; i < list.Count; ++i) {
         Marshal.StructureToPtr(list[i], ptr + structSize * i, false);
@@ -26,13 +39,7 @@ namespace CommonUtils {
     }
 
     public static List<T> ToList<T>(this IntPtr ptr, IntPtr length) {
-      var list = new List<T>();
-      var structSize = Marshal.SizeOf(typeof(T));
-
-      for (var i = 0; i < (int)length; ++i) {
-        list.Add((T)Marshal.PtrToStructure(ptr + structSize * i, typeof(T)));
-      }
-      return list;
+      return Enumerable.Range(0, (int)length).Select(i => Marshal.PtrToStructure<T>(IntPtr.Add(ptr, Marshal.SizeOf<T>() * i))).ToList();
     }
 
     public static ObservableRangeCollection<T> ToObservableRangeCollection<T>(this IEnumerable<T> source) {

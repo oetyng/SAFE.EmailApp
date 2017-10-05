@@ -1,11 +1,12 @@
-﻿using SafeMessages.Helpers;
+﻿using CommonUtils;
+using SafeMessages.Helpers;
 using SafeMessages.ViewModels;
 using Xamarin.Forms;
 using Xamarin.Forms.Xaml;
 
 namespace SafeMessages.Views {
   [XamlCompilation(XamlCompilationOptions.Compile)]
-  public partial class AuthView : ContentPage {
+  public partial class AuthView : ContentPage, ICleanup {
     public AuthView() {
       InitializeComponent();
       MessagingCenter.Subscribe<AuthViewModel>(
@@ -13,7 +14,7 @@ namespace SafeMessages.Views {
         MessengerConstants.NavUserIdsPage,
         async sender => {
           MessageCenterUnsubscribe();
-          if (Navigation.NavigationStack.Count == 0) {
+          if (!App.IsPageValid(this)) {
             return;
           }
 
@@ -22,7 +23,7 @@ namespace SafeMessages.Views {
         });
     }
 
-    private void MessageCenterUnsubscribe() {
+    public void MessageCenterUnsubscribe() {
       MessagingCenter.Unsubscribe<AuthViewModel>(this, MessengerConstants.NavUserIdsPage);
     }
   }

@@ -1,8 +1,13 @@
 ﻿using System;
+using System.IO;
+using System.Threading.Tasks;
+using Acr.UserDialogs;
 using Android.App;
 using Android.Content;
 using Android.Content.PM;
 using Android.OS;
+using Android.Runtime;
+using CommonUtils;
 using SafeMessages.Services;
 using Xamarin.Forms;
 using Xamarin.Forms.Platform.Android;
@@ -19,7 +24,8 @@ namespace SafeMessages.Droid {
      Categories = new[] {Intent.CategoryDefault, Intent.CategoryBrowsable},
      DataScheme = "safe-net.maidsafe.examples.mailtutorial")]
   public class MainActivity : FormsAppCompatActivity {
-    public AppService SafeApp => DependencyService.Get<AppService>();
+    private AppService SafeApp => DependencyService.Get<AppService>();
+    private static string LogFolderPath => DependencyService.Get<IFileOps>().ConfigFilesPath;
 
     private void HandleAppLaunch(string url) {
       System.Diagnostics.Debug.WriteLine($"Launched via: {url}");
@@ -46,8 +52,16 @@ namespace SafeMessages.Droid {
       TabLayoutResource = Resource.Layout.Tabbar;
       ToolbarResource = Resource.Layout.Toolbar;
 
+      AppDomain.CurrentDomain.UnhandledException += CurrentDomainOnUnhandledException;
+      TaskScheduler.UnobservedTaskException += TaskSchedulerOnUnobservedTaskException;
+      AndroidEnvironment.UnhandledExceptionRaiser += AndroidEnvOnUnhandledExceptionRaiser;
+
       base.OnCreate(bundle);
       Forms.Init(this, bundle);
+
+      DisplayCrashReport();
+
+      UserDialogs.Init(this);
       LoadApplication(new App());
 
       if (Intent?.Data != null) {
@@ -61,5 +75,48 @@ namespace SafeMessages.Droid {
         HandleAppLaunch(intent.Data.ToString());
       }
     }
+
+    #region Error Handling
+
+    private static void AndroidEnvOnUnhandledExceptionRaiser(object o, RaiseThrowableEventArgs exEventArgs) {
+      var newExc = new Exception("AndroidEnvironmentOnUnhandledExceptionRaiser", exEventArgs.Exception);
+      LogUnhandledException(newExc);
+    }
+
+    private static void TaskSchedulerOnUnobservedTaskException(object sender, UnobservedTaskExceptionEventArgs exEventArgs) {
+      var newExc = new Exception("TaskSchedulerOnUnobservedTaskException", exEventArgs.Exception);
+      LogUnhandledException(newExc);
+    }
+
+    private static void CurrentDomainOnUnhandledException(object sender, UnhandledExceptionEventArgs exEventArgs) {
+      var newExc = new Exception("CurrentDomainOnUnhandledException", exEventArgs.ExceptionObject as Exception);
+      LogUnhandledException(newExc);
+    }
+
+    internal static void LogUnhandledException(Exception exception) {
+      try {
+        const string errorFileName = "Fatal.log";
+        var errorFilePath = Path.Combine(LogFolderPath, errorFileName);
+        var errorMessage = $"Time: {DateTime.Now}\nError: Unhandled Exception\n{exception}\n\n";
+        File.AppendAllText(errorFilePath, errorMessage);
+      } catch {
+        // just suppress any error logging exceptions
+      }
+    }
+
+    private void DisplayCrashReport() {
+      const string errorFilename = "Fatal.log";
+      var errorFilePath = Path.Combine(LogFolderPath, errorFilename);
+
+      if (!File.Exists(errorFilePath)) {
+        return;
+      }
+
+      var errorText = File.ReadAllText(errorFilePath);
+      new AlertDialog.Builder(this).SetPositiveButton("Clear", (sender, args) => { File.Delete(errorFilePath); }).
+        SetNegativeButton("Close", (sender, args) => { }).SetMessage(errorText).SetTitle("Crash Report").Show();
+    }
+
+    #endregion
   }
 }

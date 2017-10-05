@@ -7,5 +7,6 @@
     public static string NavPreviousPage = "NavPreviousPage";
     public static string NavSendMessagePage = "NavSendMessagePage";
     public static string NavUserIdsPage = "NavUserIdsPage";
+    internal static readonly string ResetAppViews = "ResetAppViews";
   }
 }

@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using System.Windows.Input;
 using CommonUtils;
 using SafeAuthenticator.Helpers;
@@ -36,13 +37,17 @@ namespace SafeAuthenticator.ViewModels {
     }
 
     private async void OnRefreshAccounts() {
-      IsRefreshing = true;
-      var registeredApps = await Authenticator.GetRegisteredAppsAsync();
-      Apps.AddRange(registeredApps.Except(Apps));
-      Apps.Sort();
-      var acctStorageTuple = await Authenticator.GetAccountInfoAsync();
-      AccountStorageInfo = $"{acctStorageTuple.Item1} / {acctStorageTuple.Item2}";
-      IsRefreshing = false;
+      try {
+        IsRefreshing = true;
+        var registeredApps = await Authenticator.GetRegisteredAppsAsync();
+        Apps.AddRange(registeredApps.Except(Apps));
+        Apps.Sort();
+        var acctStorageTuple = await Authenticator.GetAccountInfoAsync();
+        AccountStorageInfo = $"{acctStorageTuple.Item1} / {acctStorageTuple.Item2}";
+        IsRefreshing = false;
+      } catch (Exception ex) {
+        await Application.Current.MainPage.DisplayAlert("Error", $"Refresh Accounts Failed: {ex.Message}", "OK");
+      }
     }
   }
 }

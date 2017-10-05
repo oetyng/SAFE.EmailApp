@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
-VisualStudioVersion = 15.0.26730.12
+VisualStudioVersion = 15.0.26730.16
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SafeMessages", "SafeMessages\SafeMessages.csproj", "{C13E3CFA-B02D-4F08-9331-215B7795632E}"
 EndProject
@@ -11,7 +11,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SafeMessages.iOS", "SafeMes
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{9EF078E8-2389-4499-B49D-944A0735E4D0}"
 	ProjectSection(SolutionItems) = preProject
-		..\SafeAuthenticator\NuGet.Config = ..\SafeAuthenticator\NuGet.Config
+		NuGet.Config = NuGet.Config
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CommonUtils", "..\CommonUtils\CommonUtils\CommonUtils.csproj", "{F5E9AB34-A1BE-4085-B971-CB14710878EE}"

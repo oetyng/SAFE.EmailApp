@@ -12,105 +12,85 @@ namespace SafeMessages.Native.MData {
   internal static class MData {
     private static readonly INativeBindings NativeBindings = DependencyService.Get<INativeBindings>();
 
-    public static Task<Tuple<List<byte>, ulong>> MDataGetValueAsync(ulong infoHandle, List<byte> key) {
-      var tcs = new TaskCompletionSource<Tuple<List<byte>, ulong>>();
+    public static Task<(List<byte>, ulong)> GetValueAsync(NativeHandle infoHandle, List<byte> key) {
+      var tcs = new TaskCompletionSource<(List<byte>, ulong)>();
       var keyPtr = key.ToIntPtr();
-      MDataGetValueCb callback = null;
-      callback = (self, result, dataPtr, dataLen, entryVersion) => {
+      MDataGetValueCb callback = (_, result, dataPtr, dataLen, entryVersion) => {
         if (result.ErrorCode != 0) {
           tcs.SetException(result.ToException());
-          CallbackManager.Unregister(callback);
           return;
         }
 
         var data = dataPtr.ToList<byte>(dataLen);
-        tcs.SetResult(Tuple.Create(data, entryVersion));
-        CallbackManager.Unregister(callback);
+        tcs.SetResult((data, entryVersion));
       };
 
-      CallbackManager.Register(callback);
-      NativeBindings.MDataGetValue(Session.AppPtr, infoHandle, keyPtr, (IntPtr)key.Count, Session.UserData, callback);
+      NativeBindings.MDataGetValue(Session.AppPtr, infoHandle, keyPtr, (IntPtr)key.Count, callback);
       Marshal.FreeHGlobal(keyPtr);
 
       return tcs.Task;
     }
 
-    public static Task<ulong> MDataListEntriesAsync(ulong infoHandle) {
-      var tcs = new TaskCompletionSource<ulong>();
-      MDataListEntriesCb callback = null;
-      callback = (self, result, mDataEntriesHandle) => {
+    public static Task<NativeHandle> ListEntriesAsync(NativeHandle infoHandle) {
+      var tcs = new TaskCompletionSource<NativeHandle>();
+      MDataListEntriesCb callback = (_, result, mDataEntriesHandle) => {
         if (result.ErrorCode != 0) {
           tcs.SetException(result.ToException());
-          CallbackManager.Unregister(callback);
           return;
         }
 
-        tcs.SetResult(mDataEntriesHandle);
-        CallbackManager.Unregister(callback);
+        tcs.SetResult(new NativeHandle(mDataEntriesHandle, MDataEntries.FreeAsync));
       };
 
-      CallbackManager.Register(callback);
-      NativeBindings.MDataListEntries(Session.AppPtr, infoHandle, Session.UserData, callback);
+      NativeBindings.MDataListEntries(Session.AppPtr, infoHandle, callback);
 
       return tcs.Task;
     }
 
-    public static Task<ulong> MDataListKeysAsync(ulong mDataInfoH) {
-      var tcs = new TaskCompletionSource<ulong>();
-      MDataListKeysCb callback = null;
-      callback = (pVoid, result, mDataEntKeysH) => {
+    public static Task<NativeHandle> ListKeysAsync(NativeHandle mDataInfoH) {
+      var tcs = new TaskCompletionSource<NativeHandle>();
+      MDataListKeysCb callback = (_, result, mDataEntKeysH) => {
         if (result.ErrorCode != 0) {
           tcs.SetException(result.ToException());
-          CallbackManager.Unregister(callback);
           return;
         }
 
-        tcs.SetResult(mDataEntKeysH);
-        CallbackManager.Unregister(callback);
+        tcs.SetResult(new NativeHandle(mDataEntKeysH, MDataKeys.FreeAsync));
       };
 
-      CallbackManager.Register(callback);
-      NativeBindings.MDataListKeys(Session.AppPtr, mDataInfoH, Session.UserData, callback);
+      NativeBindings.MDataListKeys(Session.AppPtr, mDataInfoH, callback);
 
       return tcs.Task;
     }
 
-    public static Task MDataMutateEntriesAsync(ulong mDataInfoH, ulong entryActionsH) {
+    public static Task MutateEntriesAsync(NativeHandle mDataInfoH, NativeHandle entryActionsH) {
       var tcs = new TaskCompletionSource<object>();
-      MDataMutateEntriesCb callback = null;
-      callback = (pVoid, result) => {
+      MDataMutateEntriesCb callback = (_, result) => {
         if (result.ErrorCode != 0) {
           tcs.SetException(result.ToException());
-          CallbackManager.Unregister(callback);
           return;
         }
 
         tcs.SetResult(null);
-        CallbackManager.Unregister(callback);
       };
 
-      CallbackManager.Register(callback);
-      NativeBindings.MDataMutateEntries(Session.AppPtr, mDataInfoH, entryActionsH, Session.UserData, callback);
+      NativeBindings.MDataMutateEntries(Session.AppPtr, mDataInfoH, entryActionsH, callback);
 
       return tcs.Task;
     }
 
-    public static Task MDataPutAsync(ulong mDataInfoH, ulong permissionsH, ulong entriesH) {
+    public static Task PutAsync(NativeHandle mDataInfoH, NativeHandle permissionsH, NativeHandle entriesH) {
       var tcs = new TaskCompletionSource<object>();
-      MDataPutCb callback = null;
-      callback = (pVoid, result) => {
+      MDataPutCb callback = (_, result) => {
         if (result.ErrorCode != 0) {
           tcs.SetException(result.ToException());
-          CallbackManager.Unregister(callback);
           return;
         }
 
         tcs.SetResult(null);
-        CallbackManager.Unregister(callback);
       };
 
-      CallbackManager.Register(callback);
-      NativeBindings.MDataPut(Session.AppPtr, mDataInfoH, permissionsH, entriesH, Session.UserData, callback);
+      NativeBindings.MDataPut(Session.AppPtr, mDataInfoH, permissionsH, entriesH, callback);
 
       return tcs.Task;
     }

@@ -12,6 +12,17 @@ namespace SafeMessages.ViewModels {
 
     public string AuthProgressMessage { get => _authProgressMessage; set => SetProperty(ref _authProgressMessage, value); }
 
+    public bool AuthReconnect {
+      get => SafeApp.AuthReconnect;
+      set {
+        if (SafeApp.AuthReconnect != value) {
+          SafeApp.AuthReconnect = value;
+        }
+
+        OnPropertyChanged();
+      }
+    }
+
     public AuthViewModel() {
       SafeApp.PropertyChanged += (s, e) => {
         if (e.PropertyName == nameof(SafeApp.IsLogInitialised)) {

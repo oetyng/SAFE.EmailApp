@@ -19,6 +19,18 @@
                TextColor="Gray"
                Font="Medium"
                IsVisible="{Binding IsUiEnabled, Converter={StaticResource InverseBooleanConverter}}" />
+        <Grid Margin="25,0,25,0" IsVisible="{Binding IsUiEnabled}" HorizontalOptions="Fill">
+          <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="Auto" />
+          </Grid.ColumnDefinitions>
+          <Label Text="Auto Reconnect"
+                 TextColor="Gray"
+                 Font="Large"
+                 VerticalOptions="Center"
+                 Grid.Column="0" />
+          <Switch IsToggled="{Binding AuthReconnect}" Grid.Column="1" />
+        </Grid>
         <Button Margin="20"
                 Text="Request Authorisation"
                 TextColor="White" Command="{Binding AuthCommand}" IsVisible="{Binding IsUiEnabled}" />
