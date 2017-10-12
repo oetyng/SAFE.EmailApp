@@ -38,6 +38,7 @@
     <Compile Include="App.xaml.cs">
       <DependentUpon>App.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Helpers\Utilities.cs" />
     <Compile Include="Helpers\MessengerConstants.cs" />
     <Compile Include="Models\ModelHelpers.cs" />
     <Compile Include="Models\RegisteredApp.cs" />

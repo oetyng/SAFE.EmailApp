@@ -3,7 +3,7 @@
 using System;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
-using CommonUtils;
+using SafeAuthenticator.Helpers;
 using SafeAuthenticator.Native;
 using Xamarin.Forms;
 #if __IOS__

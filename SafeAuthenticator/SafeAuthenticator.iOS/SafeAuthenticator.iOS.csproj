@@ -37,7 +37,8 @@
     <MtouchEnableBitcode>False</MtouchEnableBitcode>
     <OptimizePNGs>True</OptimizePNGs>
     <MtouchFloat32>False</MtouchFloat32>
-    <MtouchExtraArgs>-gcc_flags "-L${ProjectDir} -lsafe_authenticator -lsodium -lresolv -force_load ${ProjectDir}/libsafe_authenticator.a -force_load ${ProjectDir}/libsodium.a"</MtouchExtraArgs>
+    <MtouchExtraArgs>
+    </MtouchExtraArgs>
     <CodesignEntitlements>Entitlements.plist</CodesignEntitlements>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|iPhone' ">
@@ -55,7 +56,8 @@
     <MtouchTlsProvider>Default</MtouchTlsProvider>
     <PlatformTarget>x86</PlatformTarget>
     <BuildIpa>true</BuildIpa>
-    <MtouchExtraArgs>-gcc_flags "-L${ProjectDir} -lsafe_authenticator -lsodium -lresolv -force_load ${ProjectDir}/libsafe_authenticator.a -force_load ${ProjectDir}/libsodium.a"</MtouchExtraArgs>
+    <MtouchExtraArgs>
+    </MtouchExtraArgs>
     <SignAssembly>true</SignAssembly>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|iPhoneSimulator' ">
@@ -70,7 +72,8 @@
     <MtouchHttpClientHandler>HttpClientHandler</MtouchHttpClientHandler>
     <MtouchTlsProvider>Default</MtouchTlsProvider>
     <PlatformTarget>x86</PlatformTarget>
-    <MtouchExtraArgs>-gcc_flags "-L${ProjectDir} -lsafe_authenticator -lsodium -lresolv -force_load ${ProjectDir}/libsafe_authenticator.a -force_load ${ProjectDir}/libsodium.a"</MtouchExtraArgs>
+    <MtouchExtraArgs>
+    </MtouchExtraArgs>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|iPhone' ">
     <DebugSymbols>true</DebugSymbols>
@@ -91,8 +94,8 @@
     <MtouchHttpClientHandler>HttpClientHandler</MtouchHttpClientHandler>
     <MtouchTlsProvider>Default</MtouchTlsProvider>
     <PlatformTarget>x86</PlatformTarget>
-    <MtouchExtraArgs>-gcc_flags "-L${ProjectDir} -lsafe_authenticator -lsodium -lresolv -force_load ${ProjectDir}/libsafe_authenticator.a -force_load ${ProjectDir}/libsodium.a"
-</MtouchExtraArgs>
+    <MtouchExtraArgs>
+    </MtouchExtraArgs>
     <CodesignProvision>
     </CodesignProvision>
     <MtouchNoSymbolStrip>false</MtouchNoSymbolStrip>
@@ -166,12 +169,6 @@
     <None Include="app.config" />
     <None Include="Info.plist" />
     <None Include="Entitlements.plist" />
-    <None Include="libsafe_authenticator.a">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Include="libsodium.a">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
@@ -235,6 +232,17 @@
     <ImageAsset Include="Resources\Media.xcassets\LaunchImages.launchimage\Contents.json">
       <InProject>false</InProject>
     </ImageAsset>
+  </ItemGroup>
+  <ItemGroup>
+    <NativeReference Include="Native References/libsafe_authenticator.a">
+      <Kind>Static</Kind>
+      <ForceLoad>True</ForceLoad>
+      <LinkerFlags>-lresolv</LinkerFlags>
+    </NativeReference>
+    <NativeReference Include="Native References/libsodium.a">
+      <Kind>Static</Kind>
+      <ForceLoad>True</ForceLoad>
+    </NativeReference>
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\iOS\Xamarin.iOS.CSharp.targets" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">

@@ -7,13 +7,13 @@ using System.Threading.Tasks;
 using Acr.UserDialogs;
 using CommonUtils;
 using Newtonsoft.Json;
+using SafeApp;
+using SafeApp.IData;
+using SafeApp.MData;
+using SafeApp.Misc;
+using SafeApp.Utilities;
 using SafeMessages.Helpers;
 using SafeMessages.Models;
-using SafeMessages.Native;
-using SafeMessages.Native.App;
-using SafeMessages.Native.IData;
-using SafeMessages.Native.MData;
-using SafeMessages.Native.Misc;
 using SafeMessages.Services;
 using Xamarin.Forms;
 
@@ -65,6 +65,7 @@ namespace SafeMessages.Services {
     public AppService() {
       _isLogInitialised = false;
       CredentialCache = new CredentialCacheService();
+      Session.Disconnected += OnSessionDisconnected;
       InitLoggingAsync();
     }
 
@@ -190,7 +191,7 @@ namespace SafeMessages.Services {
         }
       } catch (Exception ex) {
         await Application.Current.MainPage.DisplayAlert("Error", $"Unable to Reconnect: {ex.Message}", "OK");
-        FreeState();
+        Session.FreeApp();
         MessagingCenter.Send(this, MessengerConstants.ResetAppViews);
       }
     }
@@ -200,6 +201,7 @@ namespace SafeMessages.Services {
     }
 
     public void FreeState() {
+      Session.Disconnected -= OnSessionDisconnected;
       Session.FreeApp();
     }
 
@@ -320,7 +322,12 @@ namespace SafeMessages.Services {
     }
 
     private async void InitLoggingAsync() {
-      var started = await Session.InitLoggingAsync();
+      var fileList = new List<(string, string)> {("log.toml", "log.toml")};
+      var fileOps = DependencyService.Get<IFileOps>();
+      await fileOps.TransferAssetsAsync(fileList);
+      Debug.WriteLine("Assets Transferred");
+
+      var started = await Session.InitLoggingAsync(fileOps.ConfigFilesPath);
       if (!started) {
         Debug.WriteLine("Unable to Initialise Logging.");
         return;
@@ -328,6 +335,18 @@ namespace SafeMessages.Services {
 
       Debug.WriteLine("Rust Logging Initialised.");
       IsLogInitialised = true;
+    }
+
+    private void OnSessionDisconnected(object obj, EventArgs e) {
+      Device.BeginInvokeOnMainThread(
+        async () => {
+          Session.FreeApp();
+          if (App.IsBackgrounded) {
+            return;
+          }
+
+          await CheckAndReconnect();
+        });
     }
 
     public async Task SendMessageAsync(string to, Message msg) {

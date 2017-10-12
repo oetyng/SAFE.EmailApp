@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using CommonUtils;
+using SafeAuthenticator.Helpers;
+using SafeAuthenticator.Native;
 
 namespace SafeAuthenticator.Models {
   public class RegisteredApp : ObservableObject, IComparable, IEquatable<RegisteredApp> {

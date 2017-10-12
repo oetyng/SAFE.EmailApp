@@ -37,7 +37,6 @@
   <ItemGroup>
     <Compile Include="IFileOps.cs" />
     <Compile Include="FileOps.cs" />
-    <Compile Include="Helpers.cs" />
     <Compile Include="ImageResourceExtension.cs" />
     <Compile Include="InverseBooleanConverter.cs" />
     <Compile Include="IsCollectionEmptyConverter.cs" />
@@ -51,7 +50,6 @@
     <Compile Include="PasswordShowHideBehavior.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Mock.cs" />
-    <Compile Include="Types.cs" />
     <Compile Include="UrlFormat.cs" />
     <Compile Include="ListViewNoSelectionBehavior.cs" />
   </ItemGroup>

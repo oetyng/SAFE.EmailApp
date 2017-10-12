@@ -37,7 +37,8 @@
     <MtouchEnableBitcode>False</MtouchEnableBitcode>
     <OptimizePNGs>True</OptimizePNGs>
     <MtouchFloat32>False</MtouchFloat32>
-    <MtouchExtraArgs>-gcc_flags "-L${ProjectDir} -lsafe_app -lsodium -lresolv -force_load ${ProjectDir}/libsafe_app.a -force_load ${ProjectDir}/libsodium.a"</MtouchExtraArgs>
+    <MtouchExtraArgs>
+    </MtouchExtraArgs>
     <CodesignEntitlements>Entitlements.plist</CodesignEntitlements>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|iPhone' ">
@@ -55,7 +56,8 @@
     <MtouchTlsProvider>Default</MtouchTlsProvider>
     <PlatformTarget>x86</PlatformTarget>
     <BuildIpa>true</BuildIpa>
-    <MtouchExtraArgs>-gcc_flags "-L${ProjectDir} -lsafe_app -lsodium -lresolv -force_load ${ProjectDir}/libsafe_app.a -force_load ${ProjectDir}/libsodium.a"</MtouchExtraArgs>
+    <MtouchExtraArgs>
+    </MtouchExtraArgs>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|iPhoneSimulator' ">
     <DebugType>pdbonly</DebugType>
@@ -69,7 +71,8 @@
     <MtouchHttpClientHandler>HttpClientHandler</MtouchHttpClientHandler>
     <MtouchTlsProvider>Default</MtouchTlsProvider>
     <PlatformTarget>x86</PlatformTarget>
-    <MtouchExtraArgs>-gcc_flags "-L${ProjectDir} -lsafe_app -lsodium -lresolv -force_load ${ProjectDir}/libsafe_app.a -force_load ${ProjectDir}/libsodium.a"</MtouchExtraArgs>
+    <MtouchExtraArgs>
+    </MtouchExtraArgs>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|iPhone' ">
     <DebugSymbols>true</DebugSymbols>
@@ -90,7 +93,8 @@
     <MtouchHttpClientHandler>HttpClientHandler</MtouchHttpClientHandler>
     <MtouchTlsProvider>Default</MtouchTlsProvider>
     <PlatformTarget>x86</PlatformTarget>
-    <MtouchExtraArgs>-gcc_flags "-L${ProjectDir} -lsafe_app -lsodium -lresolv -force_load ${ProjectDir}/libsafe_app.a -force_load ${ProjectDir}/libsodium.a"</MtouchExtraArgs>
+    <MtouchExtraArgs>
+    </MtouchExtraArgs>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Acr.Support.iOS, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
@@ -119,6 +123,15 @@
     </Reference>
     <Reference Include="PInvoke.Windows.Core, Version=0.3.0.0, Culture=neutral, PublicKeyToken=9e300f9f87f04a7a, processorArchitecture=MSIL">
       <HintPath>..\..\packages\PInvoke.Windows.Core.0.3.2\lib\portable-net45+win+wpa81+MonoAndroid10+xamarinios10+MonoTouch10\PInvoke.Windows.Core.dll</HintPath>
+    </Reference>
+    <Reference Include="SafeApp, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\MaidSafe.SafeApp.0.0.1\lib\Xamarin.iOS10\SafeApp.dll</HintPath>
+    </Reference>
+    <Reference Include="SafeApp.NativeBindings, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\MaidSafe.SafeApp.0.0.1\lib\Xamarin.iOS10\SafeApp.NativeBindings.dll</HintPath>
+    </Reference>
+    <Reference Include="SafeApp.Utilities, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\MaidSafe.SafeApp.0.0.1\lib\Xamarin.iOS10\SafeApp.Utilities.dll</HintPath>
     </Reference>
     <Reference Include="Splat, Version=2.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\..\packages\Splat.2.0.0\lib\Xamarin.iOS10\Splat.dll</HintPath>
@@ -171,20 +184,11 @@
     </Content>
     <None Include="Info.plist" />
     <None Include="Entitlements.plist" />
-    <None Include="libsafe_app.a">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Include="libsodium.a">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="..\..\CommonUtils\CommonUtils\FileOps.cs">
       <Link>Helpers\FileOps.cs</Link>
-    </Compile>
-    <Compile Include="..\SafeMessages\Native\NativeBindings.cs">
-      <Link>Native\NativeBindings.cs</Link>
     </Compile>
     <Compile Include="Main.cs" />
     <Compile Include="AppDelegate.cs" />
@@ -243,6 +247,8 @@
     <Error Condition="!Exists('..\..\packages\Xamarin.Forms.2.4.0.282\build\netstandard1.0\Xamarin.Forms.props')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\Xamarin.Forms.2.4.0.282\build\netstandard1.0\Xamarin.Forms.props'))" />
     <Error Condition="!Exists('..\..\packages\Xamarin.Forms.2.4.0.282\build\netstandard1.0\Xamarin.Forms.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\Xamarin.Forms.2.4.0.282\build\netstandard1.0\Xamarin.Forms.targets'))" />
     <Error Condition="!Exists('..\..\packages\Microsoft.Bcl.Build.1.0.21\build\Microsoft.Bcl.Build.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\Microsoft.Bcl.Build.1.0.21\build\Microsoft.Bcl.Build.targets'))" />
+    <Error Condition="!Exists('..\..\packages\MaidSafe.SafeApp.0.0.1\build\Xamarin.iOS10\MaidSafe.SafeApp.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\MaidSafe.SafeApp.0.0.1\build\Xamarin.iOS10\MaidSafe.SafeApp.targets'))" />
   </Target>
   <Import Project="..\..\packages\Microsoft.Bcl.Build.1.0.21\build\Microsoft.Bcl.Build.targets" Condition="Exists('..\..\packages\Microsoft.Bcl.Build.1.0.21\build\Microsoft.Bcl.Build.targets')" />
+  <Import Project="..\..\packages\MaidSafe.SafeApp.0.0.1\build\Xamarin.iOS10\MaidSafe.SafeApp.targets" Condition="Exists('..\..\packages\MaidSafe.SafeApp.0.0.1\build\Xamarin.iOS10\MaidSafe.SafeApp.targets')" />
 </Project>

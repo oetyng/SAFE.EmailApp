@@ -5,6 +5,7 @@ using System.Linq;
 using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 using CommonUtils;
+using SafeAuthenticator.Helpers;
 using SafeAuthenticator.Models;
 using SafeAuthenticator.Services;
 using Xamarin.Forms;
@@ -138,7 +139,7 @@ namespace SafeAuthenticator.Native {
         ContainersArrayPtr = authReq.Containers.ToIntPtr()
       };
 
-      var authReqFfiPtr = CommonUtils.Helpers.StructToPtr(authReqFfi);
+      var authReqFfiPtr = Helpers.Helpers.StructToPtr(authReqFfi);
       EncodeAuthRspCb callback = (_, result, encodedRsp) => {
         // -200 user did not grant access
         if (result.ErrorCode != 0 && result.ErrorCode != -200) {

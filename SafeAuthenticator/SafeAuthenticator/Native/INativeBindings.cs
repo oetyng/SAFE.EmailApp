@@ -1,5 +1,4 @@
 ﻿using System;
-using CommonUtils;
 
 namespace SafeAuthenticator.Native {
   #region Native Delegates
