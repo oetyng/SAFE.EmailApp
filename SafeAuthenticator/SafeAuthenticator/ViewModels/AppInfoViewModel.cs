@@ -4,14 +4,14 @@ using Xamarin.Forms;
 
 namespace SafeAuthenticator.ViewModels {
   internal class AppInfoViewModel : BaseViewModel {
-    private RegisteredApp _appInfo;
+    private RegisteredAppModel _appModelInfo;
 
-    public RegisteredApp AppInfo { get => _appInfo; set => SetProperty(ref _appInfo, value); }
+    public RegisteredAppModel AppModelInfo { get => _appModelInfo; set => SetProperty(ref _appModelInfo, value); }
 
     public ICommand RevokeAppCommand { get; }
 
-    public AppInfoViewModel(RegisteredApp appInfo) {
-      AppInfo = appInfo;
+    public AppInfoViewModel(RegisteredAppModel appModelInfo) {
+      AppModelInfo = appModelInfo;
       RevokeAppCommand = new Command(OnRevokeAppCommand);
     }
 

@@ -23,7 +23,7 @@ namespace SafeAuthenticator.Views {
           Navigation.InsertPageBefore(new LoginPage(), this);
           await Navigation.PopAsync();
         });
-      MessagingCenter.Subscribe<HomeViewModel, RegisteredApp>(
+      MessagingCenter.Subscribe<HomeViewModel, RegisteredAppModel>(
         this,
         MessengerConstants.NavAppInfoPage,
         async (_, appInfo) => {
@@ -38,7 +38,7 @@ namespace SafeAuthenticator.Views {
 
     public void MessageCenterUnsubscribe() {
       MessagingCenter.Unsubscribe<HomeViewModel>(this, MessengerConstants.NavLoginPage);
-      MessagingCenter.Unsubscribe<HomeViewModel, RegisteredApp>(this, MessengerConstants.NavAppInfoPage);
+      MessagingCenter.Unsubscribe<HomeViewModel, RegisteredAppModel>(this, MessengerConstants.NavAppInfoPage);
     }
   }
 }

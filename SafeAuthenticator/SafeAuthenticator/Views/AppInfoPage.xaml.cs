@@ -9,9 +9,9 @@ namespace SafeAuthenticator.Views {
   public partial class AppInfoPage : ContentPage, ICleanup {
     public AppInfoPage() : this(null) { }
 
-    public AppInfoPage(RegisteredApp appInfo) {
+    public AppInfoPage(RegisteredAppModel appModelInfo) {
       InitializeComponent();
-      BindingContext = new AppInfoViewModel(appInfo);
+      BindingContext = new AppInfoViewModel(appModelInfo);
     }
 
     public void MessageCenterUnsubscribe() { }

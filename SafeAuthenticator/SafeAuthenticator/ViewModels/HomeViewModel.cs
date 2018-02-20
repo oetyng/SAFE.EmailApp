@@ -11,7 +11,7 @@ namespace SafeAuthenticator.ViewModels {
     private string _accountStorageInfo;
     private bool _isRefreshing;
     public ICommand LogoutCommand { get; }
-    public ObservableRangeCollection<RegisteredApp> Apps { get; set; }
+    public ObservableRangeCollection<RegisteredAppModel> Apps { get; set; }
     public bool IsRefreshing { get => _isRefreshing; set => SetProperty(ref _isRefreshing, value); }
     public ICommand RefreshAccountsCommand { get; }
     public ICommand AccountSelectedCommand { get; }
@@ -19,16 +19,16 @@ namespace SafeAuthenticator.ViewModels {
 
     public HomeViewModel() {
       IsRefreshing = false;
-      Apps = new ObservableRangeCollection<RegisteredApp>();
+      Apps = new ObservableRangeCollection<RegisteredAppModel>();
       RefreshAccountsCommand = new Command(OnRefreshAccounts);
-      AccountSelectedCommand = new Command<RegisteredApp>(OnAccountSelected);
+      AccountSelectedCommand = new Command<RegisteredAppModel>(OnAccountSelected);
       LogoutCommand = new Command(OnLogout);
 
       Device.BeginInvokeOnMainThread(OnRefreshAccounts);
     }
 
-    private void OnAccountSelected(RegisteredApp appInfo) {
-      MessagingCenter.Send(this, MessengerConstants.NavAppInfoPage, appInfo);
+    private void OnAccountSelected(RegisteredAppModel appModelInfo) {
+      MessagingCenter.Send(this, MessengerConstants.NavAppInfoPage, appModelInfo);
     }
 
     private async void OnLogout() {

@@ -125,13 +125,13 @@
       <HintPath>..\..\packages\PInvoke.Windows.Core.0.3.2\lib\portable-net45+win+wpa81+MonoAndroid10+xamarinios10+MonoTouch10\PInvoke.Windows.Core.dll</HintPath>
     </Reference>
     <Reference Include="SafeApp, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\MaidSafe.SafeApp.0.0.1\lib\Xamarin.iOS10\SafeApp.dll</HintPath>
+      <HintPath>..\..\packages\MaidSafe.SafeApp.0.0.2\lib\Xamarin.iOS10\SafeApp.dll</HintPath>
     </Reference>
-    <Reference Include="SafeApp.NativeBindings, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\MaidSafe.SafeApp.0.0.1\lib\Xamarin.iOS10\SafeApp.NativeBindings.dll</HintPath>
+    <Reference Include="SafeApp.AppBindings, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\MaidSafe.SafeApp.0.0.2\lib\Xamarin.iOS10\SafeApp.AppBindings.dll</HintPath>
     </Reference>
     <Reference Include="SafeApp.Utilities, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\MaidSafe.SafeApp.0.0.1\lib\Xamarin.iOS10\SafeApp.Utilities.dll</HintPath>
+      <HintPath>..\..\packages\MaidSafe.SafeApp.0.0.2\lib\Xamarin.iOS10\SafeApp.Utilities.dll</HintPath>
     </Reference>
     <Reference Include="Splat, Version=2.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\..\packages\Splat.2.0.0\lib\Xamarin.iOS10\Splat.dll</HintPath>
@@ -208,34 +208,34 @@
   </ItemGroup>
   <ItemGroup>
     <ImageAsset Include="Resources\Media.xcassets\AppIcons.appiconset\app_icon_ios_29@2x.png">
-      <InProject>false</InProject>
+      <Visible>false</Visible>
     </ImageAsset>
     <ImageAsset Include="Resources\Media.xcassets\AppIcons.appiconset\app_icon_ios_29@3x.png">
-      <InProject>false</InProject>
+      <Visible>false</Visible>
     </ImageAsset>
     <ImageAsset Include="Resources\Media.xcassets\AppIcons.appiconset\app_icon_ios_40@2x.png">
-      <InProject>false</InProject>
+      <Visible>false</Visible>
     </ImageAsset>
     <ImageAsset Include="Resources\Media.xcassets\AppIcons.appiconset\app_icon_ios_40@3x.png">
-      <InProject>false</InProject>
+      <Visible>false</Visible>
     </ImageAsset>
     <ImageAsset Include="Resources\Media.xcassets\AppIcons.appiconset\app_icon_ios_60@2x.png">
-      <InProject>false</InProject>
+      <Visible>false</Visible>
     </ImageAsset>
     <ImageAsset Include="Resources\Media.xcassets\AppIcons.appiconset\app_icon_ios_60@3x.png">
-      <InProject>false</InProject>
+      <Visible>false</Visible>
     </ImageAsset>
     <ImageAsset Include="Resources\Media.xcassets\AppIcons.appiconset\Contents.json">
-      <InProject>false</InProject>
+      <Visible>false</Visible>
     </ImageAsset>
     <ImageAsset Include="Resources\Media.xcassets\LaunchImages.launchimage\app_launch_image_ios_@2x.png">
-      <InProject>false</InProject>
+      <Visible>false</Visible>
     </ImageAsset>
     <ImageAsset Include="Resources\Media.xcassets\LaunchImages.launchimage\app_launch_image_ios_retina.png">
-      <InProject>false</InProject>
+      <Visible>false</Visible>
     </ImageAsset>
     <ImageAsset Include="Resources\Media.xcassets\LaunchImages.launchimage\Contents.json">
-      <InProject>false</InProject>
+      <Visible>false</Visible>
     </ImageAsset>
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\iOS\Xamarin.iOS.CSharp.targets" />
@@ -247,8 +247,8 @@
     <Error Condition="!Exists('..\..\packages\Xamarin.Forms.2.4.0.282\build\netstandard1.0\Xamarin.Forms.props')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\Xamarin.Forms.2.4.0.282\build\netstandard1.0\Xamarin.Forms.props'))" />
     <Error Condition="!Exists('..\..\packages\Xamarin.Forms.2.4.0.282\build\netstandard1.0\Xamarin.Forms.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\Xamarin.Forms.2.4.0.282\build\netstandard1.0\Xamarin.Forms.targets'))" />
     <Error Condition="!Exists('..\..\packages\Microsoft.Bcl.Build.1.0.21\build\Microsoft.Bcl.Build.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\Microsoft.Bcl.Build.1.0.21\build\Microsoft.Bcl.Build.targets'))" />
-    <Error Condition="!Exists('..\..\packages\MaidSafe.SafeApp.0.0.1\build\Xamarin.iOS10\MaidSafe.SafeApp.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\MaidSafe.SafeApp.0.0.1\build\Xamarin.iOS10\MaidSafe.SafeApp.targets'))" />
+    <Error Condition="!Exists('..\..\packages\MaidSafe.SafeApp.0.0.2\build\Xamarin.iOS10\MaidSafe.SafeApp.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\MaidSafe.SafeApp.0.0.2\build\Xamarin.iOS10\MaidSafe.SafeApp.targets'))" />
   </Target>
   <Import Project="..\..\packages\Microsoft.Bcl.Build.1.0.21\build\Microsoft.Bcl.Build.targets" Condition="Exists('..\..\packages\Microsoft.Bcl.Build.1.0.21\build\Microsoft.Bcl.Build.targets')" />
-  <Import Project="..\..\packages\MaidSafe.SafeApp.0.0.1\build\Xamarin.iOS10\MaidSafe.SafeApp.targets" Condition="Exists('..\..\packages\MaidSafe.SafeApp.0.0.1\build\Xamarin.iOS10\MaidSafe.SafeApp.targets')" />
+  <Import Project="..\..\packages\MaidSafe.SafeApp.0.0.2\build\Xamarin.iOS10\MaidSafe.SafeApp.targets" Condition="Exists('..\..\packages\MaidSafe.SafeApp.0.0.2\build\Xamarin.iOS10\MaidSafe.SafeApp.targets')" />
 </Project>

@@ -70,6 +70,9 @@
     <Reference Include="FormsViewGroup, Version=2.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\..\packages\Xamarin.Forms.2.4.0.282\lib\MonoAndroid10\FormsViewGroup.dll</HintPath>
     </Reference>
+    <Reference Include="JetBrains.Annotations, Version=11.1.0.0, Culture=neutral, PublicKeyToken=1010a0d8d6380325, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\JetBrains.Annotations.11.1.0\lib\netstandard1.0\JetBrains.Annotations.dll</HintPath>
+    </Reference>
     <Reference Include="Splat, Version=2.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\..\packages\Splat.2.0.0\lib\MonoAndroid403\Splat.dll</HintPath>
     </Reference>
@@ -153,8 +156,32 @@
     <Compile Include="..\..\CommonUtils\CommonUtils\PaddedEntryRenderer.cs">
       <Link>Helpers\PaddedEntryRenderer.cs</Link>
     </Compile>
-    <Compile Include="..\SafeAuthenticator\Native\NativeBindings.cs">
-      <Link>Native\NativeBindings.cs</Link>
+    <Compile Include="..\SafeAuthenticator\Native\AuthBindings.cs">
+      <Link>Native\AuthBindings.cs</Link>
+    </Compile>
+    <Compile Include="..\SafeAuthenticator\Native\AuthBindings.Manual.cs">
+      <Link>Native\AuthBindings.Manual.cs</Link>
+    </Compile>
+    <Compile Include="..\SafeAuthenticator\Native\Authenticator.cs">
+      <Link>Native\Authenticator.cs</Link>
+    </Compile>
+    <Compile Include="..\SafeAuthenticator\Native\AuthResolver.cs">
+      <Link>Native\AuthResolver.cs</Link>
+    </Compile>
+    <Compile Include="..\SafeAuthenticator\Native\AuthTypes.cs">
+      <Link>Native\AuthTypes.cs</Link>
+    </Compile>
+    <Compile Include="..\SafeAuthenticator\Native\AuthTypes.Manual.cs">
+      <Link>Native\AuthTypes.Manual.cs</Link>
+    </Compile>
+    <Compile Include="..\SafeAuthenticator\Native\BindingUtils.cs">
+      <Link>Native\BindingUtils.cs</Link>
+    </Compile>
+    <Compile Include="..\SafeAuthenticator\Native\IAuthBindings.cs">
+      <Link>Native\IAuthBindings.cs</Link>
+    </Compile>
+    <Compile Include="..\SafeAuthenticator\Native\IAuthBindings.Manual.cs">
+      <Link>Native\IAuthBindings.Manual.cs</Link>
     </Compile>
     <Compile Include="MainActivity.cs" />
     <Compile Include="Resources\Resource.designer.cs" />

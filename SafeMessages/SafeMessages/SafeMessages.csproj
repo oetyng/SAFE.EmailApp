@@ -152,13 +152,13 @@
       <HintPath>..\..\packages\Portable.Text.Encoding.0.8.3.0\lib\portable-net45+win+wpa81+MonoAndroid10+xamarinios10+MonoTouch10\Portable.Text.Encoding.dll</HintPath>
     </Reference>
     <Reference Include="SafeApp, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\MaidSafe.SafeApp.0.0.1\lib\netstandard1.2\SafeApp.dll</HintPath>
+      <HintPath>..\..\packages\MaidSafe.SafeApp.0.0.2\lib\netstandard1.2\SafeApp.dll</HintPath>
     </Reference>
-    <Reference Include="SafeApp.NativeBindings, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\MaidSafe.SafeApp.0.0.1\lib\netstandard1.2\SafeApp.NativeBindings.dll</HintPath>
+    <Reference Include="SafeApp.AppBindings, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\MaidSafe.SafeApp.0.0.2\lib\netstandard1.2\SafeApp.AppBindings.dll</HintPath>
     </Reference>
     <Reference Include="SafeApp.Utilities, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\MaidSafe.SafeApp.0.0.1\lib\netstandard1.2\SafeApp.Utilities.dll</HintPath>
+      <HintPath>..\..\packages\MaidSafe.SafeApp.0.0.2\lib\netstandard1.2\SafeApp.Utilities.dll</HintPath>
     </Reference>
     <Reference Include="Splat, Version=2.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\..\packages\Splat.2.0.0\lib\netstandard1.1\Splat.dll</HintPath>
@@ -195,8 +195,10 @@
     </PropertyGroup>
     <Error Condition="!Exists('..\..\packages\Xamarin.Forms.2.4.0.282\build\portable-win+net45+wp80+win81+wpa81\Xamarin.Forms.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\Xamarin.Forms.2.4.0.282\build\portable-win+net45+wp80+win81+wpa81\Xamarin.Forms.targets'))" />
     <Error Condition="!Exists('..\..\packages\Microsoft.Bcl.Build.1.0.21\build\Microsoft.Bcl.Build.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\Microsoft.Bcl.Build.1.0.21\build\Microsoft.Bcl.Build.targets'))" />
+    <Error Condition="!Exists('..\..\packages\MaidSafe.SafeApp.0.0.2\build\netstandard1.2\MaidSafe.SafeApp.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\MaidSafe.SafeApp.0.0.2\build\netstandard1.2\MaidSafe.SafeApp.targets'))" />
   </Target>
   <Import Project="..\..\packages\Microsoft.Bcl.Build.1.0.21\build\Microsoft.Bcl.Build.targets" Condition="Exists('..\..\packages\Microsoft.Bcl.Build.1.0.21\build\Microsoft.Bcl.Build.targets')" />
+  <Import Project="..\..\packages\MaidSafe.SafeApp.0.0.2\build\netstandard1.2\MaidSafe.SafeApp.targets" Condition="Exists('..\..\packages\MaidSafe.SafeApp.0.0.2\build\netstandard1.2\MaidSafe.SafeApp.targets')" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">
