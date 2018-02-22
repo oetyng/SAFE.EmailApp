@@ -63,14 +63,14 @@ namespace SafeAuthenticator.Native {
     public bool AppContainer;
     public List<ContainerPermissions> Containers;
 
-    internal AuthReq(AuthReqNative native)
+    public AuthReq(AuthReqNative native)
     {
       App = native.App;
       AppContainer = native.AppContainer;
       Containers = BindingUtils.CopyToObjectList<ContainerPermissions>(native.ContainersPtr, (int)native.ContainersLen);
     }
 
-    internal AuthReqNative ToNative()
+    public AuthReqNative ToNative()
     {
       return new AuthReqNative()
       {
@@ -83,7 +83,7 @@ namespace SafeAuthenticator.Native {
     }
   }
 
-  internal struct AuthReqNative
+  public struct AuthReqNative
   {
     public AppExchangeInfo App;
     [MarshalAs(UnmanagedType.U1)]
@@ -93,7 +93,7 @@ namespace SafeAuthenticator.Native {
     // ReSharper disable once NotAccessedField.Compiler
     public UIntPtr ContainersCap;
 
-    internal void Free()
+    public void Free()
     {
       BindingUtils.FreeList(ref ContainersPtr, ref ContainersLen);
     }
@@ -105,13 +105,13 @@ namespace SafeAuthenticator.Native {
     public AppExchangeInfo App;
     public List<ContainerPermissions> Containers;
 
-    internal ContainersReq(ContainersReqNative native)
+    public ContainersReq(ContainersReqNative native)
     {
       App = native.App;
       Containers = BindingUtils.CopyToObjectList<ContainerPermissions>(native.ContainersPtr, (int)native.ContainersLen);
     }
 
-    internal ContainersReqNative ToNative()
+    public ContainersReqNative ToNative()
     {
       return new ContainersReqNative()
       {
@@ -123,7 +123,7 @@ namespace SafeAuthenticator.Native {
     }
   }
 
-  internal struct ContainersReqNative
+  public struct ContainersReqNative
   {
     public AppExchangeInfo App;
     public IntPtr ContainersPtr;
@@ -131,7 +131,7 @@ namespace SafeAuthenticator.Native {
     // ReSharper disable once NotAccessedField.Compiler
     public UIntPtr ContainersCap;
 
-    internal void Free()
+    public void Free()
     {
       BindingUtils.FreeList(ref ContainersPtr, ref ContainersLen);
     }
@@ -164,13 +164,13 @@ namespace SafeAuthenticator.Native {
     public AppExchangeInfo App;
     public List<ShareMData> MData;
 
-    internal ShareMDataReq(ShareMDataReqNative native)
+    public ShareMDataReq(ShareMDataReqNative native)
     {
       App = native.App;
       MData = BindingUtils.CopyToObjectList<ShareMData>(native.MDataPtr, (int)native.MDataLen);
     }
 
-    internal ShareMDataReqNative ToNative()
+    public ShareMDataReqNative ToNative()
     {
       return new ShareMDataReqNative()
       {
@@ -182,7 +182,7 @@ namespace SafeAuthenticator.Native {
     }
   }
 
-  internal struct ShareMDataReqNative
+  public struct ShareMDataReqNative
   {
     public AppExchangeInfo App;
     public IntPtr MDataPtr;
@@ -190,7 +190,7 @@ namespace SafeAuthenticator.Native {
     // ReSharper disable once NotAccessedField.Compiler
     public UIntPtr MDataCap;
 
-    internal void Free()
+    public void Free()
     {
       BindingUtils.FreeList(ref MDataPtr, ref MDataLen);
     }
@@ -213,7 +213,7 @@ namespace SafeAuthenticator.Native {
     public AccessContainerEntry AccessContainerEntry;
     public List<byte> BootstrapConfig;
 
-    internal AuthGranted(AuthGrantedNative native)
+    public AuthGranted(AuthGrantedNative native)
     {
       AppKeys = native.AppKeys;
       AccessContainerInfo = native.AccessContainerInfo;
@@ -221,7 +221,7 @@ namespace SafeAuthenticator.Native {
       BootstrapConfig = BindingUtils.CopyToByteList(native.BootstrapConfigPtr, (int)native.BootstrapConfigLen);
     }
 
-    internal AuthGrantedNative ToNative()
+    public AuthGrantedNative ToNative()
     {
       return new AuthGrantedNative()
       {
@@ -235,7 +235,7 @@ namespace SafeAuthenticator.Native {
     }
   }
 
-  internal struct AuthGrantedNative
+  public struct AuthGrantedNative
   {
     public AppKeys AppKeys;
     public AccessContInfo AccessContainerInfo;
@@ -245,7 +245,7 @@ namespace SafeAuthenticator.Native {
     // ReSharper disable once NotAccessedField.Compiler
     public UIntPtr BootstrapConfigCap;
 
-    internal void Free()
+    public void Free()
     {
       AccessContainerEntry.Free();
       BindingUtils.FreeList(ref BootstrapConfigPtr, ref BootstrapConfigLen);
@@ -284,12 +284,12 @@ namespace SafeAuthenticator.Native {
   {
     public List<ContainerInfo> Containers;
 
-    internal AccessContainerEntry(AccessContainerEntryNative native)
+    public AccessContainerEntry(AccessContainerEntryNative native)
     {
       Containers = BindingUtils.CopyToObjectList<ContainerInfo>(native.ContainersPtr, (int)native.ContainersLen);
     }
 
-    internal AccessContainerEntryNative ToNative()
+    public AccessContainerEntryNative ToNative()
     {
       return new AccessContainerEntryNative()
       {
@@ -300,14 +300,14 @@ namespace SafeAuthenticator.Native {
     }
   }
 
-  internal struct AccessContainerEntryNative
+  public struct AccessContainerEntryNative
   {
     public IntPtr ContainersPtr;
     public UIntPtr ContainersLen;
     // ReSharper disable once NotAccessedField.Compiler
     public UIntPtr ContainersCap;
 
-    internal void Free()
+    public void Free()
     {
       BindingUtils.FreeList(ref ContainersPtr, ref ContainersLen);
     }
@@ -352,13 +352,13 @@ namespace SafeAuthenticator.Native {
     public List<byte> Content;
     public ulong EntryVersion;
 
-    internal MDataValue(MDataValueNative native)
+    public MDataValue(MDataValueNative native)
     {
       Content = BindingUtils.CopyToByteList(native.ContentPtr, (int)native.ContentLen);
       EntryVersion = native.EntryVersion;
     }
 
-    internal MDataValueNative ToNative()
+    public MDataValueNative ToNative()
     {
       return new MDataValueNative()
       {
@@ -369,13 +369,13 @@ namespace SafeAuthenticator.Native {
     }
   }
 
-  internal struct MDataValueNative
+  public struct MDataValueNative
   {
     public IntPtr ContentPtr;
     public UIntPtr ContentLen;
     public ulong EntryVersion;
 
-    internal void Free()
+    public void Free()
     {
       BindingUtils.FreeList(ref ContentPtr, ref ContentLen);
     }
@@ -386,12 +386,12 @@ namespace SafeAuthenticator.Native {
   {
     public List<byte> Val;
 
-    internal MDataKey(MDataKeyNative native)
+    public MDataKey(MDataKeyNative native)
     {
       Val = BindingUtils.CopyToByteList(native.ValPtr, (int)native.ValLen);
     }
 
-    internal MDataKeyNative ToNative()
+    public MDataKeyNative ToNative()
     {
       return new MDataKeyNative()
       {
@@ -401,12 +401,12 @@ namespace SafeAuthenticator.Native {
     }
   }
 
-  internal struct MDataKeyNative
+  public struct MDataKeyNative
   {
     public IntPtr ValPtr;
     public UIntPtr ValLen;
 
-    internal void Free()
+    public void Free()
     {
       BindingUtils.FreeList(ref ValPtr, ref ValLen);
     }
@@ -423,7 +423,7 @@ namespace SafeAuthenticator.Native {
     public List<byte> UserMetadata;
     public byte[] DataMapName;
 
-    internal File(FileNative native)
+    public File(FileNative native)
     {
       Size = native.Size;
       CreatedSec = native.CreatedSec;
@@ -434,7 +434,7 @@ namespace SafeAuthenticator.Native {
       DataMapName = native.DataMapName;
     }
 
-    internal FileNative ToNative()
+    public FileNative ToNative()
     {
       return new FileNative()
       {
@@ -451,7 +451,7 @@ namespace SafeAuthenticator.Native {
     }
   }
 
-  internal struct FileNative
+  public struct FileNative
   {
     public ulong Size;
     public long CreatedSec;
@@ -465,7 +465,7 @@ namespace SafeAuthenticator.Native {
     [MarshalAs(UnmanagedType.ByValArray, SizeConst = (int)AppConstants.XorNameLen)]
     public byte[] DataMapName;
 
-    internal void Free()
+    public void Free()
     {
       BindingUtils.FreeList(ref UserMetadataPtr, ref UserMetadataLen);
     }
@@ -484,13 +484,13 @@ namespace SafeAuthenticator.Native {
     public AppExchangeInfo AppInfo;
     public List<ContainerPermissions> Containers;
 
-    internal RegisteredApp(RegisteredAppNative native)
+    public RegisteredApp(RegisteredAppNative native)
     {
       AppInfo = native.AppInfo;
       Containers = BindingUtils.CopyToObjectList<ContainerPermissions>(native.ContainersPtr, (int)native.ContainersLen);
     }
 
-    internal RegisteredAppNative ToNative()
+    public RegisteredAppNative ToNative()
     {
       return new RegisteredAppNative()
       {
@@ -502,7 +502,7 @@ namespace SafeAuthenticator.Native {
     }
   }
 
-  internal struct RegisteredAppNative
+  public struct RegisteredAppNative
   {
     public AppExchangeInfo AppInfo;
     public IntPtr ContainersPtr;
@@ -511,7 +511,7 @@ namespace SafeAuthenticator.Native {
     // ReSharper disable once NotAccessedField.Compiler
     public IntPtr ContainersCap;
 
-    internal void Free()
+    public void Free()
     {
       BindingUtils.FreeList(ref ContainersPtr, ref ContainersLen);
     }

@@ -57,6 +57,9 @@ namespace SafeAuthenticator.Services {
     public async Task CheckAndReconnect() {
       await _reconnectSemaphore.WaitAsync();
       try {
+        if (_authenticator == null) {
+          return;
+        }
         if (_authenticator.IsDisconnected) {
           if (!AuthReconnect) {
             throw new Exception("Reconnect Disabled");

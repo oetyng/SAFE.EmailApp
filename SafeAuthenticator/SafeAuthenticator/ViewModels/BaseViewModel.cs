@@ -3,7 +3,7 @@ using SafeAuthenticator.Services;
 using Xamarin.Forms;
 
 namespace SafeAuthenticator.ViewModels {
-  public class BaseViewModel : ObservableObject {
-    public AuthService Authenticator => DependencyService.Get<AuthService>();
+  internal class BaseViewModel : ObservableObject {
+    protected AuthService Authenticator => DependencyService.Get<AuthService>();
   }
 }

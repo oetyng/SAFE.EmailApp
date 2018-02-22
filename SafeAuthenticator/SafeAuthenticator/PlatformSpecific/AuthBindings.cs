@@ -8,12 +8,15 @@ using System.Linq;
 using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 using CommonUtils;
+using SafeAuthenticator.Native;
+using Xamarin.Forms;
 
+[assembly: Dependency(typeof(AuthBindings))]
 namespace SafeAuthenticator.Native {
-  internal partial class AuthBindings : IAuthBindings {
+  public partial class AuthBindings : IAuthBindings {
 #if __IOS__
     private const string DllName = "__Internal";
-    #else
+#else
     private const string DllName = "safe_authenticator";
 #endif
 
@@ -149,25 +152,25 @@ namespace SafeAuthenticator.Native {
       UIntAuthReqCb oAuth,
       UIntContainersReqCb oContainers,
       UIntByteListCb oUnregistered,
-      UIntShareMDataReqMetadataResponseCb oShareMdata,
-      FfiResultIpcReqErrorCb oErr);
+      UIntShareMDataReqMetadataResponseCb oShareMData,
+      FfiResultStringCb oErr);
 
-    public Task<string> EncodeShareMdataRespAsync(IntPtr auth, ref ShareMDataReq req, uint reqId, bool isGranted) {
+    public Task<string> EncodeShareMDataRespAsync(IntPtr auth, ref ShareMDataReq req, uint reqId, bool isGranted) {
       var reqNative = req.ToNative();
       var (ret, userData) = BindingUtils.PrepareTask<string>();
-      EncodeShareMdataRespNative(auth, ref reqNative, reqId, isGranted, userData, OnIpcReqEncodeCb);
+      EncodeShareMDataRespNative(auth, ref reqNative, reqId, isGranted, userData, OnFfiResultStringCb);
       reqNative.Free();
       return ret;
     }
 
     [DllImport(DllName, EntryPoint = "encode_share_mdata_resp")]
-    private static extern void EncodeShareMdataRespNative(
+    private static extern void EncodeShareMDataRespNative(
       IntPtr auth,
-      ref ShareMDataReqNative req,
+      ref Native.ShareMDataReqNative req,
       uint reqId,
       [MarshalAs(UnmanagedType.U1)] bool isGranted,
       IntPtr userData,
-      IpcReqEncodeCb oCb);
+      FfiResultStringCb oCb);
 
     public Task<string> AuthRevokeAppAsync(IntPtr auth, string appId) {
       var (ret, userData) = BindingUtils.PrepareTask<string>();
@@ -193,7 +196,7 @@ namespace SafeAuthenticator.Native {
 
     public Task<string> EncodeUnregisteredRespAsync(uint reqId, bool isGranted) {
       var (ret, userData) = BindingUtils.PrepareTask<string>();
-      EncodeUnregisteredRespNative(reqId, isGranted, userData, OnIpcReqEncodeCb);
+      EncodeUnregisteredRespNative(reqId, isGranted, userData, OnFfiResultStringCb);
       return ret;
     }
 
@@ -202,12 +205,12 @@ namespace SafeAuthenticator.Native {
       uint reqId,
       [MarshalAs(UnmanagedType.U1)] bool isGranted,
       IntPtr userData,
-      IpcReqEncodeCb oCb);
+      FfiResultStringCb oCb);
 
     public Task<string> EncodeAuthRespAsync(IntPtr auth, ref AuthReq req, uint reqId, bool isGranted) {
       var reqNative = req.ToNative();
       var (ret, userData) = BindingUtils.PrepareTask<string>();
-      EncodeAuthRespNative(auth, ref reqNative, reqId, isGranted, userData, OnIpcReqEncodeCb);
+      EncodeAuthRespNative(auth, ref reqNative, reqId, isGranted, userData, OnFfiResultStringCb);
       reqNative.Free();
       return ret;
     }
@@ -215,16 +218,16 @@ namespace SafeAuthenticator.Native {
     [DllImport(DllName, EntryPoint = "encode_auth_resp")]
     private static extern void EncodeAuthRespNative(
       IntPtr auth,
-      ref AuthReqNative req,
+      ref Native.AuthReqNative req,
       uint reqId,
       [MarshalAs(UnmanagedType.U1)] bool isGranted,
       IntPtr userData,
-      IpcReqEncodeCb oCb);
+      FfiResultStringCb oCb);
 
     public Task<string> EncodeContainersRespAsync(IntPtr auth, ref ContainersReq req, uint reqId, bool isGranted) {
       var reqNative = req.ToNative();
       var (ret, userData) = BindingUtils.PrepareTask<string>();
-      EncodeContainersRespNative(auth, ref reqNative, reqId, isGranted, userData, OnIpcReqEncodeCb);
+      EncodeContainersRespNative(auth, ref reqNative, reqId, isGranted, userData, OnFfiResultStringCb);
       reqNative.Free();
       return ret;
     }
@@ -232,11 +235,11 @@ namespace SafeAuthenticator.Native {
     [DllImport(DllName, EntryPoint = "encode_containers_resp")]
     private static extern void EncodeContainersRespNative(
       IntPtr auth,
-      ref ContainersReqNative req,
+      ref Native.ContainersReqNative req,
       uint reqId,
       [MarshalAs(UnmanagedType.U1)] bool isGranted,
       IntPtr userData,
-      IpcReqEncodeCb oCb);
+      FfiResultStringCb oCb);
 
     public Task AuthInitLoggingAsync(string outputFileNameOverride) {
       var (ret, userData) = BindingUtils.PrepareTask();
@@ -266,7 +269,7 @@ namespace SafeAuthenticator.Native {
 
 #if __IOS__
     [MonoPInvokeCallback(typeof(FfiResultAccountInfoCb))]
-    #endif
+#endif
     private static void OnFfiResultAccountInfoCb(IntPtr userData, IntPtr result, IntPtr accountInfo) {
       BindingUtils.CompleteTask(
         userData,
@@ -274,12 +277,12 @@ namespace SafeAuthenticator.Native {
         () => Marshal.PtrToStructure<AccountInfo>(accountInfo));
     }
 
-    private delegate void FfiResultAppAccessListCb(IntPtr userData, IntPtr result, IntPtr appAccessPtr, ulong appAccessLen);
+    private delegate void FfiResultAppAccessListCb(IntPtr userData, IntPtr result, IntPtr appAccessPtr, UIntPtr appAccessLen);
 
 #if __IOS__
     [MonoPInvokeCallback(typeof(FfiResultAppAccessListCb))]
-    #endif
-    private static void OnFfiResultAppAccessListCb(IntPtr userData, IntPtr result, IntPtr appAccessPtr, ulong appAccessLen) {
+#endif
+    private static void OnFfiResultAppAccessListCb(IntPtr userData, IntPtr result, IntPtr appAccessPtr, UIntPtr appAccessLen) {
       BindingUtils.CompleteTask(
         userData,
         Marshal.PtrToStructure<FfiResult>(result),
@@ -290,16 +293,16 @@ namespace SafeAuthenticator.Native {
       IntPtr userData,
       IntPtr result,
       IntPtr appExchangeInfoPtr,
-      ulong appExchangeInfoLen);
+      UIntPtr appExchangeInfoLen);
 
 #if __IOS__
     [MonoPInvokeCallback(typeof(FfiResultAppExchangeInfoListCb))]
-    #endif
+#endif
     private static void OnFfiResultAppExchangeInfoListCb(
       IntPtr userData,
       IntPtr result,
       IntPtr appExchangeInfoPtr,
-      ulong appExchangeInfoLen) {
+      UIntPtr appExchangeInfoLen) {
       BindingUtils.CompleteTask(
         userData,
         Marshal.PtrToStructure<FfiResult>(result),
@@ -312,21 +315,21 @@ namespace SafeAuthenticator.Native {
 
 #if __IOS__
     [MonoPInvokeCallback(typeof(FfiResultCb))]
-    #endif
+#endif
     private static void OnFfiResultCb(IntPtr userData, IntPtr result) {
       BindingUtils.CompleteTask(userData, Marshal.PtrToStructure<FfiResult>(result));
     }
 
-    private delegate void FfiResultRegisteredAppListCb(IntPtr userData, IntPtr result, IntPtr registeredAppPtr, ulong registeredAppLen);
+    private delegate void FfiResultRegisteredAppListCb(IntPtr userData, IntPtr result, IntPtr registeredAppPtr, UIntPtr registeredAppLen);
 
 #if __IOS__
     [MonoPInvokeCallback(typeof(FfiResultRegisteredAppListCb))]
-    #endif
-    private static void OnFfiResultRegisteredAppListCb(IntPtr userData, IntPtr result, IntPtr registeredAppPtr, ulong registeredAppLen) {
+#endif
+    private static void OnFfiResultRegisteredAppListCb(IntPtr userData, IntPtr result, IntPtr registeredAppPtr, UIntPtr registeredAppLen) {
       BindingUtils.CompleteTask(
         userData,
         Marshal.PtrToStructure<FfiResult>(result),
-        () => BindingUtils.CopyToObjectList<RegisteredAppNative>(registeredAppPtr, (int)registeredAppLen).
+        () => BindingUtils.CopyToObjectList<Native.RegisteredAppNative>(registeredAppPtr, (int)registeredAppLen).
           Select(native => new RegisteredApp(native)).ToList());
     }
 
@@ -334,20 +337,21 @@ namespace SafeAuthenticator.Native {
 
 #if __IOS__
     [MonoPInvokeCallback(typeof(FfiResultStringCb))]
-    #endif
-    private static void OnFfiResultStringCb(IntPtr userData, IntPtr result, string fileName) {
-      BindingUtils.CompleteTask(userData, Marshal.PtrToStructure<FfiResult>(result), () => fileName);
+#endif
+    private static void OnFfiResultStringCb(IntPtr userData, IntPtr result, string filename) {
+      BindingUtils.CompleteTask(userData, Marshal.PtrToStructure<FfiResult>(result), () => filename);
     }
 
     private delegate void NoneCb(IntPtr userData);
 
     private delegate void UIntAuthReqCb(IntPtr userData, uint reqId, IntPtr req);
 
-    private delegate void UIntByteListCb(IntPtr userData, uint reqId, IntPtr extraDataPtr, ulong extraDataLen);
+    private delegate void UIntByteListCb(IntPtr userData, uint reqId, IntPtr extraDataPtr, UIntPtr extraDataLen);
 
     private delegate void UIntContainersReqCb(IntPtr userData, uint reqId, IntPtr req);
 
     private delegate void UIntShareMDataReqMetadataResponseCb(IntPtr userData, uint reqId, IntPtr req, IntPtr metadata);
+
   }
 }
 #endif

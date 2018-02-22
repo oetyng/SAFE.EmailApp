@@ -2,7 +2,7 @@
 <ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:commonUtils="clr-namespace:CommonUtils;assembly=CommonUtils"
-             x:Class="SafeAuthenticator.Views.AppInfoPage" Title="{Binding AppInfo.AppName}">
+             x:Class="SafeAuthenticator.Views.AppInfoPage" Title="{Binding AppModelInfo.AppName}">
   <ContentPage.ToolbarItems>
     <ToolbarItem Text="Revoke" Command="{Binding RevokeAppCommand}" />
   </ContentPage.ToolbarItems>
@@ -10,15 +10,15 @@
     <StackLayout Margin="15,0,15,0">
       <StackLayout Orientation="Horizontal" Padding="5,15,5,5">
         <Label Text="Id" FontSize="18" TextColor="DarkGray" Margin="0,0,10,0" />
-        <Label Text="{Binding AppInfo.AppId}" FontSize="18" LineBreakMode="TailTruncation" />
+                <Label Text="{Binding AppModelInfo.AppId}" FontSize="18" LineBreakMode="TailTruncation" />
       </StackLayout>
       <StackLayout Orientation="Horizontal" Padding="5,5,5,5">
         <Label Text="Vendor" FontSize="18" TextColor="DarkGray" Margin="0,0,10,0" />
-        <Label Text="{Binding AppInfo.AppVendor}" FontSize="18" LineBreakMode="TailTruncation" />
+                <Label Text="{Binding AppModelInfo.AppVendor}" FontSize="18" LineBreakMode="TailTruncation" />
       </StackLayout>
       <StackLayout HeightRequest="1" BackgroundColor="DarkGray" />
       <Label Text="Containers" FontSize="18" LineBreakMode="TailTruncation" Margin="5,5,5,0" TextColor="DarkGray" />
-      <ListView ItemsSource="{Binding AppInfo.Containers}"
+            <ListView ItemsSource="{Binding AppModelInfo.Containers}"
                 VerticalOptions="FillAndExpand"
                 HasUnevenRows="True"
                 IsPullToRefreshEnabled="False"
@@ -47,7 +47,7 @@
           <StackLayout Orientation="Horizontal" BackgroundColor="LightGray">
             <Label Margin="20" VerticalOptions="CenterAndExpand" HorizontalOptions="CenterAndExpand"
                    Text="No Containers." TextColor="Gray"
-                   IsVisible="{Binding AppInfo.Containers.Count, Converter={StaticResource IsCollectionEmptyConverter}}" />
+                   IsVisible="{Binding AppModelInfo.Containers.Count, Converter={StaticResource IsCollectionEmptyConverter}}" />
           </StackLayout>
         </ListView.Footer>
       </ListView>

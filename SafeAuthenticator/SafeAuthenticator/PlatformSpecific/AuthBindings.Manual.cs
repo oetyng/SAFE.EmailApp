@@ -1,26 +1,27 @@
 ﻿#if !NETSTANDARD1_2 || __DESKTOP__
-#if __IOS__
 using System;
+
+#if __IOS__
 using ObjCRuntime;
 #endif
-using System;
 using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 
-namespace SafeAuthenticator.Native
-{
-  internal partial class AuthBindings {
+namespace SafeAuthenticator.Native {
+  public partial class AuthBindings {
     public void CreateAccount(
-      string locator,
-      string secret,
-      string invitation,
-      Action disconnnectedCb,
-      Action<FfiResult, IntPtr, GCHandle> cb) {
+        string locator,
+        string secret,
+        string invitation,
+        Action disconnnectedCb,
+        Action<FfiResult, IntPtr, GCHandle> cb)
+    {
       var userData = BindingUtils.ToHandlePtr((disconnnectedCb, cb));
       CreateAccNative(locator, secret, invitation, userData, OnAuthenticatorDisconnectCb, OnAuthenticatorCreateCb);
     }
 
-    public Task<IpcReq> DecodeIpcMessage(IntPtr authPtr, string msg) {
+    public Task<IpcReq> DecodeIpcMessage(IntPtr authPtr, string msg)
+    {
       var (task, userData) = BindingUtils.PrepareTask<IpcReq>();
       AuthDecodeIpcMsgNative(
         authPtr,
@@ -34,21 +35,17 @@ namespace SafeAuthenticator.Native
       return task;
     }
 
-    public void Login(string locator, string secret, Action disconnnectedCb, Action<FfiResult, IntPtr, GCHandle> cb) {
+    public void Login(string locator, string secret, Action disconnnectedCb, Action<FfiResult, IntPtr, GCHandle> cb)
+    {
       var userData = BindingUtils.ToHandlePtr((disconnnectedCb, cb));
       LoginNative(locator, secret, userData, OnAuthenticatorDisconnectCb, OnAuthenticatorCreateCb);
-    }
-
-    public Task<IpcReq> UnRegisteredDecodeIpcMsgAsync(string msg) {
-      var (task, userData) = BindingUtils.PrepareTask<IpcReq>();
-      AuthUnregisteredDecodeIpcMsgNative(msg, userData, OnDecodeIpcReqUnregisteredCb, OnFfiResultIpcReqErrorCb);
-      return task;
     }
 
 #if __IOS__
     [MonoPInvokeCallback(typeof(FfiResultAuthenticatorCb))]
 #endif
-    private static void OnAuthenticatorCreateCb(IntPtr userData, IntPtr result, IntPtr app) {
+    private static void OnAuthenticatorCreateCb(IntPtr userData, IntPtr result, IntPtr app)
+    {
       var (_, action) = BindingUtils.FromHandlePtr<(Action, Action<FfiResult, IntPtr, GCHandle>)>(userData, false);
 
       action(Marshal.PtrToStructure<FfiResult>(result), app, GCHandle.FromIntPtr(userData));
@@ -56,7 +53,8 @@ namespace SafeAuthenticator.Native
 #if __IOS__
     [MonoPInvokeCallback(typeof(NoneCb))]
 #endif
-    private static void OnAuthenticatorDisconnectCb(IntPtr userData) {
+    private static void OnAuthenticatorDisconnectCb(IntPtr userData)
+    {
       var (action, _) = BindingUtils.FromHandlePtr<(Action, Action<FfiResult, IntPtr, GCHandle>)>(userData, false);
 
       action();
@@ -65,7 +63,8 @@ namespace SafeAuthenticator.Native
 #if __IOS__
     [MonoPInvokeCallback(typeof(UIntAuthReqCb))]
 #endif
-    private static void OnDecodeIpcReqAuthCb(IntPtr userData, uint reqId, IntPtr authReq) {
+    private static void OnDecodeIpcReqAuthCb(IntPtr userData, uint reqId, IntPtr authReq)
+    {
       var tcs = BindingUtils.FromHandlePtr<TaskCompletionSource<IpcReq>>(userData);
       tcs.SetResult(new AuthIpcReq(reqId, new AuthReq(Marshal.PtrToStructure<AuthReqNative>(authReq))));
     }
@@ -73,7 +72,8 @@ namespace SafeAuthenticator.Native
 #if __IOS__
     [MonoPInvokeCallback(typeof(UIntContainersReqCb))]
 #endif
-    private static void OnDecodeIpcReqContainersCb(IntPtr userData, uint reqId, IntPtr authReq) {
+    private static void OnDecodeIpcReqContainersCb(IntPtr userData, uint reqId, IntPtr authReq)
+    {
       var tcs = BindingUtils.FromHandlePtr<TaskCompletionSource<IpcReq>>(userData);
       tcs.SetResult(new ContainersIpcReq(reqId, new ContainersReq(Marshal.PtrToStructure<ContainersReqNative>(authReq))));
     }
@@ -81,7 +81,8 @@ namespace SafeAuthenticator.Native
 #if __IOS__
     [MonoPInvokeCallback(typeof(UIntShareMDataReqMetadataResponseCb))]
 #endif
-    private static void OnDecodeIpcReqShareMDataCb(IntPtr userData, uint reqId, IntPtr authReq, IntPtr metadata) {
+    private static void OnDecodeIpcReqShareMDataCb(IntPtr userData, uint reqId, IntPtr authReq, IntPtr metadata)
+    {
       var tcs = BindingUtils.FromHandlePtr<TaskCompletionSource<IpcReq>>(userData);
       var shareMdReq = new ShareMDataReq(Marshal.PtrToStructure<ShareMDataReqNative>(authReq));
       var metadataResponse = Marshal.PtrToStructure<MetadataResponse>(metadata);
@@ -91,15 +92,17 @@ namespace SafeAuthenticator.Native
 #if __IOS__
     [MonoPInvokeCallback(typeof(UIntByteListCb))]
 #endif
-    private static void OnDecodeIpcReqUnregisteredCb(IntPtr userData, uint reqId, IntPtr extraData, ulong size) {
+    private static void OnDecodeIpcReqUnregisteredCb(IntPtr userData, uint reqId, IntPtr extraData, UIntPtr size)
+    {
       var tcs = BindingUtils.FromHandlePtr<TaskCompletionSource<IpcReq>>(userData);
-      tcs.SetResult(new UnregisteredIpcReq(reqId, extraData, size));
+      tcs.SetResult(new UnregisteredIpcReq(reqId, extraData, (ulong)size));
     }
 
 #if __IOS__
     [MonoPInvokeCallback(typeof(FfiResultIpcReqErrorCb))]
 #endif
-    private static void OnFfiResultIpcReqErrorCb(IntPtr userData, IntPtr result, string msg) {
+    private static void OnFfiResultIpcReqErrorCb(IntPtr userData, IntPtr result, string msg)
+    {
       var tcs = BindingUtils.FromHandlePtr<TaskCompletionSource<IpcReq>>(userData);
       var ffiResult = Marshal.PtrToStructure<FfiResult>(result);
       tcs.SetResult(new IpcReqError(ffiResult.ErrorCode, ffiResult.Description, msg));
@@ -108,15 +111,24 @@ namespace SafeAuthenticator.Native
 #if __IOS__
     [MonoPInvokeCallback(typeof(IpcReqEncodeCb))]
 #endif
-    private static void OnIpcReqEncodeCb(IntPtr userData, IntPtr result, string msg) {
+    private static void OnIpcReqEncodeCb(IntPtr userData, IntPtr result, string msg)
+    {
       var tcs = BindingUtils.FromHandlePtr<TaskCompletionSource<string>>(userData);
       var ffiResult = Marshal.PtrToStructure<FfiResult>(result);
-      if (ffiResult.ErrorCode != 0 && ffiResult.ErrorCode != -200) {
+      if (ffiResult.ErrorCode != 0 && ffiResult.ErrorCode != -200)
+      {
         Task.Run(() => { tcs.SetException(ffiResult.ToException()); });
         return;
       }
 
       Task.Run(() => { tcs.SetResult(msg); });
+    }
+
+    public Task<IpcReq> UnRegisteredDecodeIpcMsgAsync(string msg)
+    {
+      var (task, userData) = BindingUtils.PrepareTask<IpcReq>();
+      AuthUnregisteredDecodeIpcMsgNative(msg, userData, OnDecodeIpcReqUnregisteredCb, OnFfiResultIpcReqErrorCb);
+      return task;
     }
 
     private delegate void FfiResultIpcReqErrorCb(IntPtr userData, IntPtr result, string msg);

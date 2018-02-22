@@ -7,12 +7,8 @@ using CommonUtils;
 using Xamarin.Forms;
 
 namespace SafeAuthenticator.Native {
-  // ReSharper disable ConvertToLocalFunction
-  // ReSharper disable UnusedMember.Global
-  // ReSharper disable MemberCanBePrivate.Global
   public class Authenticator : IDisposable {
-    private static readonly IAuthBindings AuthBindings = AuthResolver.Current;
-
+    private static readonly IAuthBindings AuthBindings = DependencyService.Get<IAuthBindings>();
     //ReSharper disable once UnassignedField.Global
     public static EventHandler Disconnected;
     private IntPtr _authPtr;
@@ -22,7 +18,7 @@ namespace SafeAuthenticator.Native {
     public bool IsDisconnected { get; private set; }
 
     private Authenticator() {
-      IsDisconnected = true;
+      IsDisconnected = false;
       _authPtr = IntPtr.Zero;
     }
 
@@ -144,6 +140,7 @@ namespace SafeAuthenticator.Native {
         return;
       }
 
+      IsDisconnected = false;
       AuthBindings.AuthFree(_authPtr);
       _authPtr = IntPtr.Zero;
     }

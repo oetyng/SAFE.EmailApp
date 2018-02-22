@@ -2,6 +2,7 @@
 using System.Threading.Tasks;
 using CommonUtils;
 using SafeAuthenticator.Helpers;
+using SafeAuthenticator.Native;
 using SafeAuthenticator.Services;
 using SafeAuthenticator.Views;
 using Xamarin.Forms;
@@ -13,8 +14,7 @@ namespace SafeAuthenticator {
   public partial class App : Application {
     public const string AppName = "SAFE Authenticator";
     private static volatile bool _isBackgrounded;
-    public AuthService Authenticator => DependencyService.Get<AuthService>();
-    public static bool IsBackgrounded { get => _isBackgrounded; private set => _isBackgrounded = value; }
+    private static bool IsBackgrounded { get => _isBackgrounded; set => _isBackgrounded = value; }
 
     public App() {
       InitializeComponent();
@@ -41,7 +41,7 @@ namespace SafeAuthenticator {
       base.OnResume();
 
       IsBackgrounded = false;
-      await Authenticator.CheckAndReconnect();
+      await DependencyService.Get<AuthService>().CheckAndReconnect();
     }
 
     protected override async void OnSleep() {

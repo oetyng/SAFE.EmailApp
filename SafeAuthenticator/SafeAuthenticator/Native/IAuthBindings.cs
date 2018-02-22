@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace SafeAuthenticator.Native {
-  internal partial interface IAuthBindings {
+  public partial interface IAuthBindings {
     bool IsMockBuild();
     Task AuthReconnectAsync(IntPtr auth);
     Task<AccountInfo> AuthAccountInfoAsync(IntPtr auth);
