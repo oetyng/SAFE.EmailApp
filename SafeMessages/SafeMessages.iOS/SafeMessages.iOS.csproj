@@ -144,7 +144,7 @@
       <HintPath>..\..\packages\Validation.2.2.8\lib\dotnet\Validation.dll</HintPath>
     </Reference>
     <Reference Include="Xamarin.Auth, Version=1.5.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\Xamarin.Auth.1.5.0.3\lib\Xamarin.iOS10\Xamarin.Auth.dll</HintPath>
+      <HintPath>..\..\packages\Xamarin.Auth.1.6.0-alpha04\lib\Xamarin.iOS10\Xamarin.Auth.dll</HintPath>
     </Reference>
     <Reference Include="Xamarin.Forms.Core">
       <HintPath>..\..\packages\Xamarin.Forms.2.4.0.282\lib\Xamarin.iOS10\Xamarin.Forms.Core.dll</HintPath>
@@ -171,7 +171,7 @@
       <Name>CommonUtils</Name>
     </ProjectReference>
     <ProjectReference Include="..\SafeMessages\SafeMessages.csproj">
-      <Project>{C13E3CFA-B02D-4F08-9331-215B7795632E}</Project>
+      <Project>{3c8ffbd0-0498-4235-82ef-1449d7ea4d19}</Project>
       <Name>SafeMessages</Name>
     </ProjectReference>
   </ItemGroup>

@@ -12,6 +12,7 @@ using SafeAuthenticator.Models;
 using SafeAuthenticator.Native;
 using SafeAuthenticator.Services;
 using Xamarin.Forms;
+using Xamarin.Forms.PlatformConfiguration;
 
 [assembly: Dependency(typeof(AuthService))]
 
@@ -55,25 +56,30 @@ namespace SafeAuthenticator.Services {
     }
 
     public async Task CheckAndReconnect() {
+      if (_authenticator == null) {
+        return;
+      }
       await _reconnectSemaphore.WaitAsync();
       try {
-        if (_authenticator == null) {
-          return;
-        }
-        if (_authenticator.IsDisconnected) {
-          if (!AuthReconnect) {
+        if (_authenticator.IsDisconnected)
+        {
+          if (!AuthReconnect)
+          {
             throw new Exception("Reconnect Disabled");
           }
 
-          using (UserDialogs.Instance.Loading("Reconnecting to Network")) {
+          using (UserDialogs.Instance.Loading("Reconnecting to Network"))
+          {
             var (location, password) = CredentialCache.Retrieve();
             await LoginAsync(location, password);
           }
 
-          try {
+          try
+          {
             var cts = new CancellationTokenSource(2000);
             await UserDialogs.Instance.AlertAsync("Network connection established.", "Success", "OK", cts.Token);
-          } catch (OperationCanceledException) { }
+          }
+          catch (OperationCanceledException) { }
         }
       } catch (Exception ex) {
         await Application.Current.MainPage.DisplayAlert("Error", $"Unable to Reconnect: {ex.Message}", "OK");
@@ -97,7 +103,7 @@ namespace SafeAuthenticator.Services {
     }
 
     public void FreeState() {
-      _authenticator.Dispose();
+      _authenticator?.Dispose();
     }
 
     public async Task<(int, int)> GetAccountInfoAsync() {
@@ -110,12 +116,13 @@ namespace SafeAuthenticator.Services {
       return appList.Select(app => new RegisteredAppModel(app.AppInfo, app.Containers)).ToList();
     }
 
-    public async Task HandleUrlActivationAsync(string encodedUrl) {
+    public async Task HandleUrlActivationAsync(string encodedUri) {
       try {
         await CheckAndReconnect();
-        var formattedUrl = Regex.Split(encodedUrl, "://")[1];
-        var decodeResult = await _authenticator.DecodeIpcMessageAsync(formattedUrl);
-        if (decodeResult.GetType() == typeof(AuthIpcReq)) {
+        var encodedReq = UrlFormat.GetRequestData(encodedUri);
+        var decodeResult = await _authenticator.DecodeIpcMessageAsync(encodedReq);
+        var decodedType = decodeResult.GetType();
+        if (decodedType == typeof(AuthIpcReq)) {
           var authReq = decodeResult as AuthIpcReq;
           Debug.WriteLine($"Decoded Req From {authReq.AuthReq.App.Name}");
           var isGranted = await Application.Current.MainPage.DisplayAlert(
@@ -124,9 +131,12 @@ namespace SafeAuthenticator.Services {
             "Allow",
             "Deny");
           var encodedRsp = await _authenticator.EncodeAuthRespAsync(authReq, isGranted);
-          var formattedRsp = $"{authReq.AuthReq.App.Id}://{encodedRsp}";
+          var formattedRsp = UrlFormat.Format(authReq.AuthReq.App.Id, encodedRsp, false);
           Debug.WriteLine($"Encoded Rsp to app: {formattedRsp}");
           Device.BeginInvokeOnMainThread(() => { Device.OpenUri(new Uri(formattedRsp)); });
+        } else if (decodedType == typeof(IpcReqError)) {
+          var error = decodeResult as IpcReqError;
+          await Application.Current.MainPage.DisplayAlert("Auth Request", $"Error: {error?.Description}", "Ok");
         } else {
           Debug.WriteLine("Decoded Req is not Auth Req");
         }

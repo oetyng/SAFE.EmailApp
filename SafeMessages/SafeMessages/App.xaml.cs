@@ -41,7 +41,7 @@ namespace SafeMessages {
       base.OnResume();
 
       IsBackgrounded = false;
-      await SafeApp.CheckAndReconnect();
+      await DependencyService.Get<AppService>().CheckAndReconnect();
     }
 
     protected override async void OnSleep() {

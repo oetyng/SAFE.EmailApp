@@ -164,7 +164,10 @@ namespace SafeMessages.Services {
 
     public async Task CheckAndReconnect() {
       try {
-        if (_session == null || _session.IsDisconnected) {
+        if (_session == null) {
+          return;
+        }
+        if (_session.IsDisconnected) {
           if (!AuthReconnect) {
             throw new Exception("Reconnect Disabled");
           }
@@ -205,28 +208,14 @@ namespace SafeMessages.Services {
       };
 
       var encodedReq = await Session.EncodeAuthReqAsync(authReq);
-      var formattedReq = $"safe-auth://{encodedReq.Item2}";
+      var formattedReq = UrlFormat.Format(AppId, encodedReq.Item2, true);
       Debug.WriteLine($"Encoded Req: {formattedReq}");
       return formattedReq;
-    }
-
-    private async Task<(List<byte>, List<byte>)> GenerateRandomKeyPair() {
-      var randomKeyPairTuple = await _session.Crypto.EncGenerateKeyPairAsync();
-      byte[] inboxEncPk, inboxEncSk;
-      using (var inboxEncPkH = randomKeyPairTuple.Item1) {
-        using (var inboxEncSkH = randomKeyPairTuple.Item2) {
-          inboxEncPk = await _session.Crypto.EncPubKeyGetAsync(inboxEncPkH);
-          inboxEncSk = await _session.Crypto.EncSecretKeyGetAsync(inboxEncSkH);
-        }
-      }
-
-      return (inboxEncPk.ToList(), inboxEncSk.ToList());
     }
 
     public async Task<List<UserId>> GetIdsAsync() {
       var ids = new List<UserId>();
       var appContH = await _session.AccessContainer.GetMDataInfoAsync("apps/" + AppId);
-      List<List<byte>> cipherTextEntKeys;
       var appContEntKeys = await _session.MData.ListKeysAsync(appContH);
       foreach (var cipherTextEntKey in appContEntKeys) {
         try {
@@ -280,16 +269,16 @@ namespace SafeMessages.Services {
       return messages;
     }
 
-    public async Task HandleUrlActivationAsync(string encodedUrl) {
+    public async Task HandleUrlActivationAsync(string url) {
       try {
-        var formattedUrl = encodedUrl.Replace($"{AppId}://", "");
-        var decodeResult = await Session.DecodeIpcMessageAsync(formattedUrl);
+        var encodedRequest = UrlFormat.GetRequestData(url);
+        var decodeResult = await Session.DecodeIpcMessageAsync(encodedRequest);
         if (decodeResult.GetType() == typeof(AuthIpcMsg)) {
           var ipcMsg = decodeResult as AuthIpcMsg;
           Debug.WriteLine("Received Auth Granted from Authenticator");
           // update auth progress message
           MessagingCenter.Send(this, MessengerConstants.AuthRequestProgress, AuthInProgressMessage);
-          await Session.AppRegisteredAsync(AppId, ipcMsg.AuthGranted);
+          _session = await Session.AppRegisteredAsync(AppId, ipcMsg.AuthGranted);
           if (AuthReconnect) {
             var encodedAuthRsp = JsonConvert.SerializeObject(ipcMsg.AuthGranted);
             CredentialCache.Store(encodedAuthRsp);

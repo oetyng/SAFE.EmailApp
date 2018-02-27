@@ -24,12 +24,12 @@ namespace SafeAuthenticator.Droid {
     public AuthService Authenticator => DependencyService.Get<AuthService>();
     private static string LogFolderPath => DependencyService.Get<IFileOps>().ConfigFilesPath;
 
-    private void HandleAppLaunch(string url) {
-      System.Diagnostics.Debug.WriteLine($"Launched via: {url}");
+    private void HandleAppLaunch(string uri) {
+      System.Diagnostics.Debug.WriteLine($"Launched via: {uri}");
       Device.BeginInvokeOnMainThread(
         async () => {
           try {
-            await Authenticator.HandleUrlActivationAsync(url);
+            await Authenticator.HandleUrlActivationAsync(uri);
             System.Diagnostics.Debug.WriteLine("IPC Msg Handling Completed");
           } catch (Exception ex) {
             System.Diagnostics.Debug.WriteLine($"Error: {ex.Message}");
