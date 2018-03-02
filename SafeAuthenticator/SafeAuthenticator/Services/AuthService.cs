@@ -118,6 +118,9 @@ namespace SafeAuthenticator.Services {
 
     public async Task HandleUrlActivationAsync(string encodedUri) {
       try {
+        if (_authenticator == null) {
+          return;
+        }
         await CheckAndReconnect();
         var encodedReq = UrlFormat.GetRequestData(encodedUri);
         var decodeResult = await _authenticator.DecodeIpcMessageAsync(encodedReq);

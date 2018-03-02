@@ -203,7 +203,7 @@ namespace SafeMessages.Services {
     public async Task<string> GenerateAppRequestAsync() {
       var authReq = new AuthReq {
         AppContainer = true,
-        App = new AppExchangeInfo {Id = AppId, Scope = "", Name = "SAFE Messages", Vendor = "MaidSafe.net"},
+        App = new AppExchangeInfo {Id = AppId, Scope = "", Name = "SAFE Messages", Vendor = "MaidSafe.net Ltd"},
         Containers = new List<ContainerPermissions> {new ContainerPermissions {ContName = "_publicNames", Access = {Insert = true}}}
       };
 
