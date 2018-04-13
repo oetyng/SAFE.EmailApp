@@ -28,6 +28,7 @@ namespace SafeMessages {
       if (navPage == null) {
         return false;
       }
+
       var validPage = navPage.Navigation.NavigationStack.FirstOrDefault();
       var checkPage = page.Navigation.NavigationStack.FirstOrDefault();
       return validPage != null && validPage == checkPage;
@@ -56,14 +57,17 @@ namespace SafeMessages {
       if (navPage == null) {
         return;
       }
+
       var navigationController = navPage.Navigation;
       foreach (var page in navigationController.NavigationStack.OfType<ICleanup>()) {
         page.MessageCenterUnsubscribe();
       }
+
       var rootPage = navigationController.NavigationStack.FirstOrDefault();
       if (rootPage == null) {
         return;
       }
+
       navigationController.InsertPageBefore(NewStartupPage(), rootPage);
       await navigationController.PopToRootAsync(true);
     }

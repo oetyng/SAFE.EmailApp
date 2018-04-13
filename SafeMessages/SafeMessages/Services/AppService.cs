@@ -19,9 +19,9 @@ using Xamarin.Forms;
 
 namespace SafeMessages.Services {
   public class AppService : ObservableObject, IDisposable {
+    public const string AppId = "net.maidsafe.examples.mailtutorial";
     public const string AuthDeniedMessage = "Failed to receive Authentication.";
     public const string AuthInProgressMessage = "Connecting to SAFE Network...";
-    public const string AppId = "net.maidsafe.examples.mailtutorial";
     private const string AuthReconnectPropKey = nameof(AuthReconnect);
     private bool _isLogInitialised;
     private Session _session;
@@ -109,9 +109,11 @@ namespace SafeMessages.Services {
               var inboxEncSkRaw = await _session.Crypto.EncSecretKeyGetAsync(inboxEncSk);
 
               var inboxEmailPkEntryKey = "__email_enc_pk".ToUtfBytes();
-              using (var inboxEntriesH = await _session.MDataEntries.NewAsync())
-              {
-                await _session.MDataEntries.InsertAsync(inboxEntriesH, inboxEmailPkEntryKey, inboxEncPkRaw.ToList().ToHexString().ToUtfBytes());
+              using (var inboxEntriesH = await _session.MDataEntries.NewAsync()) {
+                await _session.MDataEntries.InsertAsync(
+                  inboxEntriesH,
+                  inboxEmailPkEntryKey,
+                  inboxEncPkRaw.ToList().ToHexString().ToUtfBytes());
                 var inboxMDataInfoH = await _session.MDataInfoActions.RandomPublicAsync(15001);
                 await _session.MData.PutAsync(inboxMDataInfoH, inboxPermH, inboxEntriesH);
                 serInboxMdInfo = await _session.MDataInfoActions.SerialiseAsync(inboxMDataInfoH);
@@ -119,9 +121,8 @@ namespace SafeMessages.Services {
 
               // Create Public Id MD
               var idDigest = await Crypto.Sha3HashAsync(userId.ToUtfBytes());
-              var pubIdMDataInfoH = new MDataInfo { Name = idDigest.ToArray(), TypeTag = 15001 };
-              using (var pubIdEntriesH = await _session.MDataEntries.NewAsync())
-              {
+              var pubIdMDataInfoH = new MDataInfo {Name = idDigest.ToArray(), TypeTag = 15001};
+              using (var pubIdEntriesH = await _session.MDataEntries.NewAsync()) {
                 await _session.MDataEntries.InsertAsync(pubIdEntriesH, "@email".ToUtfBytes(), serInboxMdInfo);
                 await _session.MData.PutAsync(pubIdMDataInfoH, inboxPermH, pubIdEntriesH);
               }
@@ -130,18 +131,16 @@ namespace SafeMessages.Services {
               var publicNamesContH = await _session.AccessContainer.GetMDataInfoAsync("_publicNames");
               var pubNamesUserIdCipherBytes = await _session.MDataInfoActions.EncryptEntryKeyAsync(publicNamesContH, userId.ToUtfBytes());
               var pubNamesMsgBoxCipherBytes = await _session.MDataInfoActions.EncryptEntryValueAsync(publicNamesContH, idDigest);
-              using (var pubNamesContEntActH = await _session.MDataEntryActions.NewAsync())
-              {
+              using (var pubNamesContEntActH = await _session.MDataEntryActions.NewAsync()) {
                 await _session.MDataEntryActions.InsertAsync(pubNamesContEntActH, pubNamesUserIdCipherBytes, pubNamesMsgBoxCipherBytes);
                 await _session.MData.MutateEntriesAsync(publicNamesContH, pubNamesContEntActH);
               }
 
               // Finally update App Container
-              var msgBox = new MessageBox
-              {
+              var msgBox = new MessageBox {
                 EmailId = userId,
-                Inbox = new DataArray { Type = "Buffer", Data = serInboxMdInfo },
-                Archive = new DataArray { Type = "Buffer", Data = serArchiveMdInfo },
+                Inbox = new DataArray {Type = "Buffer", Data = serInboxMdInfo},
+                Archive = new DataArray {Type = "Buffer", Data = serArchiveMdInfo},
                 EmailEncPk = inboxEncPkRaw.ToList().ToHexString(),
                 EmailEncSk = inboxEncSkRaw.ToList().ToHexString()
               };
@@ -150,12 +149,10 @@ namespace SafeMessages.Services {
               var appContH = await _session.AccessContainer.GetMDataInfoAsync("apps/" + AppId);
               var userIdCipherBytes = await _session.MDataInfoActions.EncryptEntryKeyAsync(appContH, userId.ToUtfBytes());
               var msgBoxCipherBytes = await _session.MDataInfoActions.EncryptEntryValueAsync(appContH, msgBoxSer.ToUtfBytes());
-              using (var appContEntActH = await _session.MDataEntryActions.NewAsync())
-              {
+              using (var appContEntActH = await _session.MDataEntryActions.NewAsync()) {
                 await _session.MDataEntryActions.InsertAsync(appContEntActH, userIdCipherBytes, msgBoxCipherBytes);
                 await _session.MData.MutateEntriesAsync(appContH, appContEntActH);
               }
-
             }
           }
         }
@@ -167,6 +164,7 @@ namespace SafeMessages.Services {
         if (_session == null) {
           return;
         }
+
         if (_session.IsDisconnected) {
           if (!AuthReconnect) {
             throw new Exception("Reconnect Disabled");
@@ -175,7 +173,7 @@ namespace SafeMessages.Services {
           using (UserDialogs.Instance.Loading("Reconnecting to Network")) {
             var encodedAuthRsp = CredentialCache.Retrieve();
             var authGranted = JsonConvert.DeserializeObject<AuthGranted>(encodedAuthRsp);
-            await Session.AppRegisteredAsync(AppId, authGranted);
+            _session = await Session.AppRegisteredAsync(AppId, authGranted);
           }
 
           try {
@@ -185,7 +183,7 @@ namespace SafeMessages.Services {
         }
       } catch (Exception ex) {
         await Application.Current.MainPage.DisplayAlert("Error", $"Unable to Reconnect: {ex.Message}", "OK");
-        _session.Dispose();
+        _session?.Dispose();
         MessagingCenter.Send(this, MessengerConstants.ResetAppViews);
       }
     }
@@ -313,6 +311,7 @@ namespace SafeMessages.Services {
       if (!obj.Equals(_session)) {
         return;
       }
+
       Device.BeginInvokeOnMainThread(
         async () => {
           _session?.Dispose();
