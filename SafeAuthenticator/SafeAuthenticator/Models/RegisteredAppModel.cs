@@ -2,17 +2,19 @@
 using System.Collections.Generic;
 using System.Linq;
 using CommonUtils;
+using JetBrains.Annotations;
 using SafeAuthenticator.Helpers;
 using SafeAuthenticator.Native;
 
 namespace SafeAuthenticator.Models {
   public class RegisteredAppModel : ObservableObject, IComparable, IEquatable<RegisteredAppModel> {
+    [PublicAPI]
     public AppExchangeInfo AppInfo { get; }
 
     public string AppName => AppInfo.Name;
     public string AppVendor => AppInfo.Vendor;
     public string AppId => AppInfo.Id;
-
+    [PublicAPI]
     public ObservableRangeCollection<ContainerPermissionsModel> Containers { get; }
 
     public RegisteredAppModel(AppExchangeInfo appInfo, IEnumerable<ContainerPermissions> containers) {
@@ -31,8 +33,7 @@ namespace SafeAuthenticator.Models {
     }
 
     public int CompareTo(object obj) {
-      var other = obj as RegisteredAppModel;
-      if (other == null) {
+      if (!(obj is RegisteredAppModel other)) {
         throw new NotSupportedException();
       }
 

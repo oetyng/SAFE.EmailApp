@@ -13,7 +13,7 @@ using Xamarin.Forms;
 
 [assembly: Dependency(typeof(AuthBindings))]
 namespace SafeAuthenticator.Native {
-  public partial class AuthBindings : IAuthBindings {
+  internal partial class AuthBindings : IAuthBindings {
 #if __IOS__
     private const string DllName = "__Internal";
 #else
@@ -166,7 +166,7 @@ namespace SafeAuthenticator.Native {
     [DllImport(DllName, EntryPoint = "encode_share_mdata_resp")]
     private static extern void EncodeShareMDataRespNative(
       IntPtr auth,
-      ref Native.ShareMDataReqNative req,
+      ref ShareMDataReqNative req,
       uint reqId,
       [MarshalAs(UnmanagedType.U1)] bool isGranted,
       IntPtr userData,
@@ -218,7 +218,7 @@ namespace SafeAuthenticator.Native {
     [DllImport(DllName, EntryPoint = "encode_auth_resp")]
     private static extern void EncodeAuthRespNative(
       IntPtr auth,
-      ref Native.AuthReqNative req,
+      ref AuthReqNative req,
       uint reqId,
       [MarshalAs(UnmanagedType.U1)] bool isGranted,
       IntPtr userData,
@@ -235,7 +235,7 @@ namespace SafeAuthenticator.Native {
     [DllImport(DllName, EntryPoint = "encode_containers_resp")]
     private static extern void EncodeContainersRespNative(
       IntPtr auth,
-      ref Native.ContainersReqNative req,
+      ref ContainersReqNative req,
       uint reqId,
       [MarshalAs(UnmanagedType.U1)] bool isGranted,
       IntPtr userData,
@@ -329,7 +329,7 @@ namespace SafeAuthenticator.Native {
       BindingUtils.CompleteTask(
         userData,
         Marshal.PtrToStructure<FfiResult>(result),
-        () => BindingUtils.CopyToObjectList<Native.RegisteredAppNative>(registeredAppPtr, (int)registeredAppLen).
+        () => BindingUtils.CopyToObjectList<RegisteredAppNative>(registeredAppPtr, (int)registeredAppLen).
           Select(native => new RegisteredApp(native)).ToList());
     }
 

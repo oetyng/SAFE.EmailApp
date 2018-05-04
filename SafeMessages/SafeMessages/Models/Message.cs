@@ -4,16 +4,16 @@ using Newtonsoft.Json;
 namespace SafeMessages.Models {
   public class Message : IComparable, IEquatable<Message> {
     [JsonProperty("from")]
-    public string From { get; set; }
+    public string From { get; }
 
     [JsonProperty("subject")]
-    public string Subject { get; set; }
+    public string Subject { get; }
 
     [JsonProperty("time")]
-    public string Time { get; set; }
+    public string Time { get; }
 
     [JsonProperty("body")]
-    public string Body { get; set; }
+    public string Body { get; }
 
     [JsonIgnore]
     public string LocalTime => Convert.ToDateTime(Time).ToString("f");

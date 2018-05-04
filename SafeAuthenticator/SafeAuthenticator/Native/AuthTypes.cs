@@ -8,9 +8,13 @@ namespace SafeAuthenticator.Native {
   [PublicAPI]
   public enum MDataAction
   {
+    // ReSharper disable once InconsistentNaming
     Insert,
+    // ReSharper disable once InconsistentNaming
     Update,
+    // ReSharper disable once InconsistentNaming
     Delete,
+    // ReSharper disable once InconsistentNaming
     ManagePermissions,
   }
 
@@ -85,13 +89,13 @@ namespace SafeAuthenticator.Native {
 
   public struct AuthReqNative
   {
-    public AppExchangeInfo App;
+    internal AppExchangeInfo App;
     [MarshalAs(UnmanagedType.U1)]
-    public bool AppContainer;
-    public IntPtr ContainersPtr;
-    public UIntPtr ContainersLen;
+    internal bool AppContainer;
+    internal IntPtr ContainersPtr;
+    internal UIntPtr ContainersLen;
     // ReSharper disable once NotAccessedField.Compiler
-    public UIntPtr ContainersCap;
+    internal UIntPtr ContainersCap;
 
     public void Free()
     {
@@ -102,8 +106,8 @@ namespace SafeAuthenticator.Native {
   [PublicAPI]
   public struct ContainersReq
   {
-    public AppExchangeInfo App;
-    public List<ContainerPermissions> Containers;
+    internal AppExchangeInfo App;
+    internal List<ContainerPermissions> Containers;
 
     public ContainersReq(ContainersReqNative native)
     {
@@ -125,11 +129,11 @@ namespace SafeAuthenticator.Native {
 
   public struct ContainersReqNative
   {
-    public AppExchangeInfo App;
-    public IntPtr ContainersPtr;
-    public UIntPtr ContainersLen;
+    internal AppExchangeInfo App;
+    internal IntPtr ContainersPtr;
+    internal UIntPtr ContainersLen;
     // ReSharper disable once NotAccessedField.Compiler
-    public UIntPtr ContainersCap;
+    internal UIntPtr ContainersCap;
 
     public void Free()
     {
@@ -184,11 +188,11 @@ namespace SafeAuthenticator.Native {
 
   public struct ShareMDataReqNative
   {
-    public AppExchangeInfo App;
-    public IntPtr MDataPtr;
-    public UIntPtr MDataLen;
+    internal AppExchangeInfo App;
+    internal IntPtr MDataPtr;
+    internal UIntPtr MDataLen;
     // ReSharper disable once NotAccessedField.Compiler
-    public UIntPtr MDataCap;
+    internal UIntPtr MDataCap;
 
     public void Free()
     {
@@ -237,14 +241,15 @@ namespace SafeAuthenticator.Native {
 
   public struct AuthGrantedNative
   {
-    public AppKeys AppKeys;
-    public AccessContInfo AccessContainerInfo;
-    public AccessContainerEntryNative AccessContainerEntry;
-    public IntPtr BootstrapConfigPtr;
-    public UIntPtr BootstrapConfigLen;
+    internal AppKeys AppKeys;
+    internal AccessContInfo AccessContainerInfo;
+    internal AccessContainerEntryNative AccessContainerEntry;
+    internal IntPtr BootstrapConfigPtr;
+    internal UIntPtr BootstrapConfigLen;
     // ReSharper disable once NotAccessedField.Compiler
-    public UIntPtr BootstrapConfigCap;
+    internal UIntPtr BootstrapConfigCap;
 
+    // ReSharper disable once UnusedMember.Global
     public void Free()
     {
       AccessContainerEntry.Free();
@@ -302,12 +307,12 @@ namespace SafeAuthenticator.Native {
 
   public struct AccessContainerEntryNative
   {
-    public IntPtr ContainersPtr;
-    public UIntPtr ContainersLen;
+    internal IntPtr ContainersPtr;
+    internal UIntPtr ContainersLen;
     // ReSharper disable once NotAccessedField.Compiler
-    public UIntPtr ContainersCap;
+    internal UIntPtr ContainersCap;
 
-    public void Free()
+    internal void Free()
     {
       BindingUtils.FreeList(ref ContainersPtr, ref ContainersLen);
     }
@@ -371,11 +376,12 @@ namespace SafeAuthenticator.Native {
 
   public struct MDataValueNative
   {
-    public IntPtr ContentPtr;
-    public UIntPtr ContentLen;
-    public ulong EntryVersion;
+    internal IntPtr ContentPtr;
+    internal UIntPtr ContentLen;
+    internal ulong EntryVersion;
 
-    public void Free()
+    // ReSharper disable once UnusedMember.Global
+    internal void Free()
     {
       BindingUtils.FreeList(ref ContentPtr, ref ContentLen);
     }
@@ -403,9 +409,10 @@ namespace SafeAuthenticator.Native {
 
   public struct MDataKeyNative
   {
-    public IntPtr ValPtr;
-    public UIntPtr ValLen;
+    internal IntPtr ValPtr;
+    internal UIntPtr ValLen;
 
+    // ReSharper disable once UnusedMember.Global
     public void Free()
     {
       BindingUtils.FreeList(ref ValPtr, ref ValLen);
@@ -453,18 +460,19 @@ namespace SafeAuthenticator.Native {
 
   public struct FileNative
   {
-    public ulong Size;
-    public long CreatedSec;
-    public uint CreatedNsec;
-    public long ModifiedSec;
-    public uint ModifiedNsec;
-    public IntPtr UserMetadataPtr;
-    public UIntPtr UserMetadataLen;
+    internal ulong Size;
+    internal long CreatedSec;
+    internal uint CreatedNsec;
+    internal long ModifiedSec;
+    internal uint ModifiedNsec;
+    internal IntPtr UserMetadataPtr;
+    internal UIntPtr UserMetadataLen;
     // ReSharper disable once NotAccessedField.Compiler
-    public UIntPtr UserMetadataCap;
+    internal UIntPtr UserMetadataCap;
     [MarshalAs(UnmanagedType.ByValArray, SizeConst = (int)AppConstants.XorNameLen)]
-    public byte[] DataMapName;
+    internal byte[] DataMapName;
 
+    // ReSharper disable once UnusedMember.Global
     public void Free()
     {
       BindingUtils.FreeList(ref UserMetadataPtr, ref UserMetadataLen);
@@ -504,13 +512,14 @@ namespace SafeAuthenticator.Native {
 
   public struct RegisteredAppNative
   {
-    public AppExchangeInfo AppInfo;
-    public IntPtr ContainersPtr;
-    public UIntPtr ContainersLen;
+    internal AppExchangeInfo AppInfo;
+    internal IntPtr ContainersPtr;
+    internal UIntPtr ContainersLen;
 
     // ReSharper disable once NotAccessedField.Compiler
-    public IntPtr ContainersCap;
+    internal IntPtr ContainersCap;
 
+    // ReSharper disable once UnusedMember.Global
     public void Free()
     {
       BindingUtils.FreeList(ref ContainersPtr, ref ContainersLen);

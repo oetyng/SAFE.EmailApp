@@ -1,6 +1,11 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:msgViewModels="clr-namespace:SafeMessages.ViewModels;assembly=SafeMessages"
+             d:DataContext="{d:DesignInstance msgViewModels:MessagesViewModel}"
              xmlns:commonUtils="clr-namespace:CommonUtils;assembly=CommonUtils"
              x:Class="SafeMessages.Views.MessagesView" Title="{Binding UserId.Name}">
   <ContentPage.ToolbarItems>
@@ -21,11 +26,11 @@
             <StackLayout Padding="20" HeightRequest="35">
               <Label Text="{Binding From}"
                      LineBreakMode="TailTruncation"
-                     Font="Bold,Medium" />
+                     FontSize="Bold,Medium" />
               <Label Text="{Binding Subject}"
                      LineBreakMode="WordWrap"
                      TextColor="Gray"
-                     Font="Micro" />
+                     FontSize="Micro" />
             </StackLayout>
           </ViewCell>
         </DataTemplate>

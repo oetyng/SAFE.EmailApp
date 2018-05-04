@@ -12,7 +12,7 @@ namespace SafeAuthenticator.ViewModels {
     private bool _isRefreshing;
     public ICommand LogoutCommand { get; }
     public ObservableRangeCollection<RegisteredAppModel> Apps { get; set; }
-    public bool IsRefreshing { get => _isRefreshing; set => SetProperty(ref _isRefreshing, value); }
+    public bool IsRefreshing { get => _isRefreshing; private set => SetProperty(ref _isRefreshing, value); }
     public ICommand RefreshAccountsCommand { get; }
     public ICommand AccountSelectedCommand { get; }
     public string AccountStorageInfo { get => _accountStorageInfo; set => SetProperty(ref _accountStorageInfo, value); }

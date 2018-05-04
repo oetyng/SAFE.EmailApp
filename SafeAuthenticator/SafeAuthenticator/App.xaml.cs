@@ -2,7 +2,6 @@
 using System.Threading.Tasks;
 using CommonUtils;
 using SafeAuthenticator.Helpers;
-using SafeAuthenticator.Native;
 using SafeAuthenticator.Services;
 using SafeAuthenticator.Views;
 using Xamarin.Forms;
@@ -12,9 +11,9 @@ using Xamarin.Forms.Xaml;
 
 namespace SafeAuthenticator {
   public partial class App : Application {
-    public const string AppName = "SAFE Authenticator";
+    internal const string AppName = "SAFE Authenticator";
     private static volatile bool _isBackgrounded;
-    private static bool IsBackgrounded { get => _isBackgrounded; set => _isBackgrounded = value; }
+    internal static bool IsBackgrounded { get => _isBackgrounded; private set => _isBackgrounded = value; }
 
     public App() {
       InitializeComponent();
@@ -23,9 +22,8 @@ namespace SafeAuthenticator {
       Current.MainPage = new NavigationPage(NewStartupPage());
     }
 
-    public static bool IsPageValid(Page page) {
-      var navPage = Current.MainPage as NavigationPage;
-      if (navPage == null) {
+    internal static bool IsPageValid(Page page) {
+      if (!(Current.MainPage is NavigationPage navPage)) {
         return false;
       }
       var validPage = navPage.Navigation.NavigationStack.FirstOrDefault();
@@ -52,8 +50,7 @@ namespace SafeAuthenticator {
     }
 
     private async Task ResetViews() {
-      var navPage = Current.MainPage as NavigationPage;
-      if (navPage == null) {
+      if (!(Current.MainPage is NavigationPage navPage)) {
         return;
       }
       var navigationController = navPage.Navigation;

@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using Acr.UserDialogs;
@@ -12,7 +11,6 @@ using SafeAuthenticator.Models;
 using SafeAuthenticator.Native;
 using SafeAuthenticator.Services;
 using Xamarin.Forms;
-using Xamarin.Forms.PlatformConfiguration;
 
 [assembly: Dependency(typeof(AuthService))]
 
@@ -22,11 +20,11 @@ namespace SafeAuthenticator.Services {
     private readonly SemaphoreSlim _reconnectSemaphore = new SemaphoreSlim(1, 1);
     private Authenticator _authenticator;
     private bool _isLogInitialised;
-    public bool IsLogInitialised { get => _isLogInitialised; set => SetProperty(ref _isLogInitialised, value); }
+    internal bool IsLogInitialised { get => _isLogInitialised; private set => SetProperty(ref _isLogInitialised, value); }
 
     private CredentialCacheService CredentialCache { get; }
 
-    public bool AuthReconnect {
+    internal bool AuthReconnect {
       get {
         if (!Application.Current.Properties.ContainsKey(AuthReconnectPropKey)) {
           return false;
@@ -47,39 +45,38 @@ namespace SafeAuthenticator.Services {
     public AuthService() {
       _isLogInitialised = false;
       CredentialCache = new CredentialCacheService();
+      Authenticator.Disconnected += OnNetworkDisconnected;
       InitLoggingAsync();
     }
 
     public void Dispose() {
+      // ReSharper disable once DelegateSubtraction
+      Authenticator.Disconnected -= OnNetworkDisconnected;
       FreeState();
       GC.SuppressFinalize(this);
     }
 
-    public async Task CheckAndReconnect() {
+    internal async Task CheckAndReconnect() {
       if (_authenticator == null) {
         return;
       }
+
       await _reconnectSemaphore.WaitAsync();
       try {
-        if (_authenticator.IsDisconnected)
-        {
-          if (!AuthReconnect)
-          {
+        if (_authenticator.IsDisconnected) {
+          if (!AuthReconnect) {
             throw new Exception("Reconnect Disabled");
           }
 
-          using (UserDialogs.Instance.Loading("Reconnecting to Network"))
-          {
+          using (UserDialogs.Instance.Loading("Reconnecting to Network")) {
             var (location, password) = CredentialCache.Retrieve();
             await LoginAsync(location, password);
           }
 
-          try
-          {
+          try {
             var cts = new CancellationTokenSource(2000);
             await UserDialogs.Instance.AlertAsync("Network connection established.", "Success", "OK", cts.Token);
-          }
-          catch (OperationCanceledException) { }
+          } catch (OperationCanceledException) { }
         }
       } catch (Exception ex) {
         await Application.Current.MainPage.DisplayAlert("Error", $"Unable to Reconnect: {ex.Message}", "OK");
@@ -90,7 +87,7 @@ namespace SafeAuthenticator.Services {
       }
     }
 
-    public async Task CreateAccountAsync(string location, string password, string invitation) {
+    internal async Task CreateAccountAsync(string location, string password, string invitation) {
       Debug.WriteLine($"CreateAccountAsync {location} - {password} - {invitation.Substring(0, 5)}");
       _authenticator = await Authenticator.CreateAccountAsync(location, password, invitation);
       if (AuthReconnect) {
@@ -106,12 +103,12 @@ namespace SafeAuthenticator.Services {
       _authenticator?.Dispose();
     }
 
-    public async Task<(int, int)> GetAccountInfoAsync() {
+    internal async Task<(int, int)> GetAccountInfoAsync() {
       var acctInfo = await _authenticator.AuthAccountInfoAsync();
       return (Convert.ToInt32(acctInfo.MutationsDone), Convert.ToInt32(acctInfo.MutationsDone + acctInfo.MutationsAvailable));
     }
 
-    public async Task<List<RegisteredAppModel>> GetRegisteredAppsAsync() {
+    internal async Task<List<RegisteredAppModel>> GetRegisteredAppsAsync() {
       var appList = await _authenticator.AuthRegisteredAppsAsync();
       return appList.Select(app => new RegisteredAppModel(app.AppInfo, app.Containers)).ToList();
     }
@@ -121,20 +118,21 @@ namespace SafeAuthenticator.Services {
         if (_authenticator == null) {
           return;
         }
+
         await CheckAndReconnect();
         var encodedReq = UrlFormat.GetRequestData(encodedUri);
         var decodeResult = await _authenticator.DecodeIpcMessageAsync(encodedReq);
         var decodedType = decodeResult.GetType();
         if (decodedType == typeof(AuthIpcReq)) {
           var authReq = decodeResult as AuthIpcReq;
-          Debug.WriteLine($"Decoded Req From {authReq.AuthReq.App.Name}");
+          Debug.WriteLine($"Decoded Req From {authReq?.AuthReq.App.Name}");
           var isGranted = await Application.Current.MainPage.DisplayAlert(
             "Auth Request",
-            $"{authReq.AuthReq.App.Name} is requesting access",
+            $"{authReq?.AuthReq.App.Name} is requesting access",
             "Allow",
             "Deny");
           var encodedRsp = await _authenticator.EncodeAuthRespAsync(authReq, isGranted);
-          var formattedRsp = UrlFormat.Format(authReq.AuthReq.App.Id, encodedRsp, false);
+          var formattedRsp = UrlFormat.Format(authReq?.AuthReq.App.Id, encodedRsp, false);
           Debug.WriteLine($"Encoded Rsp to app: {formattedRsp}");
           Device.BeginInvokeOnMainThread(() => { Device.OpenUri(new Uri(formattedRsp)); });
         } else if (decodedType == typeof(IpcReqError)) {
@@ -160,7 +158,7 @@ namespace SafeAuthenticator.Services {
       IsLogInitialised = true;
     }
 
-    public async Task LoginAsync(string location, string password) {
+    internal async Task LoginAsync(string location, string password) {
       Debug.WriteLine($"LoginAsync {location} - {password}");
       _authenticator = await Authenticator.LoginAsync(location, password);
       if (AuthReconnect) {
@@ -168,8 +166,25 @@ namespace SafeAuthenticator.Services {
       }
     }
 
-    public async Task LogoutAsync() {
+    internal async Task LogoutAsync() {
       await Task.Run(() => { _authenticator.Dispose(); });
+    }
+
+    private void OnNetworkDisconnected(object obj, EventArgs args) {
+      Debug.WriteLine("Network Observer Fired");
+
+      if (obj == null || _authenticator == null || obj as Authenticator != _authenticator) {
+        return;
+      }
+
+      Device.BeginInvokeOnMainThread(
+        async () => {
+          if (App.IsBackgrounded) {
+            return;
+          }
+
+          await CheckAndReconnect();
+        });
     }
   }
 }

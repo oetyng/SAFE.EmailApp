@@ -1,16 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Runtime.InteropServices;
 using System.Text;
 using CommonUtils;
-using SafeAuthenticator.Native;
-using SafeAuthenticator.Services;
-using Xamarin.Forms;
 
 namespace SafeAuthenticator.Helpers {
-  public static class Helpers {
-    public static ObservableRangeCollection<T> ToObservableRangeCollection<T>(this IEnumerable<T> source) {
+  internal static class Helpers {
+    internal static ObservableRangeCollection<T> ToObservableRangeCollection<T>(this IEnumerable<T> source) {
       var result = new ObservableRangeCollection<T>();
       foreach (var item in source) {
         result.Add(item);

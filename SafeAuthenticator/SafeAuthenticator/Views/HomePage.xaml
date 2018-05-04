@@ -18,19 +18,19 @@
                LineBreakMode="TailTruncation"
                TextColor="Gray"
                Margin="15,10,15,0"
-               Font="Medium" />
+               FontSize="Medium" />
         <Label Text="{Binding AccountStorageInfo}"
                LineBreakMode="TailTruncation"
                Margin="25,5,25,10"
                TextColor="DarkGray"
-               Font="Medium" />
+               FontSize="Medium" />
       </StackLayout>
       <StackLayout BackgroundColor="LightGray" HeightRequest="2" />
 
       <Label Text="Authorised Apps:" Margin="15,10,15,10"
              TextColor="Gray"
              LineBreakMode="TailTruncation"
-             Font="Medium" />
+             FontSize="Medium" />
       <ListView x:Name="AccountsView" ItemsSource="{Binding Apps}"
                 VerticalOptions="FillAndExpand"
                 HasUnevenRows="True"

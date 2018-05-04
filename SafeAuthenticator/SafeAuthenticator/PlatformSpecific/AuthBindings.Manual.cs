@@ -8,7 +8,7 @@ using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 
 namespace SafeAuthenticator.Native {
-  public partial class AuthBindings {
+  internal partial class AuthBindings {
     public void CreateAccount(
         string locator,
         string secret,
@@ -111,6 +111,7 @@ namespace SafeAuthenticator.Native {
 #if __IOS__
     [MonoPInvokeCallback(typeof(IpcReqEncodeCb))]
 #endif
+    // ReSharper disable once UnusedMember.Local
     private static void OnIpcReqEncodeCb(IntPtr userData, IntPtr result, string msg)
     {
       var tcs = BindingUtils.FromHandlePtr<TaskCompletionSource<string>>(userData);
@@ -131,8 +132,9 @@ namespace SafeAuthenticator.Native {
       return task;
     }
 
+    // ReSharper disable once UnusedMember.Local
     private delegate void FfiResultIpcReqErrorCb(IntPtr userData, IntPtr result, string msg);
-
+    // ReSharper disable once UnusedMember.Local
     private delegate void IpcReqEncodeCb(IntPtr userData, IntPtr result, string msg);
   }
 }

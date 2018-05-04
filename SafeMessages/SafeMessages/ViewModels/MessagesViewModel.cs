@@ -3,7 +3,6 @@ using System.Linq;
 using System.Windows.Input;
 using SafeMessages.Helpers;
 using SafeMessages.Models;
-using SafeMessages.Services;
 using Xamarin.Forms;
 
 namespace SafeMessages.ViewModels {

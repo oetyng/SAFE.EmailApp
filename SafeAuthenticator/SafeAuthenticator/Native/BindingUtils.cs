@@ -23,8 +23,8 @@ namespace SafeAuthenticator.Native {
     }
   }
 
-  public class BindingUtils {
-    public static void CompleteTask<T>(TaskCompletionSource<T> tcs, FfiResult result, Func<T> argFunc) {
+  public static class BindingUtils {
+    private static void CompleteTask<T>(TaskCompletionSource<T> tcs, FfiResult result, Func<T> argFunc) {
       if (result.ErrorCode != 0) {
         Task.Run(() => { tcs.SetException(result.ToException()); });
       } else {
@@ -42,7 +42,7 @@ namespace SafeAuthenticator.Native {
       CompleteTask(userData, result, () => true);
     }
 
-    public static IntPtr CopyFromByteList(List<byte> list) {
+    internal static IntPtr CopyFromByteList(List<byte> list) {
       if (list == null || list.Count == 0) {
         return IntPtr.Zero;
       }
@@ -55,7 +55,7 @@ namespace SafeAuthenticator.Native {
       return ptr;
     }
 
-    public static IntPtr CopyFromObjectList<T>(List<T> list) {
+    internal static IntPtr CopyFromObjectList<T>(List<T> list) {
       if (list == null || list.Count == 0) {
         return IntPtr.Zero;
       }
@@ -69,7 +69,7 @@ namespace SafeAuthenticator.Native {
       return ptr;
     }
 
-    public static byte[] CopyToByteArray(IntPtr ptr, int len) {
+    private static byte[] CopyToByteArray(IntPtr ptr, int len) {
       var array = new byte[len];
       if (len > 0) {
         Marshal.Copy(ptr, array, 0, len);
@@ -78,7 +78,8 @@ namespace SafeAuthenticator.Native {
       return array;
     }
 
-    public static List<byte> CopyToByteList(IntPtr ptr, int len) {
+    // ReSharper disable once UnusedMember.Global
+    internal static List<byte> CopyToByteList(IntPtr ptr, int len) {
       return new List<byte>(CopyToByteArray(ptr, len));
     }
 
@@ -91,7 +92,8 @@ namespace SafeAuthenticator.Native {
       return list;
     }
 
-    public static void FreeList(ref IntPtr ptr, ref UIntPtr len) {
+    // ReSharper disable once RedundantAssignment
+    internal static void FreeList(ref IntPtr ptr, ref UIntPtr len) {
       if (ptr != IntPtr.Zero) {
         Marshal.FreeHGlobal(ptr);
       }
