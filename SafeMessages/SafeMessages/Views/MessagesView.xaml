@@ -26,7 +26,8 @@
             <StackLayout Padding="20" HeightRequest="35">
               <Label Text="{Binding From}"
                      LineBreakMode="TailTruncation"
-                     FontSize="Bold,Medium" />
+                     FontSize="Medium"
+                     FontAttributes="Bold"/>
               <Label Text="{Binding Subject}"
                      LineBreakMode="WordWrap"
                      TextColor="Gray"

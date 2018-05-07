@@ -123,13 +123,13 @@
       <HintPath>..\..\packages\PInvoke.Windows.Core.0.5.126\lib\portable-net45+win8+wpa81\PInvoke.Windows.Core.dll</HintPath>
     </Reference>
     <Reference Include="SafeApp, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\MaidSafe.SafeApp.0.0.2\lib\Xamarin.iOS10\SafeApp.dll</HintPath>
+      <HintPath>..\..\packages\MaidSafe.SafeApp.0.0.3\lib\Xamarin.iOS10\SafeApp.dll</HintPath>
     </Reference>
     <Reference Include="SafeApp.AppBindings, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\MaidSafe.SafeApp.0.0.2\lib\Xamarin.iOS10\SafeApp.AppBindings.dll</HintPath>
+      <HintPath>..\..\packages\MaidSafe.SafeApp.0.0.3\lib\Xamarin.iOS10\SafeApp.AppBindings.dll</HintPath>
     </Reference>
     <Reference Include="SafeApp.Utilities, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\MaidSafe.SafeApp.0.0.2\lib\Xamarin.iOS10\SafeApp.Utilities.dll</HintPath>
+      <HintPath>..\..\packages\MaidSafe.SafeApp.0.0.3\lib\Xamarin.iOS10\SafeApp.Utilities.dll</HintPath>
     </Reference>
     <Reference Include="Splat, Version=2.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\..\packages\Splat.2.0.0\lib\Xamarin.iOS10\Splat.dll</HintPath>
@@ -242,9 +242,9 @@
     <Error Condition="!Exists('..\..\packages\Microsoft.Bcl.Build.1.0.21\build\Microsoft.Bcl.Build.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\Microsoft.Bcl.Build.1.0.21\build\Microsoft.Bcl.Build.targets'))" />
     <Error Condition="!Exists('..\..\packages\Xamarin.Forms.2.5.0.280555\build\netstandard1.0\Xamarin.Forms.props')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\Xamarin.Forms.2.5.0.280555\build\netstandard1.0\Xamarin.Forms.props'))" />
     <Error Condition="!Exists('..\..\packages\Xamarin.Forms.2.5.0.280555\build\netstandard1.0\Xamarin.Forms.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\Xamarin.Forms.2.5.0.280555\build\netstandard1.0\Xamarin.Forms.targets'))" />
-    <Error Condition="!Exists('..\..\packages\MaidSafe.SafeApp.0.0.2\build\Xamarin.iOS10\MaidSafe.SafeApp.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\MaidSafe.SafeApp.0.0.2\build\Xamarin.iOS10\MaidSafe.SafeApp.targets'))" />
+    <Error Condition="!Exists('..\..\packages\MaidSafe.SafeApp.0.0.3\build\Xamarin.iOS10\MaidSafe.SafeApp.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\MaidSafe.SafeApp.0.0.3\build\Xamarin.iOS10\MaidSafe.SafeApp.targets'))" />
   </Target>
   <Import Project="..\..\packages\Microsoft.Bcl.Build.1.0.21\build\Microsoft.Bcl.Build.targets" Condition="Exists('..\..\packages\Microsoft.Bcl.Build.1.0.21\build\Microsoft.Bcl.Build.targets')" />
   <Import Project="..\..\packages\Xamarin.Forms.2.5.0.280555\build\netstandard1.0\Xamarin.Forms.targets" Condition="Exists('..\..\packages\Xamarin.Forms.2.5.0.280555\build\netstandard1.0\Xamarin.Forms.targets')" />
-  <Import Project="..\..\packages\MaidSafe.SafeApp.0.0.2\build\Xamarin.iOS10\MaidSafe.SafeApp.targets" Condition="Exists('..\..\packages\MaidSafe.SafeApp.0.0.2\build\Xamarin.iOS10\MaidSafe.SafeApp.targets')" />
+  <Import Project="..\..\packages\MaidSafe.SafeApp.0.0.3\build\Xamarin.iOS10\MaidSafe.SafeApp.targets" Condition="Exists('..\..\packages\MaidSafe.SafeApp.0.0.3\build\Xamarin.iOS10\MaidSafe.SafeApp.targets')" />
 </Project>
