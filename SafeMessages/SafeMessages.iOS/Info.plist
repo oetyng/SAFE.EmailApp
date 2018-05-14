@@ -45,7 +45,7 @@
 			<string>SafeMessages</string>
 			<key>CFBundleURLSchemes</key>
 			<array>
-				<string>safe-net.maidsafe.examples.mailtutorial</string>
+				<string>net.maidsafe.examples.mailtutorial</string>
 			</array>
 			<key>CFBundleURLTypes</key>
 			<string>None</string>

@@ -40,6 +40,7 @@ namespace SafeMessages.ViewModels {
       } catch (Exception ex) {
         await Application.Current.MainPage.DisplayAlert("Error", $"Fetch Messages Failed: {ex.Message}", "OK");
       }
+
       IsRefreshing = false;
     }
 

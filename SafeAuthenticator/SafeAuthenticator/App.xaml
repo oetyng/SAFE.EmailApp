@@ -79,7 +79,7 @@
             </OnPlatform>
             <OnPlatform x:TypeArguments="Color" x:Key="PasswordEntrySeperatorColor">
                 <OnPlatform.Platforms>
-                    <On Platform="iOS" Value="LightGrey" />
+                    <On Platform="iOS" Value="LightGray" />
                     <On Platform="Android" Value="Transparent" />
                 </OnPlatform.Platforms>
             </OnPlatform>

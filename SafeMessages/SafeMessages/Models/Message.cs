@@ -30,6 +30,7 @@ namespace SafeMessages.Models {
       if (other == null) {
         throw new NotSupportedException();
       }
+
       var thisDt = Convert.ToDateTime(Time);
       var otherDt = Convert.ToDateTime(other.Time);
       return thisDt.CompareTo(otherDt);
@@ -39,9 +40,11 @@ namespace SafeMessages.Models {
       if (ReferenceEquals(null, other)) {
         return false;
       }
+
       if (ReferenceEquals(this, other)) {
         return true;
       }
+
       return string.Equals(From, other.From) && string.Equals(Subject, other.Subject) && string.Equals(Time, other.Time) &&
              string.Equals(Body, other.Body);
     }
@@ -50,9 +53,11 @@ namespace SafeMessages.Models {
       if (ReferenceEquals(null, obj)) {
         return false;
       }
+
       if (ReferenceEquals(this, obj)) {
         return true;
       }
+
       return obj.GetType() == GetType() && Equals((Message)obj);
     }
 

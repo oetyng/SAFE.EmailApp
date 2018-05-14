@@ -1,5 +1,6 @@
 #if !NETSTANDARD1_2 || __DESKTOP__
 #if __IOS__
+using System.Linq;
 using ObjCRuntime;
 #endif
 using System;
@@ -12,6 +13,7 @@ using SafeAuthenticator.Native;
 using Xamarin.Forms;
 
 [assembly: Dependency(typeof(AuthBindings))]
+
 namespace SafeAuthenticator.Native {
   internal partial class AuthBindings : IAuthBindings {
 #if __IOS__
@@ -351,7 +353,6 @@ namespace SafeAuthenticator.Native {
     private delegate void UIntContainersReqCb(IntPtr userData, uint reqId, IntPtr req);
 
     private delegate void UIntShareMDataReqMetadataResponseCb(IntPtr userData, uint reqId, IntPtr req, IntPtr metadata);
-
   }
 }
 #endif
