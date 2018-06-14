@@ -16,7 +16,7 @@ var All_ARCHITECTURES = new string[][] {
   ANDROID_ARCHITECTURES,
   IOS_ARCHITECTURES
 };
-enum Enviornment {
+enum Environment {
   Android,
   iOS
 }
@@ -28,58 +28,53 @@ enum Enviornment {
 var TAG = "6be5558";
 var androidLibDirectory = Directory("SafeAuthenticator.Android/lib/");
 var iosLibDirectory = Directory("SafeAuthenticator.iOS/Native References/");
-var Native_DIR = Directory(string.Concat(EnvironmentVariable("TEMP"), "/nativeauthlibs"));
-
-// --------------------------------------------------------------------------------
-// PREPARATION
-// --------------------------------------------------------------------------------
-
-Task("Clean")
-  .Does(() => {
-    CleanDirectories(Native_DIR);
-    CleanDirectory(androidLibDirectory);
-    CleanDirectory(iosLibDirectory);
-  });
+var nativeLibDirectory = Directory(string.Concat(System.IO.Path.GetTempPath(), "nativeauthlibs"));
 
 // --------------------------------------------------------------------------------
 // Download Libs
 // --------------------------------------------------------------------------------
 
-Task("DownloadTask")
-  .IsDependentOn("Clean")
+Task("Download-Libs")
   .Does(() => {
-    foreach(var item in Enum.GetValues(typeof (Enviornment))) {
+    foreach(var item in Enum.GetValues(typeof(Environment))) {
       string[] targets = null;
-      Information(string.Format("\n {0} ", item));
+      Information(string.Format("\n{0} ", item));
       switch (item) 
       {
-      case Enviornment.Android:
+      case Environment.Android:
         targets = ANDROID_ARCHITECTURES;
         break;
-      case Enviornment.iOS:
+      case Environment.iOS:
         targets = IOS_ARCHITECTURES;
         break;
       }
 
       foreach(var target in targets) {
-        var targetdirectory = string.Format("{0}/{1}/{2}", Native_DIR.Path, item, target);
-        var zipdownloadurl = string.Format("https://s3.eu-west-2.amazonaws.com/safe-client-libs/safe_authenticator-{0}-{1}.zip", TAG, target);
-        var zipsavepath = string.Format("{0}/{1}/{2}/safe_authenticator-{3}-{4}.zip", Native_DIR.Path, item, target, TAG, target);
+        var targetDirectory = string.Format("{0}/{1}/{2}", nativeLibDirectory.Path, item, target);
+        var zipFilename = string.Format("safe_authenticator-{0}-{1}.zip", TAG, target);
+        var zipDownloadUrl = string.Format("https://s3.eu-west-2.amazonaws.com/safe-client-libs/{0}", zipFilename);
+        var zipSavePath = string.Format("{0}/{1}/{2}/{3}", nativeLibDirectory.Path, item, target, zipFilename);
 
-        if(!DirectoryExists(targetdirectory))
-          CreateDirectory(targetdirectory);
+        Information("Downloading : {0}", zipFilename);
 
-        if(!FileExists(zipsavepath)) 
+        if(!DirectoryExists(targetDirectory))
+          CreateDirectory(targetDirectory);
+
+        if(!FileExists(zipSavePath)) 
         {
           CurlDownloadFiles(
             new [] {
-              new Uri(zipdownloadurl)
+              new Uri(zipDownloadUrl)
             },
             new CurlDownloadSettings {
               OutputPaths = new FilePath[] {
-                zipsavepath
+                zipSavePath
               }
             });
+        }
+        else
+        {
+          Information("File already exists");
         }
       }
     }
@@ -88,42 +83,48 @@ Task("DownloadTask")
     Information(exception.Message);
   });
 
-Task("UnZipTask")
-  .IsDependentOn("DownloadTask")
+Task("UnZip-Libs")
+  .IsDependentOn("Download-Libs")
   .Does(() => {
-    foreach(var item in Enum.GetValues(typeof (Enviornment))) {
+    foreach(var item in Enum.GetValues(typeof(Environment))) {
       string[] targets = null;
-      var outputdirectory = string.Empty;
+      var outputDirectory = string.Empty;
       Information(string.Format("\n {0} ", item));
-      switch (item) 
+      switch (item)
       {
-      case Enviornment.Android:
+      case Environment.Android:
         targets = ANDROID_ARCHITECTURES;
-        outputdirectory = androidLibDirectory.Path.FullPath.ToString();
+        outputDirectory = androidLibDirectory.Path.FullPath.ToString();
         break;
-      case Enviornment.iOS:
+      case Environment.iOS:
         targets = IOS_ARCHITECTURES;
-        outputdirectory = iosLibDirectory.Path.FullPath.ToString();
+        outputDirectory = iosLibDirectory.Path.FullPath.ToString();
         break;
       }
 
-      CleanDirectories(outputdirectory);
+      CleanDirectories(outputDirectory);
 
       foreach(var target in targets) {
-        var zipdirectorysource = Directory(string.Format("{0}/{1}/{2}", Native_DIR.Path, item, target));
-        var zipfiles = GetFiles(string.Format("{0}/*.*", zipdirectorysource));
-        foreach(var zip in zipfiles) {
+        var zipDirectorySource = Directory(string.Format("{0}/{1}/{2}", nativeLibDirectory.Path, item, target));
+        var zipFiles = GetFiles(string.Format("{0}/*.*", zipDirectorySource));
+        foreach(var zip in zipFiles) {
           var filename = zip.GetFilename();
           Information(" Unzipping : " + filename);
-          var platformoutputdirecotory = new StringBuilder();
-          platformoutputdirecotory.Append(outputdirectory);
+          var platformOutputDirectory = new StringBuilder();
+          platformOutputDirectory.Append(outputDirectory);
 
           if(target.Equals(ANDROID_X86))
-            platformoutputdirecotory.Append("/x86");
+            platformOutputDirectory.Append("/x86");
           else if(target.Equals(ANDROID_ARMEABI_V7A))
-            platformoutputdirecotory.Append("/armeabi-v7a");
+            platformOutputDirectory.Append("/armeabi-v7a");
 
-          Unzip(zip, platformoutputdirecotory.ToString());
+          Unzip(zip, platformOutputDirectory.ToString());
+          
+          if(target.Equals(ANDROID_X86) || target.Equals(ANDROID_ARMEABI_V7A))
+          {
+            var aFilePath = platformOutputDirectory.ToString() + "/libsafe_authenticator.a";
+            DeleteFile(aFilePath);
+          } 
         }
       }
     }
@@ -133,7 +134,7 @@ Task("UnZipTask")
   });
 
 Task("Default")
-  .IsDependentOn("UnZipTask")
+  .IsDependentOn("UnZip-Libs")
   .Does(() => {
 
   });

@@ -235,14 +235,25 @@
       <Visible>false</Visible>
     </ImageAsset>
   </ItemGroup>
-  <ItemGroup>
+   <ItemGroup>
     <NativeReference Include="Native References/libsafe_authenticator.a">
       <Kind>Static</Kind>
       <ForceLoad>True</ForceLoad>
       <LinkerFlags>-lresolv</LinkerFlags>
-	  <Frameworks>Security</Frameworks>
+      <Frameworks>Security</Frameworks>
     </NativeReference>
   </ItemGroup>
+  <Target Name="CheckNativeLibs" BeforeTargets="PrepareForBuild">
+    <ItemGroup>
+      <NativeSafeAuthLibs Include="Native References\*.a" />
+    </ItemGroup>
+    <Exec ConsoleToMSBuild="true" Condition="'@(CheckNativeLibs-&gt;Count())' == '0' AND '$(OS)' == 'Windows_NT'" Command="cd.. &amp; powershell -ExecutionPolicy ByPass -File .\build.ps1 -Configuration Release -target UnZip-Libs">
+      <Output TaskParameter="ConsoleOutput" PropertyName="OutputOfExec" />
+    </Exec>
+    <Exec ConsoleToMSBuild="true" Condition="'@(CheckNativeLibs-&gt;Count())' == '0' AND '$(OS)' == 'UNIX'" Command="cd .. &amp;&amp; ./build.sh --Configuration=Release --target=Unzip-Libs">
+      <Output TaskParameter="ConsoleOutput" PropertyName="OutputOfExec" />
+    </Exec>
+  </Target>
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\iOS\Xamarin.iOS.CSharp.targets" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
     <PropertyGroup>

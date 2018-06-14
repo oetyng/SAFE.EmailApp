@@ -170,7 +170,7 @@
     <Compile Include="Resources\Resource.designer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
-  <ItemGroup>
+ <ItemGroup>
     <AndroidNativeLibrary Include="lib\armeabi-v7a\libsafe_authenticator.so" />
     <AndroidAsset Include="..\SafeAuthenticator\crust.config">
       <Link>Assets\crust.config</Link>
@@ -267,4 +267,15 @@
   <Import Project="..\..\packages\Xamarin.Android.Support.v7.AppCompat.25.4.0.2\build\MonoAndroid70\Xamarin.Android.Support.v7.AppCompat.targets" Condition="Exists('..\..\packages\Xamarin.Android.Support.v7.AppCompat.25.4.0.2\build\MonoAndroid70\Xamarin.Android.Support.v7.AppCompat.targets')" />
   <Import Project="..\..\packages\Xamarin.Android.Support.Design.25.4.0.2\build\MonoAndroid70\Xamarin.Android.Support.Design.targets" Condition="Exists('..\..\packages\Xamarin.Android.Support.Design.25.4.0.2\build\MonoAndroid70\Xamarin.Android.Support.Design.targets')" />
   <Import Project="..\..\packages\Xamarin.Android.Support.Animated.Vector.Drawable.25.4.0.2\build\MonoAndroid70\Xamarin.Android.Support.Animated.Vector.Drawable.targets" Condition="Exists('..\..\packages\Xamarin.Android.Support.Animated.Vector.Drawable.25.4.0.2\build\MonoAndroid70\Xamarin.Android.Support.Animated.Vector.Drawable.targets')" />
+  <Target Name="CheckNativeLibs" BeforeTargets="PrepareForBuild">
+    <ItemGroup>
+      <NativeSafeAuthLibs Include="lib\**\*.so" />
+    </ItemGroup>
+    <Exec ConsoleToMSBuild="true" Condition="'@(CheckNativeLibs-&gt;Count())' == '0' AND '$(OS)' == 'Windows_NT'" Command="cd.. &amp; powershell -ExecutionPolicy ByPass -File .\build.ps1 -Configuration Release -target UnZip-Libs">
+      <Output TaskParameter="ConsoleOutput" PropertyName="OutputOfExec" />
+    </Exec>
+    <Exec ConsoleToMSBuild="true" Condition="'@(CheckNativeLibs-&gt;Count())' == '0' AND '$(OS)' == 'UNIX'" Command="cd .. &amp;&amp; ./build.sh --Configuration=Release --target=Unzip-Libs">
+      <Output TaskParameter="ConsoleOutput" PropertyName="OutputOfExec" />
+    </Exec>
+  </Target>
 </Project>

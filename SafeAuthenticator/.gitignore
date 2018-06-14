@@ -3,6 +3,10 @@
 [Oo]bj/
 [Pp]ackages/
 
+# Native Libs
+lib/
+Native References/
+
 # Build related
 tools/**
 !tools/packages.config

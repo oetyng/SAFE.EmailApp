@@ -4,6 +4,13 @@
 
 Mobile samples of SAFE Authenticator and SAFE Messages/Mail example.
 
+## Build Setup for Authenticator
+#### Mac
+To be able to build the solution you should give the permission to execute the script using following command in Authenticator directory.
+```
+chmod +x build.sh
+```
+
 ## License
 
 Licensed under either of
