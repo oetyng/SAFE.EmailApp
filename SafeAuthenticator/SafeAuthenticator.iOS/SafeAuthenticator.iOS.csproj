@@ -235,7 +235,7 @@
       <Visible>false</Visible>
     </ImageAsset>
   </ItemGroup>
-   <ItemGroup>
+  <ItemGroup>
     <NativeReference Include="Native References/libsafe_authenticator.a">
       <Kind>Static</Kind>
       <ForceLoad>True</ForceLoad>
@@ -247,10 +247,10 @@
     <ItemGroup>
       <NativeSafeAuthLibs Include="Native References\*.a" />
     </ItemGroup>
-    <Exec ConsoleToMSBuild="true" Condition="'@(CheckNativeLibs-&gt;Count())' == '0' AND '$(OS)' == 'Windows_NT'" Command="cd.. &amp; powershell -ExecutionPolicy ByPass -File .\build.ps1 -Configuration Release -target UnZip-Libs">
+    <Exec ConsoleToMSBuild="true" Condition="'@(NativeSafeAuthLibs-&gt;Count())' == '0' AND '$(OS)' == 'Windows_NT'" Command="cd.. &amp; powershell -ExecutionPolicy ByPass -File .\build.ps1 -Configuration Release -target UnZip-Libs">
       <Output TaskParameter="ConsoleOutput" PropertyName="OutputOfExec" />
     </Exec>
-    <Exec ConsoleToMSBuild="true" Condition="'@(CheckNativeLibs-&gt;Count())' == '0' AND '$(OS)' == 'UNIX'" Command="cd .. &amp;&amp; ./build.sh --Configuration=Release --target=Unzip-Libs">
+    <Exec ConsoleToMSBuild="true" Condition="'@(NativeSafeAuthLibs-&gt;Count())' == '0' AND '$(OS)' == 'UNIX'" Command="cd .. &amp;&amp; bash build.sh --Configuration=Release --target=Unzip-Libs">
       <Output TaskParameter="ConsoleOutput" PropertyName="OutputOfExec" />
     </Exec>
   </Target>
