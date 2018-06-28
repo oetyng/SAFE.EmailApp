@@ -32,9 +32,11 @@ namespace SafeMessages.ViewModels {
         if (Subject.Length > 150) {
           throw new Exception("Max subject length is 150 characters.");
         }
+
         if (Body.Length > 150) {
           throw new Exception("Max body length is 150 characters.");
         }
+
         await SafeApp.SendMessageAsync(To, new Message(SafeApp.Self.Name, Subject, DateTime.UtcNow.ToString("r"), Body));
         MessagingCenter.Send(this, MessengerConstants.NavPreviousPage);
       } catch (Exception ex) {

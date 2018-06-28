@@ -2,7 +2,7 @@
 using Xamarin.Forms;
 
 namespace CommonUtils {
-  public class ItemTappedAttached {
+  public static class ItemTappedAttached {
     public static readonly BindableProperty CommandProperty = BindableProperty.CreateAttached(
       "Command",
       typeof(ICommand),
@@ -16,7 +16,7 @@ namespace CommonUtils {
       return (ICommand)bindable.GetValue(CommandProperty);
     }
 
-    private static void OnItemTapped(object sender, ItemTappedEventArgs e) {
+    public static void OnItemTapped(object sender, ItemTappedEventArgs e) {
       var control = sender as ListView;
       var command = GetItemTapped(control);
 
@@ -25,9 +25,8 @@ namespace CommonUtils {
       }
     }
 
-    public static void OnItemTappedChanged(BindableObject bindable, object oldValue, object newValue) {
-      var control = bindable as ListView;
-      if (control != null) {
+    private static void OnItemTappedChanged(BindableObject bindable, object oldValue, object newValue) {
+      if (bindable is ListView control) {
         control.ItemTapped += OnItemTapped;
       }
     }

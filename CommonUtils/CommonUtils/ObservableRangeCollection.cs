@@ -30,7 +30,7 @@ namespace CommonUtils {
     /// </summary>
     public void AddRange(IEnumerable<T> collection, NotifyCollectionChangedAction notificationMode = NotifyCollectionChangedAction.Add) {
       if (collection == null) {
-        throw new ArgumentNullException("collection");
+        throw new ArgumentNullException(nameof(collection));
       }
 
       CheckReentrancy();
@@ -48,7 +48,7 @@ namespace CommonUtils {
       }
 
       var startIndex = Count;
-      var changedItems = collection is List<T> ? (List<T>)collection : new List<T>(collection);
+      var changedItems = collection is List<T> list ? list : new List<T>(collection);
       foreach (var i in changedItems) {
         Items.Add(i);
       }
@@ -63,7 +63,7 @@ namespace CommonUtils {
     /// </summary>
     public void RemoveRange(IEnumerable<T> collection) {
       if (collection == null) {
-        throw new ArgumentNullException("collection");
+        throw new ArgumentNullException(nameof(collection));
       }
 
       foreach (var i in collection) {
@@ -82,9 +82,9 @@ namespace CommonUtils {
     /// <summary>
     ///   Clears the current collection and replaces it with the specified collection.
     /// </summary>
-    public void ReplaceRange(IEnumerable<T> collection) {
+    private void ReplaceRange(IEnumerable<T> collection) {
       if (collection == null) {
-        throw new ArgumentNullException("collection");
+        throw new ArgumentNullException(nameof(collection));
       }
 
       Items.Clear();

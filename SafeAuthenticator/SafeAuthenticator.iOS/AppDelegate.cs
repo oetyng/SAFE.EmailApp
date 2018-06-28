@@ -12,7 +12,7 @@ using Xamarin.Forms.Platform.iOS;
 namespace SafeAuthenticator.iOS {
   [Register("AppDelegate")]
   public class AppDelegate : FormsApplicationDelegate {
-    public AuthService Authenticator => DependencyService.Get<AuthService>();
+    private AuthService Authenticator => DependencyService.Get<AuthService>();
     private static string LogFolderPath => DependencyService.Get<IFileOps>().ConfigFilesPath;
 
     public override bool FinishedLaunching(UIApplication app, NSDictionary options) {
@@ -52,7 +52,7 @@ namespace SafeAuthenticator.iOS {
       LogUnhandledException(newExc);
     }
 
-    internal static void LogUnhandledException(Exception exception) {
+    private static void LogUnhandledException(Exception exception) {
       try {
         const string errorFileName = "Fatal.log";
         var errorFilePath = Path.Combine(LogFolderPath, errorFileName);

@@ -22,7 +22,7 @@ namespace SafeMessages.Droid {
    IntentFilter(
      new[] {Intent.ActionView},
      Categories = new[] {Intent.CategoryDefault, Intent.CategoryBrowsable},
-     DataScheme = "safe-net.maidsafe.examples.mailtutorial")]
+     DataScheme = AppService.AppId)]
   public class MainActivity : FormsAppCompatActivity {
     private AppService SafeApp => DependencyService.Get<AppService>();
     private static string LogFolderPath => DependencyService.Get<IFileOps>().ConfigFilesPath;

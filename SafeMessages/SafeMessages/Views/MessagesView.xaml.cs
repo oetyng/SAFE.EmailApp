@@ -45,6 +45,7 @@ namespace SafeMessages.Views {
       if (!viewModel.RefreshCommand.CanExecute(null)) {
         return;
       }
+
       AppData.ClearMessages();
       viewModel.RefreshCommand.Execute(null);
     }

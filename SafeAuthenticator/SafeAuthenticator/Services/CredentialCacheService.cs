@@ -21,6 +21,7 @@ namespace SafeAuthenticator.Services {
       if (acctInfo == null) {
         throw new NullReferenceException("acctInfo");
       }
+
       return acctInfo;
     }
 

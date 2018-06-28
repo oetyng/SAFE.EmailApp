@@ -20,16 +20,17 @@ namespace SafeAuthenticator.Droid {
      LaunchMode = LaunchMode.SingleTask,
      ConfigurationChanges = ConfigChanges.ScreenSize | ConfigChanges.Orientation),
    IntentFilter(new[] {Intent.ActionView}, Categories = new[] {Intent.CategoryDefault, Intent.CategoryBrowsable}, DataScheme = "safe-auth")]
+  // ReSharper disable once UnusedMember.Global
   public class MainActivity : FormsAppCompatActivity {
-    public AuthService Authenticator => DependencyService.Get<AuthService>();
+    private AuthService Authenticator => DependencyService.Get<AuthService>();
     private static string LogFolderPath => DependencyService.Get<IFileOps>().ConfigFilesPath;
 
-    private void HandleAppLaunch(string url) {
-      System.Diagnostics.Debug.WriteLine($"Launched via: {url}");
+    private void HandleAppLaunch(string uri) {
+      System.Diagnostics.Debug.WriteLine($"Launched via: {uri}");
       Device.BeginInvokeOnMainThread(
         async () => {
           try {
-            await Authenticator.HandleUrlActivationAsync(url);
+            await Authenticator.HandleUrlActivationAsync(uri);
             System.Diagnostics.Debug.WriteLine("IPC Msg Handling Completed");
           } catch (Exception ex) {
             System.Diagnostics.Debug.WriteLine($"Error: {ex.Message}");
@@ -90,7 +91,7 @@ namespace SafeAuthenticator.Droid {
       LogUnhandledException(newExc);
     }
 
-    internal static void LogUnhandledException(Exception exception) {
+    private static void LogUnhandledException(Exception exception) {
       try {
         const string errorFileName = "Fatal.log";
         var errorFilePath = Path.Combine(LogFolderPath, errorFileName);

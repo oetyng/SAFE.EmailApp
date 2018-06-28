@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-             xmlns:viewModels="clr-namespace:SafeAuthenticator.ViewModels;assembly=SafeAuthenticator.Portable"
+             xmlns:viewModels="clr-namespace:SafeAuthenticator.ViewModels;assembly=SafeAuthenticator"
              xmlns:commonUtils="clr-namespace:CommonUtils;assembly=CommonUtils"
              Title="Home"
              x:Class="SafeAuthenticator.Views.HomePage">
@@ -18,19 +18,19 @@
                LineBreakMode="TailTruncation"
                TextColor="Gray"
                Margin="15,10,15,0"
-               Font="Medium" />
+               FontSize="Medium" />
         <Label Text="{Binding AccountStorageInfo}"
                LineBreakMode="TailTruncation"
                Margin="25,5,25,10"
                TextColor="DarkGray"
-               Font="Medium" />
+               FontSize="Medium" />
       </StackLayout>
       <StackLayout BackgroundColor="LightGray" HeightRequest="2" />
 
       <Label Text="Authorised Apps:" Margin="15,10,15,10"
              TextColor="Gray"
              LineBreakMode="TailTruncation"
-             Font="Medium" />
+             FontSize="Medium" />
       <ListView x:Name="AccountsView" ItemsSource="{Binding Apps}"
                 VerticalOptions="FillAndExpand"
                 HasUnevenRows="True"

@@ -14,10 +14,24 @@
       <Color x:Key="MediumGrayTextColor">#4d4d4d</Color>
       <Color x:Key="LightTextColor">#999999</Color>
 
-      <OnPlatform x:TypeArguments="system:Double" Android="50" iOS="45" x:Key="ButtonHeightRequest" />
-      <OnPlatform x:TypeArguments="system:Double" Android="45" iOS="40" x:Key="EntryHeightRequest" />
-      <OnPlatform x:TypeArguments="system:Double" Android="45" iOS="30" x:Key="SendMsgEntryHeightRequest" />
-
+      <OnPlatform x:TypeArguments="system:Double" x:Key="ButtonHeightRequest">
+        <OnPlatform.Platforms>
+          <On Platform="iOS" Value="45" />
+          <On Platform="Android" Value="50" />
+        </OnPlatform.Platforms>
+      </OnPlatform>
+      <OnPlatform x:TypeArguments="system:Double" x:Key="EntryHeightRequest">
+        <OnPlatform.Platforms>
+          <On Platform="iOS" Value="40" />
+          <On Platform="Android" Value="45" />
+        </OnPlatform.Platforms>
+      </OnPlatform>
+      <OnPlatform x:TypeArguments="system:Double" x:Key="SendMsgEntryHeightRequest">
+        <OnPlatform.Platforms>
+          <On Platform="iOS" Value="30" />
+          <On Platform="Android" Value="45" />
+        </OnPlatform.Platforms>
+      </OnPlatform>
       <Color x:Key="ButtonNormal">#2A5789</Color>
       <Color x:Key="ButtonDisabled">#8aa5c0</Color>
 
