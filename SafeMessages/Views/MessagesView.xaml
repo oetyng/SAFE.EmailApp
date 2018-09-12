@@ -1,0 +1,48 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:msgViewModels="clr-namespace:SafeMessages.ViewModels;assembly=SafeMessages"
+             d:DataContext="{d:DesignInstance msgViewModels:MessagesViewModel}"
+             xmlns:controls="clr-namespace:SafeMessages.Controls"
+             x:Class="SafeMessages.Views.MessagesView" Title="{Binding UserId.Name}">
+  <ContentPage.ToolbarItems>
+    <ToolbarItem Text="New" Command="{Binding SendCommand}" />
+  </ContentPage.ToolbarItems>
+  <ContentPage.Content>
+    <ListView x:Name="MessagesListView" ItemsSource="{Binding AppData.Messages}"
+              VerticalOptions="FillAndExpand"
+              HasUnevenRows="True"
+              RefreshCommand="{Binding RefreshCommand}"
+              IsPullToRefreshEnabled="True"
+              IsRefreshing="{Binding IsRefreshing, Mode=OneWay}"
+              controls:ItemTappedAttached.Command="{Binding MessageSelectedCommand}"
+              CachingStrategy="RecycleElement">
+      <ListView.ItemTemplate>
+        <DataTemplate>
+          <ViewCell>
+            <StackLayout Padding="20" HeightRequest="35">
+              <Label Text="{Binding From}"
+                     LineBreakMode="TailTruncation"
+                     FontSize="Medium"
+                     FontAttributes="Bold" />
+              <Label Text="{Binding Subject}"
+                     LineBreakMode="WordWrap"
+                     TextColor="Gray"
+                     FontSize="Micro" />
+            </StackLayout>
+          </ViewCell>
+        </DataTemplate>
+      </ListView.ItemTemplate>
+      <ListView.Footer>
+        <StackLayout Orientation="Horizontal" BackgroundColor="LightGray">
+          <Label Margin="20" VerticalOptions="CenterAndExpand" HorizontalOptions="CenterAndExpand"
+                 Text="No Messages." TextColor="Gray"
+                 IsVisible="{Binding AppData.Messages.Count, Converter={StaticResource IsCollectionEmptyConverter}}" />
+        </StackLayout>
+      </ListView.Footer>
+    </ListView>
+  </ContentPage.Content>
+</ContentPage>
