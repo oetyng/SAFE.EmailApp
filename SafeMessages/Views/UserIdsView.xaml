@@ -1,42 +1,43 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
+
 <ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:viewModels="clr-namespace:SafeMessages.ViewModels;assembly=SafeMessages"
              xmlns:controls="clr-namespace:SafeMessages.Controls"
              x:Class="SafeMessages.Views.UserIdsView" Title="Accounts">
-  <ContentPage.BindingContext>
-    <viewModels:UserIdsViewModel />
-  </ContentPage.BindingContext>
-  <ContentPage.ToolbarItems>
-    <ToolbarItem Text="Add" Command="{Binding AddAcountCommand}" />
-  </ContentPage.ToolbarItems>
-  <ContentPage.Content>
-    <ListView x:Name="AccountsView" ItemsSource="{Binding AppData.Accounts}"
-              VerticalOptions="FillAndExpand"
-              HasUnevenRows="True"
-              RefreshCommand="{Binding RefreshAccountsCommand}"
-              IsPullToRefreshEnabled="True"
-              IsRefreshing="{Binding IsRefreshing, Mode=OneWay}"
-              controls:ItemTappedAttached.Command="{Binding UserIdSelectedCommand}"
-              CachingStrategy="RecycleElement">
-      <ListView.ItemTemplate>
-        <DataTemplate>
-          <ViewCell>
-            <StackLayout Padding="25,15,25,15">
-              <Label Text="{Binding Name}"
-                     LineBreakMode="TailTruncation"
-                     FontSize="Medium" />
-            </StackLayout>
-          </ViewCell>
-        </DataTemplate>
-      </ListView.ItemTemplate>
-      <ListView.Footer>
-        <StackLayout Orientation="Horizontal" BackgroundColor="LightGray">
-          <Label Margin="20" VerticalOptions="CenterAndExpand" HorizontalOptions="CenterAndExpand"
-                 Text="No Message Ids." TextColor="Gray"
-                 IsVisible="{Binding AppData.Accounts.Count, Converter={StaticResource IsCollectionEmptyConverter}}" />
-        </StackLayout>
-      </ListView.Footer>
-    </ListView>
-  </ContentPage.Content>
+    <ContentPage.BindingContext>
+        <viewModels:UserIdsViewModel />
+    </ContentPage.BindingContext>
+    <ContentPage.ToolbarItems>
+        <ToolbarItem Text="Add" Command="{Binding AddAccountCommand}" />
+    </ContentPage.ToolbarItems>
+    <ContentPage.Content>
+        <ListView x:Name="AccountsView" ItemsSource="{Binding AppData.Accounts}"
+                  VerticalOptions="FillAndExpand"
+                  HasUnevenRows="True"
+                  RefreshCommand="{Binding RefreshAccountsCommand}"
+                  IsPullToRefreshEnabled="True"
+                  IsRefreshing="{Binding IsRefreshing, Mode=OneWay}"
+                  controls:ItemTappedAttached.Command="{Binding UserIdSelectedCommand}"
+                  CachingStrategy="RecycleElement">
+            <ListView.ItemTemplate>
+                <DataTemplate>
+                    <ViewCell>
+                        <StackLayout Padding="25,15,25,15">
+                            <Label Text="{Binding Name}"
+                                   LineBreakMode="TailTruncation"
+                                   FontSize="Medium" />
+                        </StackLayout>
+                    </ViewCell>
+                </DataTemplate>
+            </ListView.ItemTemplate>
+            <ListView.Footer>
+                <StackLayout Orientation="Horizontal" BackgroundColor="LightGray">
+                    <Label Margin="20" VerticalOptions="CenterAndExpand" HorizontalOptions="CenterAndExpand"
+                           Text="No Message Ids." TextColor="Gray"
+                           IsVisible="{Binding AppData.Accounts.Count, Converter={StaticResource IsCollectionEmptyConverter}}" />
+                </StackLayout>
+            </ListView.Footer>
+        </ListView>
+    </ContentPage.Content>
 </ContentPage>

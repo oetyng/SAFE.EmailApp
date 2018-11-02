@@ -1,6 +1,7 @@
 ﻿namespace SafeMessages.Helpers
 {
-  public interface ICleanup {
-    void MessageCenterUnsubscribe();
-  }
+    public interface ICleanup
+    {
+        void MessageCenterUnsubscribe();
+    }
 }

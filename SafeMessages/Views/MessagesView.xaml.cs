@@ -4,54 +4,62 @@ using SafeMessages.ViewModels;
 using Xamarin.Forms;
 using Xamarin.Forms.Xaml;
 
-namespace SafeMessages.Views {
-  [XamlCompilation(XamlCompilationOptions.Compile)]
-  public partial class MessagesView : ContentPage, ICleanup {
-    public DataModel AppData => DependencyService.Get<DataModel>();
+namespace SafeMessages.Views
+{
+    [XamlCompilation(XamlCompilationOptions.Compile)]
+    public partial class MessagesView : ContentPage, ICleanup
+    {
+        public MessagesView() : this(null)
+        {
+        }
 
-    public MessagesView() : this(null) { }
+        public MessagesView(UserId userId)
+        {
+            InitializeComponent();
 
-    public MessagesView(UserId userId) {
-      InitializeComponent();
+            var viewModel = new MessagesViewModel(userId);
+            BindingContext = viewModel;
+            MessagingCenter.Subscribe<MessagesViewModel>(
+                this,
+                MessengerConstants.NavSendMessagePage,
+                async _ =>
+                {
+                    if (!App.IsPageValid(this))
+                    {
+                        MessageCenterUnsubscribe();
+                        return;
+                    }
 
-      var viewModel = new MessagesViewModel(userId);
-      BindingContext = viewModel;
-      MessagingCenter.Subscribe<MessagesViewModel>(
-        this,
-        MessengerConstants.NavSendMessagePage,
-        async _ => {
-          if (!App.IsPageValid(this)) {
-            MessageCenterUnsubscribe();
-            return;
-          }
+                    await Navigation.PushAsync(new SendMessageView());
+                });
 
-          await Navigation.PushAsync(new SendMessageView());
-        });
+            MessagingCenter.Subscribe<MessagesViewModel, Message>(
+                this,
+                MessengerConstants.NavDisplayMessageView,
+                async (_, message) =>
+                {
+                    if (!App.IsPageValid(this))
+                    {
+                        MessageCenterUnsubscribe();
+                        return;
+                    }
 
-      MessagingCenter.Subscribe<MessagesViewModel, Message>(
-        this,
-        MessengerConstants.NavDisplayMessageView,
-        async (_, message) => {
-          if (!App.IsPageValid(this)) {
-            MessageCenterUnsubscribe();
-            return;
-          }
+                    await Navigation.PushAsync(new DisplayMessagePage(message));
+                    MessagesListView.SelectedItem = null;
+                });
 
-          await Navigation.PushAsync(new DisplayMessagePage(message));
-          MessagesListView.SelectedItem = null;
-        });
+            if (!viewModel.RefreshCommand.CanExecute(null)) return;
 
-      if (!viewModel.RefreshCommand.CanExecute(null)) {
-        return;
-      }
+            AppData.ClearMessages();
+            viewModel.RefreshCommand.Execute(null);
+        }
 
-      AppData.ClearMessages();
-      viewModel.RefreshCommand.Execute(null);
+        public DataModel AppData => DependencyService.Get<DataModel>();
+
+        public void MessageCenterUnsubscribe()
+        {
+            MessagingCenter.Unsubscribe<MessagesViewModel>(this, MessengerConstants.NavSendMessagePage);
+            MessagingCenter.Unsubscribe<MessagesViewModel, Message>(this, MessengerConstants.NavDisplayMessageView);
+        }
     }
-
-    public void MessageCenterUnsubscribe() {
-      MessagingCenter.Unsubscribe<MessagesViewModel>(this, MessengerConstants.NavSendMessagePage);
-      MessagingCenter.Unsubscribe<MessagesViewModel, Message>(this, MessengerConstants.NavDisplayMessageView);
-    }
-  }
 }

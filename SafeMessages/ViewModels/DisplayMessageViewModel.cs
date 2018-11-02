@@ -3,22 +3,31 @@ using SafeMessages.Helpers;
 using SafeMessages.Models;
 using Xamarin.Forms;
 
-namespace SafeMessages.ViewModels {
-  internal class DisplayMessageViewModel : BaseViewModel {
-    private Message _message;
+namespace SafeMessages.ViewModels
+{
+    internal class DisplayMessageViewModel : BaseViewModel
+    {
+        private Message _message;
 
-    public ICommand ReplyCommand { get; }
-    public Message Message { get => _message; set => SetProperty(ref _message, value); }
+        public DisplayMessageViewModel(Message message)
+        {
+            IsUiEnabled = true;
+            Message = message;
+            ReplyCommand = new Command(OnReplyCommand);
+        }
 
-    public DisplayMessageViewModel(Message message) {
-      IsUiEnabled = true;
-      Message = message;
-      ReplyCommand = new Command(OnReplyCommand);
+        public ICommand ReplyCommand { get; }
+
+        public Message Message
+        {
+            get => _message;
+            set => SetProperty(ref _message, value);
+        }
+
+        private void OnReplyCommand()
+        {
+            var subject = Message.Subject.StartsWith("Re: ") ? Message.Subject : $"Re: {Message.Subject}";
+            MessagingCenter.Send(this, MessengerConstants.NavSendMessagePage, subject);
+        }
     }
-
-    private void OnReplyCommand() {
-      var subject = Message.Subject.StartsWith("Re: ") ? Message.Subject : $"Re: {Message.Subject}";
-      MessagingCenter.Send(this, MessengerConstants.NavSendMessagePage, subject);
-    }
-  }
 }
