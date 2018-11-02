@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:msgViewModels="clr-namespace:SafeMessages.ViewModels;assembly=SafeMessages"
+             xmlns:system="clr-namespace:System;assembly=netstandard"
+             d:DataContext="{d:DesignInstance msgViewModels:SendMessageViewModel}"
+             x:Class="SafeMessages.Views.SendMessageView">
+  <ContentPage.Content>
+    <StackLayout Spacing="10" Padding="15">
+      <Label Text="To" FontSize="Small" TextColor="DarkGray" />
+      <Entry Text="{Binding To}" FontSize="Small" HeightRequest="{StaticResource SendMsgEntryHeightRequest}" />
+      <Label Text="Subject" FontSize="Small" TextColor="DarkGray" />
+      <Entry Text="{Binding Subject}" FontSize="Small" HeightRequest="{StaticResource SendMsgEntryHeightRequest}" />
+      <Label Text="Message" FontSize="Small" TextColor="DarkGray" Margin="0,10,0,0" />
+
+
+      <ContentView>
+        <ContentView.HeightRequest>
+          <OnPlatform x:TypeArguments="system:Double">
+            <OnPlatform.Platforms>
+              <On Platform="iOS" Value="122" />
+              <On Platform="Android" Value="140" />
+            </OnPlatform.Platforms>
+          </OnPlatform>
+
+        </ContentView.HeightRequest>
+        <ContentView.Content>
+          <OnPlatform x:TypeArguments="View">
+            <OnPlatform.Platforms>
+              <On Platform="iOS">
+                <Frame CornerRadius="5"
+                       OutlineColor="#E6E6E6"
+                       HasShadow="False"
+                       Padding="1">
+                  <Editor BackgroundColor="White" Text="{Binding Body}" FontSize="Small"
+                          Keyboard="Chat" />
+                </Frame>
+              </On>
+              <On Platform="Android">
+                <Editor Text="{Binding Body}" FontSize="Small"
+                        Keyboard="Chat" />
+              </On>
+            </OnPlatform.Platforms>
+          </OnPlatform>
+        </ContentView.Content>
+      </ContentView>
+      <StackLayout Margin="0,15,0,15"
+                   HeightRequest="{StaticResource ButtonHeightRequest}" VerticalOptions="Center">
+        <ActivityIndicator IsRunning="True"
+                           IsVisible="{Binding IsUiEnabled, Converter={StaticResource InverseBooleanConverter}}" />
+        <Button Text="Send"
+                TextColor="White" Command="{Binding SendCommand}" IsVisible="{Binding IsUiEnabled}" />
+      </StackLayout>
+    </StackLayout>
+  </ContentPage.Content>
+</ContentPage>

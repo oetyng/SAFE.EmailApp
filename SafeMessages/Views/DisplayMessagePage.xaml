@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="SafeMessages.Views.DisplayMessagePage">
+  <ContentPage.ToolbarItems>
+    <ToolbarItem Text="Reply" Command="{Binding ReplyCommand}" />
+  </ContentPage.ToolbarItems>
+  <ContentPage.Content>
+    <StackLayout Padding="15,0,15,0">
+      <StackLayout Orientation="Horizontal" Padding="5,15,5,5">
+        <Label Text="From" FontSize="18" TextColor="DarkGray" Margin="0,0,10,0" />
+        <Label Text="{Binding Message.From}" FontSize="20" LineBreakMode="TailTruncation" />
+      </StackLayout>
+      <StackLayout BackgroundColor="LightGray" HeightRequest="1" />
+      <StackLayout Orientation="Horizontal" Padding="5,15,5,5">
+        <Label Text="Subject" FontSize="18" VerticalTextAlignment="Center" TextColor="DarkGray" Margin="0,0,10,0" />
+        <Label Text="{Binding Message.Subject}" FontSize="20" LineBreakMode="TailTruncation" />
+      </StackLayout>
+      <StackLayout BackgroundColor="LightGray" HeightRequest="1" />
+      <Label Text="{Binding Message.LocalTime}" FontSize="14" Margin="5,15,5,5" TextColor="LightGray" />
+      <Label Text="{Binding Message.Body}" FontSize="20" Margin="5,5,5,15" LineBreakMode="WordWrap"
+             VerticalOptions="StartAndExpand" />
+    </StackLayout>
+  </ContentPage.Content>
+</ContentPage>
