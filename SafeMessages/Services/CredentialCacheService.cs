@@ -25,7 +25,7 @@ namespace SafeMessages.Services
             var authResponse = await SecureStorage.GetAsync(AuthRspKey);
             if (authResponse == null)
             {
-                throw new NullReferenceException("");
+                throw new NullReferenceException("authResponse");
             }
 
             return authResponse;
