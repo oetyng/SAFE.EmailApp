@@ -49,14 +49,20 @@ namespace SafeMessages.Services
         {
             get
             {
-                if (!Application.Current.Properties.ContainsKey(AuthReconnectPropKey)) return false;
+                if (!Application.Current.Properties.ContainsKey(AuthReconnectPropKey))
+                {
+                    return false;
+                }
 
                 var val = Application.Current.Properties[AuthReconnectPropKey] as bool?;
                 return val == true;
             }
             set
             {
-                if (value == false) CredentialCache.Delete();
+                if (value == false)
+                {
+                    CredentialCache.Delete();
+                }
 
                 Application.Current.Properties[AuthReconnectPropKey] = value;
             }
@@ -71,11 +77,13 @@ namespace SafeMessages.Services
         public async Task AddIdAsync(string userId)
         {
             if (userId.Contains(".") || userId.Contains("@"))
+            {
                 throw new NotSupportedException("Unsupported characters '.' and '@'.");
+            }
 
             // Check if account exits first and return error
             var dstPubIdDigest = await Crypto.Sha3HashAsync(userId.ToUtfBytes());
-            var dstPubIdMDataInfoH = new MDataInfo {Name = dstPubIdDigest.ToArray(), TypeTag = 15001};
+            var dstPubIdMDataInfoH = new MDataInfo { Name = dstPubIdDigest.ToArray(), TypeTag = 15001 };
             var accountExists = false;
             try
             {
@@ -87,7 +95,10 @@ namespace SafeMessages.Services
                 // ignored - acct not found
             }
 
-            if (accountExists) throw new Exception("Id already exists.");
+            if (accountExists)
+            {
+                throw new Exception("Id already exists.");
+            }
 
             // Create Self Permissions to Inbox and Archive
             using (var inboxSelfPermSetH = await _session.MDataPermissions.NewAsync())
@@ -100,7 +111,7 @@ namespace SafeMessages.Services
                             inboxSelfPermSetH,
                             appSignPkH,
                             new PermissionSet
-                                {Delete = true, Insert = true, ManagePermissions = true, Read = true, Update = true});
+                            { Delete = true, Insert = true, ManagePermissions = true, Read = true, Update = true });
                     }
 
                     // Create Archive MD
@@ -110,7 +121,7 @@ namespace SafeMessages.Services
 
                     // Update Inbox permisions to allow anyone to insert
                     await _session.MDataPermissions.InsertAsync(inboxPermH, NativeHandle.Zero,
-                        new PermissionSet {Insert = true});
+                        new PermissionSet { Insert = true });
 
                     // Create Inbox MD
                     var (inboxEncPk, inboxEncSk) = await _session.Crypto.EncGenerateKeyPairAsync();
@@ -135,7 +146,7 @@ namespace SafeMessages.Services
 
                         // Create Public Id MD
                         var idDigest = await Crypto.Sha3HashAsync(userId.ToUtfBytes());
-                        var pubIdMDataInfoH = new MDataInfo {Name = idDigest.ToArray(), TypeTag = 15001};
+                        var pubIdMDataInfoH = new MDataInfo { Name = idDigest.ToArray(), TypeTag = 15001 };
                         using (var pubIdEntriesH = await _session.MDataEntries.NewAsync())
                         {
                             await _session.MDataEntries.InsertAsync(pubIdEntriesH, "@email".ToUtfBytes(),
@@ -160,8 +171,8 @@ namespace SafeMessages.Services
                         var msgBox = new MessageBox
                         {
                             EmailId = userId,
-                            Inbox = new DataArray {Type = "Buffer", Data = serInboxMdInfo},
-                            Archive = new DataArray {Type = "Buffer", Data = serArchiveMdInfo},
+                            Inbox = new DataArray { Type = "Buffer", Data = serInboxMdInfo },
+                            Archive = new DataArray { Type = "Buffer", Data = serArchiveMdInfo },
                             EmailEncPk = inboxEncPkRaw.ToList().ToHexString(),
                             EmailEncSk = inboxEncSkRaw.ToList().ToHexString()
                         };
@@ -187,11 +198,17 @@ namespace SafeMessages.Services
         {
             try
             {
-                if (_session == null) return;
+                if (_session == null)
+                {
+                    return;
+                }
 
                 if (_session.IsDisconnected)
                 {
-                    if (!AuthReconnect) throw new Exception("Reconnect Disabled");
+                    if (!AuthReconnect)
+                    {
+                        throw new Exception("Reconnect Disabled");
+                    }
 
                     using (UserDialogs.Instance.Loading("Reconnecting to Network"))
                     {
@@ -237,7 +254,7 @@ namespace SafeMessages.Services
             var authReq = new AuthReq
             {
                 AppContainer = true,
-                App = new AppExchangeInfo {Id = AppId, Scope = "", Name = "SAFE Messages", Vendor = "MaidSafe.net Ltd"},
+                App = new AppExchangeInfo { Id = AppId, Scope = "", Name = "SAFE Messages", Vendor = "MaidSafe.net Ltd" },
                 Containers = new List<ContainerPermissions>
                     {new ContainerPermissions {ContName = "_publicNames", Access = {Insert = true}}}
             };
@@ -254,6 +271,7 @@ namespace SafeMessages.Services
             var appContH = await _session.AccessContainer.GetMDataInfoAsync("apps/" + AppId);
             var appContEntKeys = await _session.MData.ListKeysAsync(appContH);
             foreach (var cipherTextEntKey in appContEntKeys)
+            {
                 try
                 {
                     var plainTextEntKey = await _session.MDataInfoActions.DecryptAsync(appContH, cipherTextEntKey.Val);
@@ -263,6 +281,7 @@ namespace SafeMessages.Services
                 {
                     // ignore incompatible entries.
                 }
+            }
 
             return ids;
         }
@@ -285,10 +304,14 @@ namespace SafeMessages.Services
                     await _session.Crypto.EncSecretKeyNewAsync(msgBox.EmailEncSk.ToHexBytes().ToArray()))
                 {
                     foreach (var key in inboxEntKeys)
+                    {
                         try
                         {
                             var entryKey = key.Val.ToUtfString();
-                            if (entryKey == "__email_enc_pk") continue;
+                            if (entryKey == "__email_enc_pk")
+                            {
+                                continue;
+                            }
 
                             var value = await _session.MData.GetValueAsync(inboxInfo, key.Val);
                             var iDataNameEncoded =
@@ -310,6 +333,7 @@ namespace SafeMessages.Services
                         {
                             Debug.WriteLine("Exception: " + e.Message);
                         }
+                    }
                 }
             }
 
@@ -334,7 +358,7 @@ namespace SafeMessages.Services
                         if (AuthReconnect)
                         {
                             var encodedAuthRsp = JsonConvert.SerializeObject(ipcMsg.AuthGranted);
-                            CredentialCache.Store(encodedAuthRsp);
+                            await CredentialCache.Store(encodedAuthRsp);
                         }
                     }
 
@@ -354,7 +378,7 @@ namespace SafeMessages.Services
 
         private async void InitLoggingAsync()
         {
-            var fileList = new List<(string, string)> {("log.toml", "log.toml")};
+            var fileList = new List<(string, string)> { ("log.toml", "log.toml") };
             var fileOps = DependencyService.Get<IFileOps>();
             await fileOps.TransferAssetsAsync(fileList);
             Debug.WriteLine("Assets Transferred");
@@ -373,13 +397,19 @@ namespace SafeMessages.Services
 
         private void OnSessionDisconnected(object obj, EventArgs e)
         {
-            if (!obj.Equals(_session)) return;
+            if (!obj.Equals(_session))
+            {
+                return;
+            }
 
             Device.BeginInvokeOnMainThread(
                 async () =>
                 {
                     _session?.Dispose();
-                    if (App.IsBackgrounded) return;
+                    if (App.IsBackgrounded)
+                    {
+                        return;
+                    }
 
                     await CheckAndReconnect();
                 });
@@ -388,7 +418,7 @@ namespace SafeMessages.Services
         public async Task SendMessageAsync(string to, Message msg)
         {
             var dstPubIdDigest = await Crypto.Sha3HashAsync(to.ToUtfBytes());
-            var dstPubIdMDataInfoH = new MDataInfo {Name = dstPubIdDigest.ToArray(), TypeTag = 15001};
+            var dstPubIdMDataInfoH = new MDataInfo { Name = dstPubIdDigest.ToArray(), TypeTag = 15001 };
             var serDstMsgMDataInfo = await _session.MData.GetValueAsync(dstPubIdMDataInfoH, "@email".ToUtfBytes());
             var dstInboxMDataInfoH = await _session.MDataInfoActions.DeserialiseAsync(serDstMsgMDataInfo.Item1);
             var dstInboxPkItem = await _session.MData.GetValueAsync(dstInboxMDataInfoH, "__email_enc_pk".ToUtfBytes());
