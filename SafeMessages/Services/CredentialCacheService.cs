@@ -1,6 +1,6 @@
 ﻿using System;
-using System.Linq;
-using Xamarin.Auth;
+using Xamarin.Essentials;
+using System.Threading.Tasks;
 
 namespace SafeMessages.Services
 {
@@ -12,33 +12,28 @@ namespace SafeMessages.Services
         {
             try
             {
-                var acctInfo = GetAccountInfo();
-                AccountStore.Create().Delete(acctInfo, App.AppName);
+                SecureStorage.RemoveAll();
             }
-            catch (NullReferenceException)
+            catch (Exception)
             {
                 // ignore acct not existing
             }
         }
 
-        private static Account GetAccountInfo()
+        public async Task<string> Retrieve()
         {
-            var acctInfo = AccountStore.Create().FindAccountsForService(App.AppName).FirstOrDefault();
-            if (acctInfo == null) throw new NullReferenceException("acctInfo");
-            return acctInfo;
+            var authResponse = await SecureStorage.GetAsync(AuthRspKey);
+            if (authResponse == null)
+            {
+                throw new NullReferenceException("");
+            }
+
+            return authResponse;
         }
 
-        public string Retrieve()
+        public async Task Store(string authRsp)
         {
-            var acctInfo = GetAccountInfo();
-            return acctInfo.Properties[AuthRspKey];
-        }
-
-        public void Store(string authRsp)
-        {
-            var acctInfo = new Account {Username = "CachedAcct"};
-            acctInfo.Properties.Add(AuthRspKey, authRsp);
-            AccountStore.Create().Save(acctInfo, App.AppName);
+            await SecureStorage.SetAsync(AuthRspKey, authRsp);
         }
     }
 }

@@ -195,7 +195,7 @@ namespace SafeMessages.Services
 
                     using (UserDialogs.Instance.Loading("Reconnecting to Network"))
                     {
-                        var encodedAuthRsp = CredentialCache.Retrieve();
+                        var encodedAuthRsp = await CredentialCache.Retrieve();
                         var authGranted = JsonConvert.DeserializeObject<AuthGranted>(encodedAuthRsp);
                         _session = await Session.AppRegisteredAsync(AppId, authGranted);
                     }
