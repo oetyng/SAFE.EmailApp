@@ -17,7 +17,8 @@ namespace SafeMessages.Views
                 async sender =>
                 {
                     MessageCenterUnsubscribe();
-                    if (!App.IsPageValid(this)) return;
+                    if (!App.IsPageValid(this))
+                        return;
 
                     await Navigation.PopAsync();
                 });

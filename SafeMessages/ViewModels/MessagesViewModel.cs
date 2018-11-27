@@ -36,7 +36,9 @@ namespace SafeMessages.ViewModels
         }
 
         public ICommand RefreshCommand { get; }
+
         public ICommand SendCommand { get; }
+
         public ICommand MessageSelectedCommand { get; }
 
         private void OnMessageSelectedCommand(Message message)

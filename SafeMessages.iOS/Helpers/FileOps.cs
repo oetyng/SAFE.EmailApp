@@ -17,7 +17,8 @@ namespace SafeMessages.iOS.Helpers
             get
             {
                 string path;
-// Resources -> /Library
+
+                // Resources -> /Library
                 path = Environment.GetFolderPath(Environment.SpecialFolder.Resources);
                 return path;
             }
@@ -26,6 +27,7 @@ namespace SafeMessages.iOS.Helpers
         public async Task TransferAssetsAsync(List<(string, string)> fileList)
         {
             foreach (var tuple in fileList)
+            {
                 using (var reader = new StreamReader(Path.Combine(".", tuple.Item1)))
                 {
                     using (var writer = new StreamWriter(Path.Combine(ConfigFilesPath, tuple.Item2)))
@@ -36,6 +38,7 @@ namespace SafeMessages.iOS.Helpers
 
                     reader.Close();
                 }
+            }
         }
     }
 }

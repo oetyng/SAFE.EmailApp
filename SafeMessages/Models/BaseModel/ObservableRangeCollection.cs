@@ -27,23 +27,27 @@ namespace SafeMessages.Models.BaseModel
         /// </summary>
         /// <param name="collection">collection: The collection from which the elements are copied.</param>
         /// <exception cref="System.ArgumentNullException">The collection parameter cannot be null.</exception>
-        public ObservableRangeCollection(IEnumerable<T> collection) : base(collection)
+        public ObservableRangeCollection(IEnumerable<T> collection)
+            : base(collection)
         {
         }
 
         /// <summary>
         ///     Adds the elements of the specified collection to the end of the ObservableCollection(Of T).
         /// </summary>
-        public void AddRange(IEnumerable<T> collection,
+        public void AddRange(
+            IEnumerable<T> collection,
             NotifyCollectionChangedAction notificationMode = NotifyCollectionChangedAction.Add)
         {
-            if (collection == null) throw new ArgumentNullException(nameof(collection));
+            if (collection == null)
+                throw new ArgumentNullException(nameof(collection));
 
             CheckReentrancy();
 
             if (notificationMode == NotifyCollectionChangedAction.Reset)
             {
-                foreach (var i in collection) Items.Add(i);
+                foreach (var i in collection)
+                    Items.Add(i);
 
                 OnPropertyChanged(new PropertyChangedEventArgs("Count"));
                 OnPropertyChanged(new PropertyChangedEventArgs("Item[]"));
@@ -54,12 +58,12 @@ namespace SafeMessages.Models.BaseModel
 
             var startIndex = Count;
             var changedItems = collection is List<T> list ? list : new List<T>(collection);
-            foreach (var i in changedItems) Items.Add(i);
+            foreach (var i in changedItems)
+                Items.Add(i);
 
             OnPropertyChanged(new PropertyChangedEventArgs("Count"));
             OnPropertyChanged(new PropertyChangedEventArgs("Item[]"));
-            OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, changedItems,
-                startIndex));
+            OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, changedItems, startIndex));
         }
 
         /// <summary>
@@ -67,9 +71,11 @@ namespace SafeMessages.Models.BaseModel
         /// </summary>
         public void RemoveRange(IEnumerable<T> collection)
         {
-            if (collection == null) throw new ArgumentNullException(nameof(collection));
+            if (collection == null)
+                throw new ArgumentNullException(nameof(collection));
 
-            foreach (var i in collection) Items.Remove(i);
+            foreach (var i in collection)
+                Items.Remove(i);
             OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset));
         }
 
@@ -78,7 +84,7 @@ namespace SafeMessages.Models.BaseModel
         /// </summary>
         public void Replace(T item)
         {
-            ReplaceRange(new[] {item});
+            ReplaceRange(new[] { item });
         }
 
         /// <summary>
@@ -86,7 +92,8 @@ namespace SafeMessages.Models.BaseModel
         /// </summary>
         private void ReplaceRange(IEnumerable<T> collection)
         {
-            if (collection == null) throw new ArgumentNullException(nameof(collection));
+            if (collection == null)
+                throw new ArgumentNullException(nameof(collection));
 
             Items.Clear();
             AddRange(collection, NotifyCollectionChangedAction.Reset);
@@ -95,11 +102,14 @@ namespace SafeMessages.Models.BaseModel
         public void Sort(bool reverse = false)
         {
             var sorted = Items.OrderBy(x => x).ToList();
-            if (reverse) sorted.Reverse();
+            if (reverse)
+                sorted.Reverse();
 
-            if (sorted.Equals(Items)) return;
+            if (sorted.Equals(Items))
+                return;
 
-            for (var i = 0; i < sorted.Count; i++) MoveItem(Items.IndexOf(sorted[i]), i);
+            for (var i = 0; i < sorted.Count; i++)
+                MoveItem(Items.IndexOf(sorted[i]), i);
         }
     }
 }

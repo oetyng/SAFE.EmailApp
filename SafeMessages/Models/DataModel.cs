@@ -15,6 +15,7 @@ namespace SafeMessages.Models
         }
 
         public ObservableRangeCollection<UserId> Accounts { get; set; }
+
         public ObservableRangeCollection<Message> Messages { get; set; }
 
         public void ClearMessages()

@@ -9,7 +9,8 @@ namespace SafeMessages.Views
     [XamlCompilation(XamlCompilationOptions.Compile)]
     public partial class SendMessageView : ContentPage, ICleanup
     {
-        public SendMessageView() : this(null, string.Empty)
+        public SendMessageView()
+            : this(null, string.Empty)
         {
         }
 
@@ -24,7 +25,8 @@ namespace SafeMessages.Views
                 async sender =>
                 {
                     MessageCenterUnsubscribe();
-                    if (!App.IsPageValid(this)) return;
+                    if (!App.IsPageValid(this))
+                        return;
 
                     await Navigation.PopAsync();
                 });

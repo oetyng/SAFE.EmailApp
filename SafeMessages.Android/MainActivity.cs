@@ -22,36 +22,37 @@ namespace SafeMessages.Droid
         LaunchMode = LaunchMode.SingleTask,
         ConfigurationChanges = ConfigChanges.ScreenSize | ConfigChanges.Orientation)]
     [IntentFilter(
-        new[] {Intent.ActionView},
-        Categories = new[] {Intent.CategoryDefault, Intent.CategoryBrowsable},
+        new[] { Intent.ActionView },
+        Categories = new[] { Intent.CategoryDefault, Intent.CategoryBrowsable },
         DataScheme = AppService.AppId)]
     public class MainActivity : FormsAppCompatActivity
     {
-        private AppService SafeApp => DependencyService.Get<AppService>();
         private static string LogFolderPath => DependencyService.Get<IFileOps>().ConfigFilesPath;
+
+        private AppService SafeApp => DependencyService.Get<AppService>();
 
         private void HandleAppLaunch(string url)
         {
             Debug.WriteLine($"Launched via: {url}");
-            Device.BeginInvokeOnMainThread(
-                async () =>
+            Device.BeginInvokeOnMainThread(async () =>
+            {
+                try
                 {
-                    try
-                    {
-                        await SafeApp.HandleUrlActivationAsync(url);
-                        Debug.WriteLine("IPC Msg Handling Completed");
-                    }
-                    catch (Exception ex)
-                    {
-                        Debug.WriteLine($"Error: {ex.Message}");
-                    }
-                });
+                    await SafeApp.HandleUrlActivationAsync(url);
+                    Debug.WriteLine("IPC Msg Handling Completed");
+                }
+                catch (Exception ex)
+                {
+                    Debug.WriteLine($"Error: {ex.Message}");
+                }
+            });
         }
 
         public override void OnBackPressed()
         {
             if (Xamarin.Forms.Application.Current.MainPage is NavigationPage currentNav &&
-                currentNav.Navigation.NavigationStack.Count == 1) SafeApp.FreeState();
+                currentNav.Navigation.NavigationStack.Count == 1)
+                SafeApp.FreeState();
 
             base.OnBackPressed();
         }
@@ -73,13 +74,15 @@ namespace SafeMessages.Droid
             UserDialogs.Init(this);
             LoadApplication(new App());
 
-            if (Intent?.Data != null) HandleAppLaunch(Intent.Data.ToString());
+            if (Intent?.Data != null)
+                HandleAppLaunch(Intent.Data.ToString());
         }
 
         protected override void OnNewIntent(Intent intent)
         {
             base.OnNewIntent(intent);
-            if (intent?.Data != null) HandleAppLaunch(intent.Data.ToString());
+            if (intent?.Data != null)
+                HandleAppLaunch(intent.Data.ToString());
         }
 
         #region Error Handling
@@ -90,8 +93,7 @@ namespace SafeMessages.Droid
             LogUnhandledException(newExc);
         }
 
-        private static void TaskSchedulerOnUnobservedTaskException(object sender,
-            UnobservedTaskExceptionEventArgs exEventArgs)
+        private static void TaskSchedulerOnUnobservedTaskException(object sender, UnobservedTaskExceptionEventArgs exEventArgs)
         {
             var newExc = new Exception("TaskSchedulerOnUnobservedTaskException", exEventArgs.Exception);
             LogUnhandledException(newExc);
@@ -123,7 +125,8 @@ namespace SafeMessages.Droid
             const string errorFilename = "Fatal.log";
             var errorFilePath = Path.Combine(LogFolderPath, errorFilename);
 
-            if (!File.Exists(errorFilePath)) return;
+            if (!File.Exists(errorFilePath))
+                return;
 
             var errorText = File.ReadAllText(errorFilePath);
             new AlertDialog.Builder(this).SetPositiveButton("Clear", (sender, args) => { File.Delete(errorFilePath); })
