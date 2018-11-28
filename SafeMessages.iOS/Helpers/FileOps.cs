@@ -16,11 +16,8 @@ namespace SafeMessages.iOS.Helpers
         {
             get
             {
-                string path;
-
                 // Resources -> /Library
-                path = Environment.GetFolderPath(Environment.SpecialFolder.Resources);
-                return path;
+                return Environment.GetFolderPath(Environment.SpecialFolder.Resources);
             }
         }
 
