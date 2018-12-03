@@ -9,7 +9,8 @@ namespace SafeMessages.Views
     [XamlCompilation(XamlCompilationOptions.Compile)]
     public partial class DisplayMessagePage : ContentPage, ICleanup
     {
-        public DisplayMessagePage() : this(null)
+        public DisplayMessagePage()
+            : this(null)
         {
         }
 

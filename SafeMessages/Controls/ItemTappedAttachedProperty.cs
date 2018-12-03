@@ -16,7 +16,7 @@ namespace SafeMessages.Controls
 
         public static ICommand GetItemTapped(BindableObject bindable)
         {
-            return (ICommand) bindable.GetValue(CommandProperty);
+            return (ICommand)bindable.GetValue(CommandProperty);
         }
 
         public static void OnItemTapped(object sender, ItemTappedEventArgs e)
@@ -24,12 +24,14 @@ namespace SafeMessages.Controls
             var control = sender as ListView;
             var command = GetItemTapped(control);
 
-            if (command != null && command.CanExecute(e.Item)) command.Execute(e.Item);
+            if (command != null && command.CanExecute(e.Item))
+                command.Execute(e.Item);
         }
 
         private static void OnItemTappedChanged(BindableObject bindable, object oldValue, object newValue)
         {
-            if (bindable is ListView control) control.ItemTapped += OnItemTapped;
+            if (bindable is ListView control)
+                control.ItemTapped += OnItemTapped;
         }
 
         public static void SetItemTapped(BindableObject bindable, ICommand value)

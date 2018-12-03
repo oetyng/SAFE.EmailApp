@@ -15,27 +15,27 @@ namespace SafeMessages
         public const string AppName = "SAFE Messages";
         private static volatile bool _isBackgrounded;
 
-        public App()
-        {
-            InitializeComponent();
-
-            MessagingCenter.Subscribe<AppService>(this, MessengerConstants.ResetAppViews,
-                async _ => { await ResetViews(); });
-            Current.MainPage = new NavigationPage(NewStartupPage());
-        }
-
-        public AppService SafeApp => DependencyService.Get<AppService>();
-
         public static bool IsBackgrounded
         {
             get => _isBackgrounded;
             private set => _isBackgrounded = value;
         }
 
+        public App()
+        {
+            InitializeComponent();
+
+            MessagingCenter.Subscribe<AppService>(this, MessengerConstants.ResetAppViews, async _ => { await ResetViews(); });
+            Current.MainPage = new NavigationPage(NewStartupPage());
+        }
+
+        public AppService SafeApp => DependencyService.Get<AppService>();
+
         public static bool IsPageValid(Page page)
         {
             var navPage = Current.MainPage as NavigationPage;
-            if (navPage == null) return false;
+            if (navPage == null)
+                return false;
 
             var validPage = navPage.Navigation.NavigationStack.FirstOrDefault();
             var checkPage = page.Navigation.NavigationStack.FirstOrDefault();
@@ -66,14 +66,16 @@ namespace SafeMessages
         private static async Task ResetViews()
         {
             var navPage = Current.MainPage as NavigationPage;
-            if (navPage == null) return;
+            if (navPage == null)
+                return;
 
             var navigationController = navPage.Navigation;
             foreach (var page in navigationController.NavigationStack.OfType<ICleanup>())
                 page.MessageCenterUnsubscribe();
 
             var rootPage = navigationController.NavigationStack.FirstOrDefault();
-            if (rootPage == null) return;
+            if (rootPage == null)
+                return;
 
             navigationController.InsertPageBefore(NewStartupPage(), rootPage);
             await navigationController.PopToRootAsync(true);

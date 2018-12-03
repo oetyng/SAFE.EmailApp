@@ -9,7 +9,8 @@ namespace SafeMessages.Views
     [XamlCompilation(XamlCompilationOptions.Compile)]
     public partial class MessagesView : ContentPage, ICleanup
     {
-        public MessagesView() : this(null)
+        public MessagesView()
+            : this(null)
         {
         }
 
@@ -48,7 +49,8 @@ namespace SafeMessages.Views
                     MessagesListView.SelectedItem = null;
                 });
 
-            if (!viewModel.RefreshCommand.CanExecute(null)) return;
+            if (!viewModel.RefreshCommand.CanExecute(null))
+                return;
 
             AppData.ClearMessages();
             viewModel.RefreshCommand.Execute(null);

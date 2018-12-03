@@ -1,6 +1,6 @@
 ﻿using System;
-using Xamarin.Essentials;
 using System.Threading.Tasks;
+using Xamarin.Essentials;
 
 namespace SafeMessages.Services
 {

@@ -161,7 +161,6 @@ AppPackages/
 sql/
 *.Cache
 ClientBin/
-[Ss]tyle[Cc]op.*
 ~$*
 *~
 *.dbmdl
@@ -171,6 +170,7 @@ ClientBin/
 node_modules/
 .DS_Store
 *.bak
+.vscode
 
 # RIA/Silverlight projects
 Generated_Code/

@@ -17,16 +17,15 @@ namespace SafeMessages.Droid.Helpers
         {
             get
             {
-                string path;
                 // Personal -> /data/data/@PACKAGE_NAME@/files
-                path = Environment.GetFolderPath(Environment.SpecialFolder.Personal);
-                return path;
+                return Environment.GetFolderPath(Environment.SpecialFolder.Personal);
             }
         }
 
         public async Task TransferAssetsAsync(List<(string, string)> fileList)
         {
             foreach (var tuple in fileList)
+            {
                 using (var reader = new StreamReader(Application.Context.Assets.Open(tuple.Item1)))
                 {
                     using (var writer = new StreamWriter(Path.Combine(ConfigFilesPath, tuple.Item2)))
@@ -37,6 +36,7 @@ namespace SafeMessages.Droid.Helpers
 
                     reader.Close();
                 }
+            }
         }
     }
 }

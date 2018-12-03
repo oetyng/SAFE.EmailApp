@@ -13,20 +13,26 @@ namespace SafeMessages.Models
             Body = body;
         }
 
-        [JsonProperty("from")] public string From { get; }
+        [JsonProperty("from")]
+        public string From { get; }
 
-        [JsonProperty("subject")] public string Subject { get; }
+        [JsonProperty("subject")]
+        public string Subject { get; }
 
-        [JsonProperty("time")] public string Time { get; }
+        [JsonProperty("time")]
+        public string Time { get; }
 
-        [JsonProperty("body")] public string Body { get; }
+        [JsonProperty("body")]
+        public string Body { get; }
 
-        [JsonIgnore] public string LocalTime => Convert.ToDateTime(Time).ToString("f");
+        [JsonIgnore]
+        public string LocalTime => Convert.ToDateTime(Time).ToString("f");
 
         public int CompareTo(object obj)
         {
             var other = obj as Message;
-            if (other == null) throw new NotSupportedException();
+            if (other == null)
+                throw new NotSupportedException();
 
             var thisDt = Convert.ToDateTime(Time);
             var otherDt = Convert.ToDateTime(other.Time);
@@ -35,9 +41,11 @@ namespace SafeMessages.Models
 
         public bool Equals(Message other)
         {
-            if (ReferenceEquals(null, other)) return false;
+            if (ReferenceEquals(null, other))
+                return false;
 
-            if (ReferenceEquals(this, other)) return true;
+            if (ReferenceEquals(this, other))
+                return true;
 
             return string.Equals(From, other.From) && string.Equals(Subject, other.Subject) &&
                    string.Equals(Time, other.Time) &&
@@ -46,11 +54,13 @@ namespace SafeMessages.Models
 
         public override bool Equals(object obj)
         {
-            if (ReferenceEquals(null, obj)) return false;
+            if (ReferenceEquals(null, obj))
+                return false;
 
-            if (ReferenceEquals(this, obj)) return true;
+            if (ReferenceEquals(this, obj))
+                return true;
 
-            return obj.GetType() == GetType() && Equals((Message) obj);
+            return obj.GetType() == GetType() && Equals((Message)obj);
         }
 
         public override int GetHashCode()

@@ -14,6 +14,11 @@
     <PackageReference Include="Xamarin.Forms" Version="3.3.0.967583" />
   </ItemGroup>
 
+  <Import Project="$(MSBuildThisFileDirectory)..\CodeStyles.targets" />
+  <ItemGroup>
+    <Content Include="..\stylecop.json" Link="stylecop.json" />
+  </ItemGroup>
+
   <ItemGroup>
     <Folder Include="Models\BaseModel\" />
   </ItemGroup>

@@ -126,6 +126,7 @@
     <None Include="Entitlements.plist" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="GlobalSuppressions.cs" />
     <Compile Include="Helpers\FileOps.cs" />
     <Compile Include="Main.cs" />
     <Compile Include="AppDelegate.cs" />
@@ -208,4 +209,8 @@
     </PackageReference>
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\iOS\Xamarin.iOS.CSharp.targets" />
+  <Import Project="$(MSBuildThisFileDirectory)..\CodeStyles.targets" />
+  <ItemGroup>
+    <Content Include="..\stylecop.json" Link="stylecop.json" />
+  </ItemGroup>
 </Project>

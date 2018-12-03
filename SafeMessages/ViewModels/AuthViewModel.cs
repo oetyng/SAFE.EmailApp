@@ -15,7 +15,8 @@ namespace SafeMessages.ViewModels
         {
             SafeApp.PropertyChanged += (s, e) =>
             {
-                if (e.PropertyName == nameof(SafeApp.IsLogInitialised)) IsUiEnabled = SafeApp.IsLogInitialised;
+                if (e.PropertyName == nameof(SafeApp.IsLogInitialised))
+                    IsUiEnabled = SafeApp.IsLogInitialised;
             };
 
             MessagingCenter.Subscribe<AppService, string>(
@@ -53,7 +54,8 @@ namespace SafeMessages.ViewModels
             get => SafeApp.AuthReconnect;
             set
             {
-                if (SafeApp.AuthReconnect != value) SafeApp.AuthReconnect = value;
+                if (SafeApp.AuthReconnect != value)
+                    SafeApp.AuthReconnect = value;
 
                 OnPropertyChanged();
             }
@@ -70,8 +72,7 @@ namespace SafeMessages.ViewModels
             }
             catch (Exception ex)
             {
-                await Application.Current.MainPage.DisplayAlert("Error", $"Generate App Request Failed: {ex.Message}",
-                    "OK");
+                await Application.Current.MainPage.DisplayAlert("Error", $"Generate App Request Failed: {ex.Message}", "OK");
             }
         }
     }

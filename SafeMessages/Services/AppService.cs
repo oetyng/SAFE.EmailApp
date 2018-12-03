@@ -37,6 +37,7 @@ namespace SafeMessages.Services
         }
 
         public UserId Self { get; set; }
+
         private CredentialCacheService CredentialCache { get; }
 
         public bool IsLogInitialised
@@ -57,6 +58,7 @@ namespace SafeMessages.Services
                 var val = Application.Current.Properties[AuthReconnectPropKey] as bool?;
                 return val == true;
             }
+
             set
             {
                 if (value == false)
@@ -120,8 +122,7 @@ namespace SafeMessages.Services
                     var serArchiveMdInfo = await _session.MDataInfoActions.SerialiseAsync(archiveMDataInfoH);
 
                     // Update Inbox permisions to allow anyone to insert
-                    await _session.MDataPermissions.InsertAsync(inboxPermH, NativeHandle.Zero,
-                        new PermissionSet { Insert = true });
+                    await _session.MDataPermissions.InsertAsync(inboxPermH, NativeHandle.Zero, new PermissionSet { Insert = true });
 
                     // Create Inbox MD
                     var (inboxEncPk, inboxEncSk) = await _session.Crypto.EncGenerateKeyPairAsync();
@@ -149,8 +150,7 @@ namespace SafeMessages.Services
                         var pubIdMDataInfoH = new MDataInfo { Name = idDigest.ToArray(), TypeTag = 15001 };
                         using (var pubIdEntriesH = await _session.MDataEntries.NewAsync())
                         {
-                            await _session.MDataEntries.InsertAsync(pubIdEntriesH, "@email".ToUtfBytes(),
-                                serInboxMdInfo);
+                            await _session.MDataEntries.InsertAsync(pubIdEntriesH, "@email".ToUtfBytes(), serInboxMdInfo);
                             await _session.MData.PutAsync(pubIdMDataInfoH, inboxPermH, pubIdEntriesH);
                         }
 
@@ -162,8 +162,7 @@ namespace SafeMessages.Services
                             await _session.MDataInfoActions.EncryptEntryValueAsync(publicNamesContH, idDigest);
                         using (var pubNamesContEntActH = await _session.MDataEntryActions.NewAsync())
                         {
-                            await _session.MDataEntryActions.InsertAsync(pubNamesContEntActH, pubNamesUserIdCipherBytes,
-                                pubNamesMsgBoxCipherBytes);
+                            await _session.MDataEntryActions.InsertAsync(pubNamesContEntActH, pubNamesUserIdCipherBytes, pubNamesMsgBoxCipherBytes);
                             await _session.MData.MutateEntriesAsync(publicNamesContH, pubNamesContEntActH);
                         }
 
@@ -185,8 +184,7 @@ namespace SafeMessages.Services
                             await _session.MDataInfoActions.EncryptEntryValueAsync(appContH, msgBoxSer.ToUtfBytes());
                         using (var appContEntActH = await _session.MDataEntryActions.NewAsync())
                         {
-                            await _session.MDataEntryActions.InsertAsync(appContEntActH, userIdCipherBytes,
-                                msgBoxCipherBytes);
+                            await _session.MDataEntryActions.InsertAsync(appContEntActH, userIdCipherBytes, msgBoxCipherBytes);
                             await _session.MData.MutateEntriesAsync(appContH, appContEntActH);
                         }
                     }
@@ -220,8 +218,7 @@ namespace SafeMessages.Services
                     try
                     {
                         var cts = new CancellationTokenSource(2000);
-                        await UserDialogs.Instance.AlertAsync("Network connection established.", "Success", "OK",
-                            cts.Token);
+                        await UserDialogs.Instance.AlertAsync("Network connection established.", "Success", "OK", cts.Token);
                     }
                     catch (OperationCanceledException)
                     {
@@ -254,9 +251,9 @@ namespace SafeMessages.Services
             var authReq = new AuthReq
             {
                 AppContainer = true,
-                App = new AppExchangeInfo { Id = AppId, Scope = "", Name = "SAFE Messages", Vendor = "MaidSafe.net Ltd" },
+                App = new AppExchangeInfo { Id = AppId, Scope = string.Empty, Name = "SAFE Messages", Vendor = "MaidSafe.net Ltd" },
                 Containers = new List<ContainerPermissions>
-                    {new ContainerPermissions {ContName = "_publicNames", Access = {Insert = true}}}
+                    { new ContainerPermissions { ContName = "_publicNames", Access = { Insert = true } } }
             };
 
             var encodedReq = await Session.EncodeAuthReqAsync(authReq);
@@ -350,6 +347,7 @@ namespace SafeMessages.Services
                 {
                     var ipcMsg = decodeResult as AuthIpcMsg;
                     Debug.WriteLine("Received Auth Granted from Authenticator");
+
                     // update auth progress message
                     MessagingCenter.Send(this, MessengerConstants.AuthRequestProgress, AuthInProgressMessage);
                     if (ipcMsg != null)
@@ -442,8 +440,7 @@ namespace SafeMessages.Services
                     await _session.Crypto.EncryptSealedBoxAsync(encodedString.ToUtfBytes(), dstInboxPkH);
                 using (var dstMsgEntActH = await _session.MDataEntryActions.NewAsync())
                 {
-                    await _session.MDataEntryActions.InsertAsync(dstMsgEntActH,
-                        RandomGenerator.RandomString(15).ToUtfBytes(), msgDataMapNameCipher);
+                    await _session.MDataEntryActions.InsertAsync(dstMsgEntActH, RandomGenerator.RandomString(15).ToUtfBytes(), msgDataMapNameCipher);
                     await _session.MData.MutateEntriesAsync(dstInboxMDataInfoH, dstMsgEntActH);
                 }
             }

@@ -15,6 +15,7 @@ namespace SafeMessages.iOS
     public class AppDelegate : FormsApplicationDelegate
     {
         public AppService SafeApp => DependencyService.Get<AppService>();
+
         private static string LogFolderPath => DependencyService.Get<IFileOps>().ConfigFilesPath;
 
         public override bool FinishedLaunching(UIApplication app, NSDictionary options)
@@ -50,8 +51,7 @@ namespace SafeMessages.iOS
 
         #region Error Handling
 
-        private static void TaskSchedulerOnUnobservedTaskException(object sender,
-            UnobservedTaskExceptionEventArgs exEventArgs)
+        private static void TaskSchedulerOnUnobservedTaskException(object sender, UnobservedTaskExceptionEventArgs exEventArgs)
         {
             var newExc = new Exception("TaskSchedulerOnUnobservedTaskException", exEventArgs.Exception);
             LogUnhandledException(newExc);
@@ -83,20 +83,20 @@ namespace SafeMessages.iOS
             const string errorFilename = "Fatal.log";
             var errorFilePath = Path.Combine(LogFolderPath, errorFilename);
 
-            if (!File.Exists(errorFilePath)) return;
+            if (!File.Exists(errorFilePath))
+                return;
 
             var errorText = File.ReadAllText(errorFilePath);
-            Device.BeginInvokeOnMainThread(
-                () =>
-                {
-                    var vc = UIApplication.SharedApplication?.KeyWindow?.RootViewController;
-                    if (vc == null) return;
-                    var alert = UIAlertController.Create("Crash Report", errorText, UIAlertControllerStyle.Alert);
-                    alert.AddAction(UIAlertAction.Create("Close", UIAlertActionStyle.Cancel, null));
-                    alert.AddAction(UIAlertAction.Create("Clear", UIAlertActionStyle.Default,
-                        action => { File.Delete(errorFilePath); }));
-                    vc.PresentViewController(alert, true, null);
-                });
+            Device.BeginInvokeOnMainThread(() =>
+            {
+                var vc = UIApplication.SharedApplication?.KeyWindow?.RootViewController;
+                if (vc == null)
+                    return;
+                var alert = UIAlertController.Create("Crash Report", errorText, UIAlertControllerStyle.Alert);
+                alert.AddAction(UIAlertAction.Create("Close", UIAlertActionStyle.Cancel, null));
+                alert.AddAction(UIAlertAction.Create("Clear", UIAlertActionStyle.Default, action => { File.Delete(errorFilePath); }));
+                vc.PresentViewController(alert, true, null);
+            });
         }
 
         #endregion
