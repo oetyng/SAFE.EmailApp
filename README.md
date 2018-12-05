@@ -37,7 +37,7 @@ If building on Visual Studio 2017, you will need the following SDKs and workload
 - Latest Xcode
 
 ### Supported Platforms
-- Android 4.1+ (armeabi-v7, x86_64)
+- Android 4.1+ (armeabi-v7a, x86_64)
 - iOS 8+ (ARM64, x64)
 
 ## Further Help
