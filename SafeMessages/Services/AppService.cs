@@ -122,7 +122,7 @@ namespace SafeMessages.Services
                     var serArchiveMdInfo = await _session.MDataInfoActions.SerialiseAsync(archiveMDataInfoH);
 
                     // Update Inbox permisions to allow anyone to insert
-                    await _session.MDataPermissions.InsertAsync(inboxPermH, NativeHandle.EmptyMDataEntries, new PermissionSet { Insert = true });
+                    await _session.MDataPermissions.InsertAsync(inboxPermH, NativeHandle.AnyOne, new PermissionSet { Insert = true });
 
                     // Create Inbox MD
                     var (inboxEncPk, inboxEncSk) = await _session.Crypto.EncGenerateKeyPairAsync();
