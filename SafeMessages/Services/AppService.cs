@@ -118,11 +118,11 @@ namespace SafeMessages.Services
 
                     // Create Archive MD
                     var archiveMDataInfoH = await _session.MDataInfoActions.RandomPrivateAsync(15001);
-                    await _session.MData.PutAsync(archiveMDataInfoH, inboxPermH, NativeHandle.Zero);
+                    await _session.MData.PutAsync(archiveMDataInfoH, inboxPermH, NativeHandle.EmptyMDataEntries);
                     var serArchiveMdInfo = await _session.MDataInfoActions.SerialiseAsync(archiveMDataInfoH);
 
                     // Update Inbox permisions to allow anyone to insert
-                    await _session.MDataPermissions.InsertAsync(inboxPermH, NativeHandle.Zero, new PermissionSet { Insert = true });
+                    await _session.MDataPermissions.InsertAsync(inboxPermH, NativeHandle.AnyOne, new PermissionSet { Insert = true });
 
                     // Create Inbox MD
                     var (inboxEncPk, inboxEncSk) = await _session.Crypto.EncGenerateKeyPairAsync();
@@ -271,7 +271,7 @@ namespace SafeMessages.Services
             {
                 try
                 {
-                    var plainTextEntKey = await _session.MDataInfoActions.DecryptAsync(appContH, cipherTextEntKey.Val);
+                    var plainTextEntKey = await _session.MDataInfoActions.DecryptAsync(appContH, cipherTextEntKey.Key);
                     ids.Add(new UserId(plainTextEntKey.ToUtfString()));
                 }
                 catch (Exception)
@@ -304,13 +304,13 @@ namespace SafeMessages.Services
                     {
                         try
                         {
-                            var entryKey = key.Val.ToUtfString();
+                            var entryKey = key.Key.ToUtfString();
                             if (entryKey == "__email_enc_pk")
                             {
                                 continue;
                             }
 
-                            var value = await _session.MData.GetValueAsync(inboxInfo, key.Val);
+                            var value = await _session.MData.GetValueAsync(inboxInfo, key.Key);
                             var iDataNameEncoded =
                                 await _session.Crypto.DecryptSealedBoxAsync(value.Item1, inboxPkH, inboxSkH);
                             var iDataNameBytes = iDataNameEncoded.ToUtfString().Split(',')
