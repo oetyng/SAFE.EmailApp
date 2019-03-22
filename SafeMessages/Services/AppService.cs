@@ -21,7 +21,7 @@ namespace SafeMessages.Services
 {
     public class AppService : ObservableObject, IDisposable
     {
-        public const string AppId = "net.maidsafe.examples.mailtutorial";
+        public const string AppId = "net.maidsafe.examples.SafeMessages";
         public const string AuthDeniedMessage = "Failed to receive Authentication.";
         public const string AuthInProgressMessage = "Connecting to SAFE Network...";
         private const string AuthReconnectPropKey = nameof(AuthReconnect);
