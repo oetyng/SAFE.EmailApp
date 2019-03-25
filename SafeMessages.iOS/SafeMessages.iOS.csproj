@@ -127,6 +127,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="GlobalSuppressions.cs" />
+    <Compile Include="Helpers\AppHandler.cs" />
     <Compile Include="Helpers\FileOps.cs" />
     <Compile Include="Main.cs" />
     <Compile Include="AppDelegate.cs" />

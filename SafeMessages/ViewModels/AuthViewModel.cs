@@ -68,10 +68,16 @@ namespace SafeMessages.ViewModels
                 IsUiEnabled = false;
                 AuthProgressMessage = "Requesting Authentication.";
                 var url = await SafeApp.GenerateAppRequestAsync();
-                Device.BeginInvokeOnMainThread(() => { Device.OpenUri(new Uri(url)); });
+                var appLaunched = await DependencyService.Get<IAppHandler>().LaunchApp(url);
+                if (!appLaunched)
+                {
+                    IsUiEnabled = true;
+                    await Application.Current.MainPage.DisplayAlert("Authorisation failed", "The SAFE Authenticator app is required to authorise this application", "OK");
+                }
             }
             catch (Exception ex)
             {
+                IsUiEnabled = true;
                 await Application.Current.MainPage.DisplayAlert("Error", $"Generate App Request Failed: {ex.Message}", "OK");
             }
         }
