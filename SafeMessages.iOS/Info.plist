@@ -7,7 +7,7 @@
 	<key>CFBundleName</key>
 	<string>SafeMessages.iOS</string>
 	<key>CFBundleIdentifier</key>
-	<string>net.maidsafe.SafeMessages</string>
+	<string>net.maidsafe.safemessages</string>
 	<key>CFBundleVersion</key>
 	<string>1.0</string>
 	<key>LSRequiresIPhoneOS</key>
@@ -43,7 +43,7 @@
 			<string>SafeMessages</string>
 			<key>CFBundleURLSchemes</key>
 			<array>
-				<string>net.maidsafe.examples.mailtutorial</string>
+				<string>net.maidsafe.examples.safemessages</string>
 			</array>
 			<key>CFBundleURLTypes</key>
 			<string>None</string>
