@@ -29,13 +29,11 @@ namespace SafeMessages.Views
                         return;
                     }
 
-                    await Navigation.PushAsync(new SendMessageView(new UserId(message.From), subject));
+                    await Navigation.PushAsync(new SendMessageView(new UserId(message.From), subject, message.Body));
                 });
         }
 
         public void MessageCenterUnsubscribe()
-        {
-            MessagingCenter.Unsubscribe<DisplayMessageViewModel, string>(this, MessengerConstants.NavSendMessagePage);
-        }
+            => MessagingCenter.Unsubscribe<DisplayMessageViewModel, string>(this, MessengerConstants.NavSendMessagePage);
     }
 }

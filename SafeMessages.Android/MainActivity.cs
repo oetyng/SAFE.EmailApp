@@ -24,21 +24,21 @@ namespace SafeMessages.Droid
     [IntentFilter(
         new[] { Intent.ActionView },
         Categories = new[] { Intent.CategoryDefault, Intent.CategoryBrowsable },
-        DataScheme = AppService.AppId)]
+        DataScheme = AppConstants.AppId)]
     public class MainActivity : FormsAppCompatActivity
     {
-        private static string LogFolderPath => DependencyService.Get<IFileOps>().ConfigFilesPath;
+        static string LogFolderPath => DependencyService.Get<IFileOps>().ConfigFilesPath;
 
-        private AppService SafeApp => DependencyService.Get<AppService>();
+        AppService AppService => DependencyService.Get<AppService>();
 
-        private void HandleAppLaunch(string url)
+        void HandleAppLaunch(string url)
         {
             Debug.WriteLine($"Launched via: {url}");
             Device.BeginInvokeOnMainThread(async () =>
             {
                 try
                 {
-                    await SafeApp.HandleUrlActivationAsync(url);
+                    await AppService.HandleUrlActivationAsync(url);
                     Debug.WriteLine("IPC Msg Handling Completed");
                 }
                 catch (Exception ex)
@@ -52,7 +52,7 @@ namespace SafeMessages.Droid
         {
             if (Xamarin.Forms.Application.Current.MainPage is NavigationPage currentNav &&
                 currentNav.Navigation.NavigationStack.Count == 1)
-                SafeApp.FreeState();
+                AppService.FreeState();
 
             base.OnBackPressed();
         }
@@ -87,19 +87,19 @@ namespace SafeMessages.Droid
 
         #region Error Handling
 
-        private static void AndroidEnvOnUnhandledExceptionRaiser(object o, RaiseThrowableEventArgs exEventArgs)
+        static void AndroidEnvOnUnhandledExceptionRaiser(object o, RaiseThrowableEventArgs exEventArgs)
         {
             var newExc = new Exception("AndroidEnvironmentOnUnhandledExceptionRaiser", exEventArgs.Exception);
             LogUnhandledException(newExc);
         }
 
-        private static void TaskSchedulerOnUnobservedTaskException(object sender, UnobservedTaskExceptionEventArgs exEventArgs)
+        static void TaskSchedulerOnUnobservedTaskException(object sender, UnobservedTaskExceptionEventArgs exEventArgs)
         {
             var newExc = new Exception("TaskSchedulerOnUnobservedTaskException", exEventArgs.Exception);
             LogUnhandledException(newExc);
         }
 
-        private static void CurrentDomainOnUnhandledException(object sender, UnhandledExceptionEventArgs exEventArgs)
+        static void CurrentDomainOnUnhandledException(object sender, UnhandledExceptionEventArgs exEventArgs)
         {
             var newExc = new Exception("CurrentDomainOnUnhandledException", exEventArgs.ExceptionObject as Exception);
             LogUnhandledException(newExc);
@@ -120,7 +120,7 @@ namespace SafeMessages.Droid
             }
         }
 
-        private void DisplayCrashReport()
+        void DisplayCrashReport()
         {
             const string errorFilename = "Fatal.log";
             var errorFilePath = Path.Combine(LogFolderPath, errorFilename);

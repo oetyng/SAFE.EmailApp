@@ -41,7 +41,7 @@ namespace SafeMessages.Models
 
         public bool Equals(Message other)
         {
-            if (ReferenceEquals(null, other))
+            if (other is null)
                 return false;
 
             if (ReferenceEquals(this, other))
@@ -54,7 +54,7 @@ namespace SafeMessages.Models
 
         public override bool Equals(object obj)
         {
-            if (ReferenceEquals(null, obj))
+            if (obj is null)
                 return false;
 
             if (ReferenceEquals(this, obj))

@@ -25,7 +25,7 @@ namespace SafeMessages.Services
         public async Task<List<UserId>> GetIdsAsync()
         {
             var ids = new List<UserId>();
-            var appContH = await _session.AccessContainer.GetMDataInfoAsync("apps/" + AppService.AppId);
+            var appContH = await _session.AccessContainer.GetMDataInfoAsync("apps/" + AppConstants.AppId);
             var appContEntKeys = await _session.MData.ListKeysAsync(appContH);
             foreach (var cipherTextEntKey in appContEntKeys)
             {
@@ -140,7 +140,7 @@ namespace SafeMessages.Services
                         };
 
                         var msgBoxSer = JsonConvert.SerializeObject(msgBox);
-                        var appContH = await _session.AccessContainer.GetMDataInfoAsync("apps/" + AppService.AppId);
+                        var appContH = await _session.AccessContainer.GetMDataInfoAsync("apps/" + AppConstants.AppId);
                         var userIdCipherBytes =
                             await _session.MDataInfoActions.EncryptEntryKeyAsync(appContH, userId.ToUtfBytes());
                         var msgBoxCipherBytes =

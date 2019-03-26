@@ -12,8 +12,7 @@ namespace SafeMessages
 {
     public partial class App : Application
     {
-        public const string AppName = "SAFE Messages";
-        private static volatile bool _isBackgrounded;
+        static volatile bool _isBackgrounded;
 
         public static bool IsBackgrounded
         {
@@ -33,8 +32,7 @@ namespace SafeMessages
 
         public static bool IsPageValid(Page page)
         {
-            var navPage = Current.MainPage as NavigationPage;
-            if (navPage == null)
+            if (!(Current.MainPage is NavigationPage navPage))
                 return false;
 
             var validPage = navPage.Navigation.NavigationStack.FirstOrDefault();
@@ -42,10 +40,8 @@ namespace SafeMessages
             return validPage != null && validPage == checkPage;
         }
 
-        private static Page NewStartupPage()
-        {
-            return new AuthView();
-        }
+        static Page NewStartupPage()
+            => new AuthView();
 
         protected override async void OnResume()
         {
@@ -63,10 +59,9 @@ namespace SafeMessages
             await SavePropertiesAsync();
         }
 
-        private static async Task ResetViews()
+        static async Task ResetViews()
         {
-            var navPage = Current.MainPage as NavigationPage;
-            if (navPage == null)
+            if (!(Current.MainPage is NavigationPage navPage))
                 return;
 
             var navigationController = navPage.Navigation;

@@ -10,14 +10,14 @@ namespace SafeMessages.Views
     public partial class SendMessageView : ContentPage, ICleanup
     {
         public SendMessageView()
-            : this(null, string.Empty)
+            : this(null, string.Empty, string.Empty)
         {
         }
 
-        public SendMessageView(UserId userId, string subject)
+        public SendMessageView(UserId userId, string subject, string inReplyTo)
         {
             InitializeComponent();
-            var viewModel = new SendMessageViewModel(userId, subject);
+            var viewModel = new SendMessageViewModel(userId, subject, inReplyTo);
             BindingContext = viewModel;
             MessagingCenter.Subscribe<SendMessageViewModel>(
                 this,
@@ -33,8 +33,6 @@ namespace SafeMessages.Views
         }
 
         public void MessageCenterUnsubscribe()
-        {
-            MessagingCenter.Unsubscribe<SendMessageViewModel>(this, MessengerConstants.NavPreviousPage);
-        }
+            => MessagingCenter.Unsubscribe<SendMessageViewModel>(this, MessengerConstants.NavPreviousPage);
     }
 }

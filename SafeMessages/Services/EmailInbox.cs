@@ -27,7 +27,7 @@ namespace SafeMessages.Services
         public async Task<List<Message>> GetMessagesAsync(string userId)
         {
             var messages = new List<Message>();
-            var appCont = await _session.AccessContainer.GetMDataInfoAsync("apps/" + AppService.AppId);
+            var appCont = await _session.AccessContainer.GetMDataInfoAsync("apps/" + AppConstants.AppId);
             var userIdByteList = userId.ToUtfBytes();
             var cipherBytes = await _session.MDataInfoActions.EncryptEntryKeyAsync(appCont, userIdByteList);
             var content = await _session.MData.GetValueAsync(appCont, cipherBytes);

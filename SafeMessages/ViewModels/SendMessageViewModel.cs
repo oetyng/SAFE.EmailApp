@@ -15,10 +15,10 @@ namespace SafeMessages.ViewModels
 
         string _to;
 
-        public SendMessageViewModel(UserId userId, string subject)
+        public SendMessageViewModel(UserId userId, string subject, string inReplyTo)
         {
             IsUiEnabled = true;
-            Body = string.Empty;
+            Body = "\n\n\n" + inReplyTo;
             Subject = subject;
             To = userId == null ? string.Empty : userId.Name;
             SendCommand = new Command(OnSendCommand);
@@ -52,8 +52,8 @@ namespace SafeMessages.ViewModels
                 if (Subject.Length > 150)
                     throw new Exception("Max subject length is 150 characters.");
 
-                if (Body.Length > 150)
-                    throw new Exception("Max body length is 150 characters.");
+                if (Body.Length > 1500)
+                    throw new Exception("Max body length is 1500 characters.");
 
                 await EmailInbox.SendMessageAsync(To, new Message(AppService.Self.Name, Subject, DateTime.UtcNow.ToString("r"), Body));
                 MessagingCenter.Send(this, MessengerConstants.NavPreviousPage);

@@ -19,7 +19,6 @@ namespace SafeMessages.Services
 {
     public class AppService : ObservableObject, IDisposable
     {
-        public const string AppId = "SAFE.EmailApp";
         public const string AuthDeniedMessage = "Failed to receive Authentication.";
         public const string AuthInProgressMessage = "Connecting to SAFE Network...";
         const string AuthReconnectPropKey = nameof(AuthReconnect);
@@ -86,7 +85,7 @@ namespace SafeMessages.Services
                     {
                         var encodedAuthRsp = await CredentialCache.Retrieve();
                         var authGranted = JsonConvert.DeserializeObject<AuthGranted>(encodedAuthRsp);
-                        _session = await Session.AppRegisteredAsync(AppId, authGranted);
+                        _session = await Session.AppRegisteredAsync(AppConstants.AppId, authGranted);
                     }
 
                     try
@@ -122,13 +121,13 @@ namespace SafeMessages.Services
             var authReq = new AuthReq
             {
                 AppContainer = true,
-                App = new AppExchangeInfo { Id = AppId, Scope = string.Empty, Name = AppId, Vendor = "oetyng" },
+                App = new AppExchangeInfo { Id = AppConstants.AppId, Scope = string.Empty, Name = AppConstants.AppName, Vendor = "oetyng" },
                 Containers = new List<ContainerPermissions>
                 { new ContainerPermissions { ContName = "_publicNames", Access = { Insert = true } } }
             };
 
             var encodedReq = await Session.EncodeAuthReqAsync(authReq);
-            var formattedReq = UrlFormat.Format(AppId, encodedReq.Item2, true);
+            var formattedReq = UrlFormat.Format(AppConstants.AppId, encodedReq.Item2, true);
             Debug.WriteLine($"Encoded Req: {formattedReq}");
             return formattedReq;
         }
@@ -148,7 +147,7 @@ namespace SafeMessages.Services
                     MessagingCenter.Send(this, MessengerConstants.AuthRequestProgress, AuthInProgressMessage);
                     if (ipcMsg != null)
                     {
-                        _session = await Session.AppRegisteredAsync(AppId, ipcMsg.AuthGranted);
+                        _session = await Session.AppRegisteredAsync(AppConstants.AppId, ipcMsg.AuthGranted);
                         if (AuthReconnect)
                         {
                             var encodedAuthRsp = JsonConvert.SerializeObject(ipcMsg.AuthGranted);
