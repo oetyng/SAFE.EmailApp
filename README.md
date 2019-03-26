@@ -20,7 +20,7 @@ Demonstrates the usage of:
 ### Application Data Model
 The following diagram depicts how the emails are stored in the SAFE network, as well as how the email app stores email accounts information.
 
-![Email App Data Model](https://raw.githubusercontent.com/maidsafe/safe_examples/master/email_app/design/EmailApp-DataModel.png)
+![Email App Data Model](/design/EmailApp-DataModel.png)
 
 ## Building
 
@@ -37,7 +37,7 @@ If building on Visual Studio 2017, you will need the following SDKs and workload
 - Latest Xcode
 
 ### Supported Platforms
-- Android 4.1+ (armeabi-v7a, x86_64)
+- Android 4.2+ (armeabi-v7a, x86_64)
 - iOS 8+ (ARM64, x64)
 
 ## Further Help
