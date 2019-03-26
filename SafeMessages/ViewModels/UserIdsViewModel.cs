@@ -9,7 +9,7 @@ namespace SafeMessages.ViewModels
 {
     internal class UserIdsViewModel : BaseViewModel
     {
-        private bool _isRefreshing;
+        bool _isRefreshing;
 
         public UserIdsViewModel()
         {
@@ -34,17 +34,15 @@ namespace SafeMessages.ViewModels
 
         public ICommand UserIdSelectedCommand { get; }
 
-        private void OnAddAccountCommand()
-        {
-            MessagingCenter.Send(this, MessengerConstants.NavAddIdPage);
-        }
+        void OnAddAccountCommand()
+            => MessagingCenter.Send(this, MessengerConstants.NavAddIdPage);
 
-        private async void OnRefreshAccountsCommand()
+        async void OnRefreshAccountsCommand()
         {
             IsRefreshing = true;
             try
             {
-                var accounts = await SafeApp.GetIdsAsync();
+                var accounts = await EmailIdManager.GetIdsAsync();
                 AppData.Accounts.AddRange(accounts.Except(AppData.Accounts));
                 AppData.Accounts.Sort();
             }
@@ -56,9 +54,9 @@ namespace SafeMessages.ViewModels
             IsRefreshing = false;
         }
 
-        private void OnUserIdSelectedCommand(UserId userId)
+        void OnUserIdSelectedCommand(UserId userId)
         {
-            SafeApp.Self = userId;
+            AppService.Self = userId;
             MessagingCenter.Send(this, MessengerConstants.NavMessagesPage, userId);
         }
     }

@@ -9,8 +9,8 @@ namespace SafeMessages.ViewModels
 {
     internal class MessagesViewModel : BaseViewModel
     {
-        private bool _isRefreshing;
-        private UserId _userId;
+        bool _isRefreshing;
+        UserId _userId;
 
         public MessagesViewModel(UserId userId)
         {
@@ -41,17 +41,15 @@ namespace SafeMessages.ViewModels
 
         public ICommand MessageSelectedCommand { get; }
 
-        private void OnMessageSelectedCommand(Message message)
-        {
-            MessagingCenter.Send(this, MessengerConstants.NavDisplayMessageView, message);
-        }
+        void OnMessageSelectedCommand(Message message)
+            => MessagingCenter.Send(this, MessengerConstants.NavDisplayMessageView, message);
 
-        private async void OnRefreshCommand()
+        async void OnRefreshCommand()
         {
             IsRefreshing = true;
             try
             {
-                var messages = await SafeApp.GetMessagesAsync(UserId.Name);
+                var messages = await EmailInbox.GetMessagesAsync(UserId.Name);
                 AppData.Messages.RemoveRange(AppData.Messages.Except(messages));
                 AppData.Messages.AddRange(messages.Except(AppData.Messages));
                 AppData.Messages.Sort(true);
@@ -64,9 +62,7 @@ namespace SafeMessages.ViewModels
             IsRefreshing = false;
         }
 
-        private void OnSendCommand()
-        {
-            MessagingCenter.Send(this, MessengerConstants.NavSendMessagePage);
-        }
+        void OnSendCommand()
+            => MessagingCenter.Send(this, MessengerConstants.NavSendMessagePage);
     }
 }

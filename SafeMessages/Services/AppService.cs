@@ -1,13 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Acr.UserDialogs;
 using Newtonsoft.Json;
 using SafeApp;
-using SafeApp.Misc;
 using SafeApp.Utilities;
 using SafeMessages.Helpers;
 using SafeMessages.Models;
@@ -21,12 +19,12 @@ namespace SafeMessages.Services
 {
     public class AppService : ObservableObject, IDisposable
     {
-        public const string AppId = "net.maidsafe.examples.safemessages";
+        public const string AppId = "SAFE.EmailApp";
         public const string AuthDeniedMessage = "Failed to receive Authentication.";
         public const string AuthInProgressMessage = "Connecting to SAFE Network...";
-        private const string AuthReconnectPropKey = nameof(AuthReconnect);
-        private bool _isLogInitialised;
-        private Session _session;
+        const string AuthReconnectPropKey = nameof(AuthReconnect);
+        bool _isLogInitialised;
+        Session _session;
 
         public AppService()
         {
@@ -36,9 +34,9 @@ namespace SafeMessages.Services
             InitLoggingAsync();
         }
 
-        public UserId Self { get; set; }
+        CredentialCacheService CredentialCache { get; }
 
-        private CredentialCacheService CredentialCache { get; }
+        public UserId Self { get; set; }
 
         public bool IsLogInitialised
         {
@@ -51,9 +49,7 @@ namespace SafeMessages.Services
             get
             {
                 if (!Application.Current.Properties.ContainsKey(AuthReconnectPropKey))
-                {
                     return false;
-                }
 
                 var val = Application.Current.Properties[AuthReconnectPropKey] as bool?;
                 return val == true;
@@ -62,9 +58,7 @@ namespace SafeMessages.Services
             set
             {
                 if (value == false)
-                {
                     CredentialCache.Delete();
-                }
 
                 Application.Current.Properties[AuthReconnectPropKey] = value;
             }
@@ -76,137 +70,17 @@ namespace SafeMessages.Services
             GC.SuppressFinalize(this);
         }
 
-        public async Task AddIdAsync(string userId)
-        {
-            if (userId.Contains(".") || userId.Contains("@"))
-            {
-                throw new NotSupportedException("Unsupported characters '.' and '@'.");
-            }
-
-            // Check if account exits first and return error
-            var dstPubIdDigest = await Crypto.Sha3HashAsync(userId.ToUtfBytes());
-            var dstPubIdMDataInfoH = new MDataInfo { Name = dstPubIdDigest.ToArray(), TypeTag = 15001 };
-            var accountExists = false;
-            try
-            {
-                await _session.MData.ListKeysAsync(dstPubIdMDataInfoH);
-                accountExists = true;
-            }
-            catch (Exception)
-            {
-                // ignored - acct not found
-            }
-
-            if (accountExists)
-            {
-                throw new Exception("Id already exists.");
-            }
-
-            // Create Self Permissions to Inbox and Archive
-            using (var inboxSelfPermSetH = await _session.MDataPermissions.NewAsync())
-            {
-                using (var inboxPermH = await _session.MDataPermissions.NewAsync())
-                {
-                    using (var appSignPkH = await _session.Crypto.AppPubSignKeyAsync())
-                    {
-                        await _session.MDataPermissions.InsertAsync(
-                            inboxSelfPermSetH,
-                            appSignPkH,
-                            new PermissionSet
-                            { Delete = true, Insert = true, ManagePermissions = true, Read = true, Update = true });
-                    }
-
-                    // Create Archive MD
-                    var archiveMDataInfoH = await _session.MDataInfoActions.RandomPrivateAsync(15001);
-                    await _session.MData.PutAsync(archiveMDataInfoH, inboxPermH, NativeHandle.EmptyMDataEntries);
-                    var serArchiveMdInfo = await _session.MDataInfoActions.SerialiseAsync(archiveMDataInfoH);
-
-                    // Update Inbox permisions to allow anyone to insert
-                    await _session.MDataPermissions.InsertAsync(inboxPermH, NativeHandle.AnyOne, new PermissionSet { Insert = true });
-
-                    // Create Inbox MD
-                    var (inboxEncPk, inboxEncSk) = await _session.Crypto.EncGenerateKeyPairAsync();
-                    using (inboxEncSk)
-                    using (inboxEncPk)
-                    {
-                        List<byte> serInboxMdInfo;
-                        var inboxEncPkRaw = await _session.Crypto.EncPubKeyGetAsync(inboxEncPk);
-                        var inboxEncSkRaw = await _session.Crypto.EncSecretKeyGetAsync(inboxEncSk);
-
-                        var inboxEmailPkEntryKey = "__email_enc_pk".ToUtfBytes();
-                        using (var inboxEntriesH = await _session.MDataEntries.NewAsync())
-                        {
-                            await _session.MDataEntries.InsertAsync(
-                                inboxEntriesH,
-                                inboxEmailPkEntryKey,
-                                inboxEncPkRaw.ToList().ToHexString().ToUtfBytes());
-                            var inboxMDataInfoH = await _session.MDataInfoActions.RandomPublicAsync(15001);
-                            await _session.MData.PutAsync(inboxMDataInfoH, inboxPermH, inboxEntriesH);
-                            serInboxMdInfo = await _session.MDataInfoActions.SerialiseAsync(inboxMDataInfoH);
-                        }
-
-                        // Create Public Id MD
-                        var idDigest = await Crypto.Sha3HashAsync(userId.ToUtfBytes());
-                        var pubIdMDataInfoH = new MDataInfo { Name = idDigest.ToArray(), TypeTag = 15001 };
-                        using (var pubIdEntriesH = await _session.MDataEntries.NewAsync())
-                        {
-                            await _session.MDataEntries.InsertAsync(pubIdEntriesH, "@email".ToUtfBytes(), serInboxMdInfo);
-                            await _session.MData.PutAsync(pubIdMDataInfoH, inboxPermH, pubIdEntriesH);
-                        }
-
-                        // Update _publicNames Container
-                        var publicNamesContH = await _session.AccessContainer.GetMDataInfoAsync("_publicNames");
-                        var pubNamesUserIdCipherBytes =
-                            await _session.MDataInfoActions.EncryptEntryKeyAsync(publicNamesContH, userId.ToUtfBytes());
-                        var pubNamesMsgBoxCipherBytes =
-                            await _session.MDataInfoActions.EncryptEntryValueAsync(publicNamesContH, idDigest);
-                        using (var pubNamesContEntActH = await _session.MDataEntryActions.NewAsync())
-                        {
-                            await _session.MDataEntryActions.InsertAsync(pubNamesContEntActH, pubNamesUserIdCipherBytes, pubNamesMsgBoxCipherBytes);
-                            await _session.MData.MutateEntriesAsync(publicNamesContH, pubNamesContEntActH);
-                        }
-
-                        // Finally update App Container
-                        var msgBox = new MessageBox
-                        {
-                            EmailId = userId,
-                            Inbox = new DataArray { Type = "Buffer", Data = serInboxMdInfo },
-                            Archive = new DataArray { Type = "Buffer", Data = serArchiveMdInfo },
-                            EmailEncPk = inboxEncPkRaw.ToList().ToHexString(),
-                            EmailEncSk = inboxEncSkRaw.ToList().ToHexString()
-                        };
-
-                        var msgBoxSer = JsonConvert.SerializeObject(msgBox);
-                        var appContH = await _session.AccessContainer.GetMDataInfoAsync("apps/" + AppId);
-                        var userIdCipherBytes =
-                            await _session.MDataInfoActions.EncryptEntryKeyAsync(appContH, userId.ToUtfBytes());
-                        var msgBoxCipherBytes =
-                            await _session.MDataInfoActions.EncryptEntryValueAsync(appContH, msgBoxSer.ToUtfBytes());
-                        using (var appContEntActH = await _session.MDataEntryActions.NewAsync())
-                        {
-                            await _session.MDataEntryActions.InsertAsync(appContEntActH, userIdCipherBytes, msgBoxCipherBytes);
-                            await _session.MData.MutateEntriesAsync(appContH, appContEntActH);
-                        }
-                    }
-                }
-            }
-        }
-
         public async Task CheckAndReconnect()
         {
             try
             {
                 if (_session == null)
-                {
                     return;
-                }
 
                 if (_session.IsDisconnected)
                 {
                     if (!AuthReconnect)
-                    {
                         throw new Exception("Reconnect Disabled");
-                    }
 
                     using (UserDialogs.Instance.Loading("Reconnecting to Network"))
                     {
@@ -233,10 +107,7 @@ namespace SafeMessages.Services
             }
         }
 
-        ~AppService()
-        {
-            FreeState();
-        }
+        ~AppService() => FreeState();
 
         public void FreeState()
         {
@@ -251,90 +122,15 @@ namespace SafeMessages.Services
             var authReq = new AuthReq
             {
                 AppContainer = true,
-                App = new AppExchangeInfo { Id = AppId, Scope = string.Empty, Name = "SAFE Messages", Vendor = "MaidSafe.net Ltd" },
+                App = new AppExchangeInfo { Id = AppId, Scope = string.Empty, Name = AppId, Vendor = "oetyng" },
                 Containers = new List<ContainerPermissions>
-                    { new ContainerPermissions { ContName = "_publicNames", Access = { Insert = true } } }
+                { new ContainerPermissions { ContName = "_publicNames", Access = { Insert = true } } }
             };
 
             var encodedReq = await Session.EncodeAuthReqAsync(authReq);
             var formattedReq = UrlFormat.Format(AppId, encodedReq.Item2, true);
             Debug.WriteLine($"Encoded Req: {formattedReq}");
             return formattedReq;
-        }
-
-        public async Task<List<UserId>> GetIdsAsync()
-        {
-            var ids = new List<UserId>();
-            var appContH = await _session.AccessContainer.GetMDataInfoAsync("apps/" + AppId);
-            var appContEntKeys = await _session.MData.ListKeysAsync(appContH);
-            foreach (var cipherTextEntKey in appContEntKeys)
-            {
-                try
-                {
-                    var plainTextEntKey = await _session.MDataInfoActions.DecryptAsync(appContH, cipherTextEntKey.Key);
-                    ids.Add(new UserId(plainTextEntKey.ToUtfString()));
-                }
-                catch (Exception)
-                {
-                    // ignore incompatible entries.
-                }
-            }
-
-            return ids;
-        }
-
-        public async Task<List<Message>> GetMessagesAsync(string userId)
-        {
-            var messages = new List<Message>();
-            var appCont = await _session.AccessContainer.GetMDataInfoAsync("apps/" + AppId);
-            var userIdByteList = userId.ToUtfBytes();
-            var cipherBytes = await _session.MDataInfoActions.EncryptEntryKeyAsync(appCont, userIdByteList);
-            var content = await _session.MData.GetValueAsync(appCont, cipherBytes);
-            var plainBytes = await _session.MDataInfoActions.DecryptAsync(appCont, content.Item1);
-
-            var msgBox = JsonConvert.DeserializeObject<MessageBox>(plainBytes.ToUtfString());
-            var inboxInfo = await _session.MDataInfoActions.DeserialiseAsync(msgBox.Inbox.Data);
-            var inboxEntKeys = await _session.MData.ListKeysAsync(inboxInfo);
-            using (var inboxPkH = await _session.Crypto.EncPubKeyNewAsync(msgBox.EmailEncPk.ToHexBytes().ToArray()))
-            {
-                using (var inboxSkH =
-                    await _session.Crypto.EncSecretKeyNewAsync(msgBox.EmailEncSk.ToHexBytes().ToArray()))
-                {
-                    foreach (var key in inboxEntKeys)
-                    {
-                        try
-                        {
-                            var entryKey = key.Key.ToUtfString();
-                            if (entryKey == "__email_enc_pk")
-                            {
-                                continue;
-                            }
-
-                            var value = await _session.MData.GetValueAsync(inboxInfo, key.Key);
-                            var iDataNameEncoded =
-                                await _session.Crypto.DecryptSealedBoxAsync(value.Item1, inboxPkH, inboxSkH);
-                            var iDataNameBytes = iDataNameEncoded.ToUtfString().Split(',')
-                                .Select(val => Convert.ToByte(val)).ToArray();
-                            using (var msgDataReaderH = await _session.IData.FetchSelfEncryptorAsync(iDataNameBytes))
-                            {
-                                var msgSize = await _session.IData.SizeAsync(msgDataReaderH);
-                                var msgCipher =
-                                    await _session.IData.ReadFromSelfEncryptorAsync(msgDataReaderH, 0, msgSize);
-                                var plainTextMsg =
-                                    await _session.Crypto.DecryptSealedBoxAsync(msgCipher, inboxPkH, inboxSkH);
-                                var jsonMsgData = plainTextMsg.ToUtfString();
-                                messages.Add(JsonConvert.DeserializeObject<Message>(jsonMsgData));
-                            }
-                        }
-                        catch (Exception e)
-                        {
-                            Debug.WriteLine("Exception: " + e.Message);
-                        }
-                    }
-                }
-            }
-
-            return messages;
         }
 
         public async Task HandleUrlActivationAsync(string url)
@@ -374,7 +170,7 @@ namespace SafeMessages.Services
             }
         }
 
-        private async void InitLoggingAsync()
+        async void InitLoggingAsync()
         {
             var fileList = new List<(string, string)> { ("log.toml", "log.toml") };
             var fileOps = DependencyService.Get<IFileOps>();
@@ -393,57 +189,20 @@ namespace SafeMessages.Services
             }
         }
 
-        private void OnSessionDisconnected(object obj, EventArgs e)
+        void OnSessionDisconnected(object obj, EventArgs e)
         {
             if (!obj.Equals(_session))
-            {
                 return;
-            }
 
             Device.BeginInvokeOnMainThread(
                 async () =>
                 {
                     _session?.Dispose();
                     if (App.IsBackgrounded)
-                    {
                         return;
-                    }
 
                     await CheckAndReconnect();
                 });
-        }
-
-        public async Task SendMessageAsync(string to, Message msg)
-        {
-            var dstPubIdDigest = await Crypto.Sha3HashAsync(to.ToUtfBytes());
-            var dstPubIdMDataInfoH = new MDataInfo { Name = dstPubIdDigest.ToArray(), TypeTag = 15001 };
-            var serDstMsgMDataInfo = await _session.MData.GetValueAsync(dstPubIdMDataInfoH, "@email".ToUtfBytes());
-            var dstInboxMDataInfoH = await _session.MDataInfoActions.DeserialiseAsync(serDstMsgMDataInfo.Item1);
-            var dstInboxPkItem = await _session.MData.GetValueAsync(dstInboxMDataInfoH, "__email_enc_pk".ToUtfBytes());
-            using (var dstInboxPkH =
-                await _session.Crypto.EncPubKeyNewAsync(dstInboxPkItem.Item1.ToUtfString().ToHexBytes().ToArray()))
-            {
-                var plainTxtMsg = JsonConvert.SerializeObject(msg);
-                var cipherTxt = await _session.Crypto.EncryptSealedBoxAsync(plainTxtMsg.ToUtfBytes(), dstInboxPkH);
-                byte[] msgDataMapNameBytes;
-                using (var msgWriterH = await _session.IData.NewSelfEncryptorAsync())
-                {
-                    await _session.IData.WriteToSelfEncryptorAsync(msgWriterH, cipherTxt);
-                    using (var msgCipherOptH = await _session.CipherOpt.NewPlaintextAsync())
-                    {
-                        msgDataMapNameBytes = await _session.IData.CloseSelfEncryptorAsync(msgWriterH, msgCipherOptH);
-                    }
-                }
-
-                var encodedString = string.Join(", ", msgDataMapNameBytes.Select(val => val));
-                var msgDataMapNameCipher =
-                    await _session.Crypto.EncryptSealedBoxAsync(encodedString.ToUtfBytes(), dstInboxPkH);
-                using (var dstMsgEntActH = await _session.MDataEntryActions.NewAsync())
-                {
-                    await _session.MDataEntryActions.InsertAsync(dstMsgEntActH, RandomGenerator.RandomString(15).ToUtfBytes(), msgDataMapNameCipher);
-                    await _session.MData.MutateEntriesAsync(dstInboxMDataInfoH, dstMsgEntActH);
-                }
-            }
         }
     }
 }

@@ -13,10 +13,10 @@ namespace SafeMessages.ViewModels
 
         public AuthViewModel()
         {
-            SafeApp.PropertyChanged += (s, e) =>
+            AppService.PropertyChanged += (s, e) =>
             {
-                if (e.PropertyName == nameof(SafeApp.IsLogInitialised))
-                    IsUiEnabled = SafeApp.IsLogInitialised;
+                if (e.PropertyName == nameof(AppService.IsLogInitialised))
+                    IsUiEnabled = AppService.IsLogInitialised;
             };
 
             MessagingCenter.Subscribe<AppService, string>(
@@ -36,7 +36,7 @@ namespace SafeMessages.ViewModels
                         IsUiEnabled = true;
                     }
                 });
-            IsUiEnabled = SafeApp.IsLogInitialised;
+            IsUiEnabled = AppService.IsLogInitialised;
 
             AuthCommand = new Command(OnAuthCommand);
         }
@@ -51,11 +51,11 @@ namespace SafeMessages.ViewModels
 
         public bool AuthReconnect
         {
-            get => SafeApp.AuthReconnect;
+            get => AppService.AuthReconnect;
             set
             {
-                if (SafeApp.AuthReconnect != value)
-                    SafeApp.AuthReconnect = value;
+                if (AppService.AuthReconnect != value)
+                    AppService.AuthReconnect = value;
 
                 OnPropertyChanged();
             }
@@ -67,7 +67,7 @@ namespace SafeMessages.ViewModels
             {
                 IsUiEnabled = false;
                 AuthProgressMessage = "Requesting Authentication.";
-                var url = await SafeApp.GenerateAppRequestAsync();
+                var url = await AppService.GenerateAppRequestAsync();
                 var appLaunched = await DependencyService.Get<IAppHandler>().LaunchApp(url);
                 if (!appLaunched)
                 {

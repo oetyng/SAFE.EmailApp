@@ -9,11 +9,11 @@ namespace SafeMessages.ViewModels
     internal class SendMessageViewModel : BaseViewModel
     {
         // FIXME Prop Names
-        private string _body;
+        string _body;
 
-        private string _subject;
+        string _subject;
 
-        private string _to;
+        string _to;
 
         public SendMessageViewModel(UserId userId, string subject)
         {
@@ -44,7 +44,7 @@ namespace SafeMessages.ViewModels
             set => SetProperty(ref _subject, value);
         }
 
-        private async void OnSendCommand()
+        async void OnSendCommand()
         {
             IsUiEnabled = false;
             try
@@ -55,7 +55,7 @@ namespace SafeMessages.ViewModels
                 if (Body.Length > 150)
                     throw new Exception("Max body length is 150 characters.");
 
-                await SafeApp.SendMessageAsync(To, new Message(SafeApp.Self.Name, Subject, DateTime.UtcNow.ToString("r"), Body));
+                await EmailInbox.SendMessageAsync(To, new Message(AppService.Self.Name, Subject, DateTime.UtcNow.ToString("r"), Body));
                 MessagingCenter.Send(this, MessengerConstants.NavPreviousPage);
             }
             catch (Exception ex)

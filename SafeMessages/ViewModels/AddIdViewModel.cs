@@ -8,7 +8,7 @@ namespace SafeMessages.ViewModels
 {
     internal class AddIdViewModel : BaseViewModel
     {
-        private string _userId;
+        string _userId;
 
         public AddIdViewModel()
         {
@@ -27,12 +27,12 @@ namespace SafeMessages.ViewModels
             set => SetProperty(ref _userId, value);
         }
 
-        private async void OnCreateIdCommand()
+        async void OnCreateIdCommand()
         {
             IsUiEnabled = false;
             try
             {
-                await SafeApp.AddIdAsync(UserId);
+                await EmailIdManager.AddIdAsync(UserId);
                 AppData.Accounts.Add(new UserId(UserId));
                 AppData.Accounts.Sort();
                 MessagingCenter.Send(this, MessengerConstants.NavUserIdsPage);

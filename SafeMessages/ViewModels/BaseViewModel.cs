@@ -6,7 +6,7 @@ namespace SafeMessages.ViewModels
 {
     public class BaseViewModel : ObservableObject
     {
-        private bool _isUiEnabled;
+        bool _isUiEnabled;
 
         public bool IsUiEnabled
         {
@@ -14,6 +14,10 @@ namespace SafeMessages.ViewModels
             set => SetProperty(ref _isUiEnabled, value);
         }
 
-        public AppService SafeApp => DependencyService.Get<AppService>();
+        public AppService AppService => DependencyService.Get<AppService>();
+
+        public EmailIdManager EmailIdManager => DependencyService.Get<EmailIdManager>();
+
+        public EmailInbox EmailInbox => DependencyService.Get<EmailInbox>();
     }
 }
