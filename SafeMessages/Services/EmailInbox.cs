@@ -49,17 +49,18 @@ namespace SafeMessages.Services
                             continue;
 
                         var value = await _session.MData.GetValueAsync(inboxInfo, key.Key);
-                        var iDataNameEncoded =
-                            await _session.Crypto.DecryptSealedBoxAsync(value.Item1, inboxPkH, inboxSkH);
-                        var iDataNameBytes = iDataNameEncoded.ToUtfString().Split(',')
-                            .Select(val => Convert.ToByte(val)).ToArray();
-                        using (var msgDataReaderH = await _session.IData.FetchSelfEncryptorAsync(iDataNameBytes))
+                        var iDataNameEncoded = await _session.Crypto.DecryptSealedBoxAsync(value.Item1, inboxPkH, inboxSkH);
+                        var iDataNameBytes = iDataNameEncoded.ToUtfString()
+                            .Split(',')
+                            .Select(val => Convert.ToByte(val))
+                            .ToArray();
+                        using (var selfEncryptor = await _session.IData.FetchSelfEncryptorAsync(iDataNameBytes))
                         {
-                            var msgSize = await _session.IData.SizeAsync(msgDataReaderH);
-                            var msgCipher = await _session.IData.ReadFromSelfEncryptorAsync(msgDataReaderH, 0, msgSize);
+                            var msgSize = await _session.IData.SizeAsync(selfEncryptor);
+                            var msgCipher = await _session.IData.ReadFromSelfEncryptorAsync(selfEncryptor, 0, msgSize);
                             var plainTextMsg = await _session.Crypto.DecryptSealedBoxAsync(msgCipher, inboxPkH, inboxSkH);
-                            var jsonMsgData = plainTextMsg.ToUtfString();
-                            messages.Add(JsonConvert.DeserializeObject<Message>(jsonMsgData));
+                            var jsonMsg = plainTextMsg.ToUtfString();
+                            messages.Add(JsonConvert.DeserializeObject<Message>(jsonMsg));
                         }
                     }
                     catch (Exception e)
@@ -74,33 +75,49 @@ namespace SafeMessages.Services
 
         public async Task SendMessageAsync(string to, Message msg)
         {
+            var (inbox, publicKey) = await GetRecipientAsync(to);
+            var encryptedEmailLink = await StoreEmailAsync(msg, publicKey);
+            await SendEmailLinkAsync(encryptedEmailLink, inbox);
+        }
+
+        async Task<(MDataInfo, byte[])> GetRecipientAsync(string to)
+        {
             var dstPubIdDigest = await Crypto.Sha3HashAsync(to.ToUtfBytes());
             var dstPubIdMDataInfoH = new MDataInfo { Name = dstPubIdDigest.ToArray(), TypeTag = 15001 };
             var serDstMsgMDataInfo = await _session.MData.GetValueAsync(dstPubIdMDataInfoH, "@email".ToUtfBytes());
-            var dstInboxMDataInfoH = await _session.MDataInfoActions.DeserialiseAsync(serDstMsgMDataInfo.Item1);
-            var dstInboxPkItem = await _session.MData.GetValueAsync(dstInboxMDataInfoH, "__email_enc_pk".ToUtfBytes());
+            var recipientInbox = await _session.MDataInfoActions.DeserialiseAsync(serDstMsgMDataInfo.Item1);
+            var dstInboxPkItem = await _session.MData.GetValueAsync(recipientInbox, "__email_enc_pk".ToUtfBytes());
+            var publicKey = dstInboxPkItem.Item1.ToUtfString().ToHexBytes().ToArray();
+            return (recipientInbox, publicKey);
+        }
 
-            using (var dstInboxPkH = await _session.Crypto.EncPubKeyNewAsync(dstInboxPkItem.Item1.ToUtfString().ToHexBytes().ToArray()))
+        async Task<List<byte>> StoreEmailAsync(Message msg, byte[] publicKey)
+        {
+            using (var dstInboxPkH = await _session.Crypto.EncPubKeyNewAsync(publicKey))
             {
                 var plainTxtMsg = JsonConvert.SerializeObject(msg);
                 var cipherTxt = await _session.Crypto.EncryptSealedBoxAsync(plainTxtMsg.ToUtfBytes(), dstInboxPkH);
-                byte[] msgDataMapNameBytes;
 
+                byte[] emailLink;
                 using (var msgWriterH = await _session.IData.NewSelfEncryptorAsync())
                 {
                     await _session.IData.WriteToSelfEncryptorAsync(msgWriterH, cipherTxt);
                     using (var msgCipherOptH = await _session.CipherOpt.NewPlaintextAsync())
-                        msgDataMapNameBytes = await _session.IData.CloseSelfEncryptorAsync(msgWriterH, msgCipherOptH);
+                        emailLink = await _session.IData.CloseSelfEncryptorAsync(msgWriterH, msgCipherOptH);
                 }
 
-                var encodedString = string.Join(", ", msgDataMapNameBytes.Select(val => val));
-                var msgDataMapNameCipher = await _session.Crypto.EncryptSealedBoxAsync(encodedString.ToUtfBytes(), dstInboxPkH);
+                var encodedString = string.Join(", ", emailLink.Select(val => val));
+                var encryptedEmailLink = await _session.Crypto.EncryptSealedBoxAsync(encodedString.ToUtfBytes(), dstInboxPkH);
+                return encryptedEmailLink;
+            }
+        }
 
-                using (var dstMsgEntActH = await _session.MDataEntryActions.NewAsync())
-                {
-                    await _session.MDataEntryActions.InsertAsync(dstMsgEntActH, RandomGenerator.RandomString(15).ToUtfBytes(), msgDataMapNameCipher);
-                    await _session.MData.MutateEntriesAsync(dstInboxMDataInfoH, dstMsgEntActH);
-                }
+        async Task SendEmailLinkAsync(List<byte> encryptedEmailLink, MDataInfo inbox)
+        {
+            using (var tx = await _session.MDataEntryActions.NewAsync())
+            {
+                await _session.MDataEntryActions.InsertAsync(tx, RandomGenerator.RandomString(15).ToUtfBytes(), encryptedEmailLink);
+                await _session.MData.MutateEntriesAsync(inbox, tx);
             }
         }
     }
