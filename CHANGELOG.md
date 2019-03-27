@@ -1,4 +1,4 @@
-# SafeMessages Change Log
+# SAFE.EmailApp Change Log
 
 ## [0.1.1]
 - Update to use latest packages and package reference (PR [#17](https://github.com/maidsafe/safe-email-app-csharp/pull/17)).
