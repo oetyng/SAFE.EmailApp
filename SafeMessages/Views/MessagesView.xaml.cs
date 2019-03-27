@@ -11,8 +11,7 @@ namespace SafeMessages.Views
     {
         public MessagesView()
             : this(null)
-        {
-        }
+        { }
 
         public MessagesView(UserId userId)
         {

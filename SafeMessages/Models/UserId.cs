@@ -5,17 +5,13 @@ namespace SafeMessages.Models
 {
     public class UserId : ObservableObject, IComparable, IEquatable<UserId>
     {
-        public UserId(string name)
-        {
-            Name = name;
-        }
+        public UserId(string name) => Name = name;
 
         public string Name { get; }
 
         public int CompareTo(object obj)
         {
-            var other = obj as UserId;
-            if (other == null)
+            if (!(obj is UserId other))
                 throw new NotSupportedException();
 
             return string.CompareOrdinal(Name, other.Name);
@@ -23,14 +19,14 @@ namespace SafeMessages.Models
 
         public bool Equals(UserId other)
         {
-            if (ReferenceEquals(null, other))
+            if (other is null)
                 return false;
             return ReferenceEquals(this, other) || string.Equals(Name, other.Name);
         }
 
         public override bool Equals(object obj)
         {
-            if (ReferenceEquals(null, obj))
+            if (obj is null)
                 return false;
             if (ReferenceEquals(this, obj))
                 return true;
@@ -38,8 +34,6 @@ namespace SafeMessages.Models
         }
 
         public override int GetHashCode()
-        {
-            return Name != null ? Name.GetHashCode() : 0;
-        }
+            => Name != null ? Name.GetHashCode() : 0;
     }
 }

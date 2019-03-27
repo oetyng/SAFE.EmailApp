@@ -6,7 +6,7 @@ namespace SafeMessages.Services
 {
     internal class CredentialCacheService
     {
-        private const string AuthRspKey = "AuthRsp";
+        const string AuthRspKey = "AuthRsp";
 
         public void Delete()
         {
@@ -24,16 +24,12 @@ namespace SafeMessages.Services
         {
             var authResponse = await SecureStorage.GetAsync(AuthRspKey);
             if (authResponse == null)
-            {
                 throw new NullReferenceException("authResponse");
-            }
 
             return authResponse;
         }
 
-        public async Task Store(string authRsp)
-        {
-            await SecureStorage.SetAsync(AuthRspKey, authRsp);
-        }
+        public Task Store(string authRsp)
+            => SecureStorage.SetAsync(AuthRspKey, authRsp);
     }
 }

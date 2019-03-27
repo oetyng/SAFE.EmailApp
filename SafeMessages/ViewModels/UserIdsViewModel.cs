@@ -29,9 +29,7 @@ namespace SafeMessages.ViewModels
         }
 
         public ICommand RefreshAccountsCommand { get; }
-
         public ICommand AddAccountCommand { get; }
-
         public ICommand UserIdSelectedCommand { get; }
 
         void OnAddAccountCommand()

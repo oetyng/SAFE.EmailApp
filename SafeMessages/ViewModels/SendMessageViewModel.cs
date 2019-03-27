@@ -10,9 +10,7 @@ namespace SafeMessages.ViewModels
     {
         // FIXME Prop Names
         string _body;
-
         string _subject;
-
         string _to;
 
         public SendMessageViewModel(UserId userId, string subject, string inReplyTo)

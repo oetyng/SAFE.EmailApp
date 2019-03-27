@@ -25,8 +25,6 @@ namespace SafeMessages.Views
         }
 
         public void MessageCenterUnsubscribe()
-        {
-            MessagingCenter.Unsubscribe<AddIdViewModel>(this, MessengerConstants.NavUserIdsPage);
-        }
+            => MessagingCenter.Unsubscribe<AddIdViewModel>(this, MessengerConstants.NavUserIdsPage);
     }
 }

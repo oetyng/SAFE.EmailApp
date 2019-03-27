@@ -18,8 +18,7 @@ namespace SafeMessages.Models.BaseModel
         ///     Initializes a new instance of the System.Collections.ObjectModel.ObservableCollection(Of T) class.
         /// </summary>
         public ObservableRangeCollection()
-        {
-        }
+        { }
 
         /// <summary>
         ///     Initializes a new instance of the System.Collections.ObjectModel.ObservableCollection(Of T) class that contains
@@ -29,8 +28,7 @@ namespace SafeMessages.Models.BaseModel
         /// <exception cref="System.ArgumentNullException">The collection parameter cannot be null.</exception>
         public ObservableRangeCollection(IEnumerable<T> collection)
             : base(collection)
-        {
-        }
+        { }
 
         /// <summary>
         ///     Adds the elements of the specified collection to the end of the ObservableCollection(Of T).
@@ -76,16 +74,14 @@ namespace SafeMessages.Models.BaseModel
 
             foreach (var i in collection)
                 Items.Remove(i);
+
             OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset));
         }
 
         /// <summary>
         ///     Clears the current collection and replaces it with the specified item.
         /// </summary>
-        public void Replace(T item)
-        {
-            ReplaceRange(new[] { item });
-        }
+        public void Replace(T item) => ReplaceRange(new[] { item });
 
         /// <summary>
         ///     Clears the current collection and replaces it with the specified collection.
@@ -96,6 +92,7 @@ namespace SafeMessages.Models.BaseModel
                 throw new ArgumentNullException(nameof(collection));
 
             Items.Clear();
+
             AddRange(collection, NotifyCollectionChangedAction.Reset);
         }
 

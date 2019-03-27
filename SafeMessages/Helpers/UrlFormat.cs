@@ -11,8 +11,6 @@ namespace SafeMessages.Helpers
         }
 
         public static string GetRequestData(string url)
-        {
-            return new Uri(url).PathAndQuery.Replace("/", string.Empty);
-        }
+            => new Uri(url).PathAndQuery.Replace("/", string.Empty);
     }
 }

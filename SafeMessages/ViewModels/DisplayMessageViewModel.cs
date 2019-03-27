@@ -7,7 +7,7 @@ namespace SafeMessages.ViewModels
 {
     internal class DisplayMessageViewModel : BaseViewModel
     {
-        private Message _message;
+        Message _message;
 
         public DisplayMessageViewModel(Message message)
         {
@@ -24,7 +24,7 @@ namespace SafeMessages.ViewModels
             set => SetProperty(ref _message, value);
         }
 
-        private void OnReplyCommand()
+        void OnReplyCommand()
         {
             var subject = Message.Subject.StartsWith("Re: ") ? Message.Subject : $"Re: {Message.Subject}";
             MessagingCenter.Send(this, MessengerConstants.NavSendMessagePage, subject);

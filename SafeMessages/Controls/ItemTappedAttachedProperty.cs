@@ -15,9 +15,7 @@ namespace SafeMessages.Controls
             OnItemTappedChanged);
 
         public static ICommand GetItemTapped(BindableObject bindable)
-        {
-            return (ICommand)bindable.GetValue(CommandProperty);
-        }
+            => (ICommand)bindable.GetValue(CommandProperty);
 
         public static void OnItemTapped(object sender, ItemTappedEventArgs e)
         {
@@ -35,8 +33,6 @@ namespace SafeMessages.Controls
         }
 
         public static void SetItemTapped(BindableObject bindable, ICommand value)
-        {
-            bindable.SetValue(CommandProperty, value);
-        }
+            => bindable.SetValue(CommandProperty, value);
     }
 }

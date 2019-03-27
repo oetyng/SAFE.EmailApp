@@ -5,7 +5,7 @@ namespace SafeMessages.Helpers
 {
     public static class RandomGenerator
     {
-        private static readonly Random Random = new Random();
+        static readonly Random Random = new Random();
 
         public static string RandomString(int maxLength, bool fixedLength = false)
         {

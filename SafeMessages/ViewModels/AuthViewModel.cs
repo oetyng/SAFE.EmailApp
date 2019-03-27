@@ -9,7 +9,7 @@ namespace SafeMessages.ViewModels
 {
     internal class AuthViewModel : BaseViewModel
     {
-        private string _authProgressMessage;
+        string _authProgressMessage;
 
         public AuthViewModel()
         {
@@ -36,8 +36,8 @@ namespace SafeMessages.ViewModels
                         IsUiEnabled = true;
                     }
                 });
-            IsUiEnabled = AppService.IsLogInitialised;
 
+            IsUiEnabled = AppService.IsLogInitialised;
             AuthCommand = new Command(OnAuthCommand);
         }
 
@@ -61,7 +61,7 @@ namespace SafeMessages.ViewModels
             }
         }
 
-        private async void OnAuthCommand()
+        async void OnAuthCommand()
         {
             try
             {

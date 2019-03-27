@@ -16,7 +16,7 @@ namespace SafeMessages.iOS
     {
         public AppService SafeApp => DependencyService.Get<AppService>();
 
-        private static string LogFolderPath => DependencyService.Get<IFileOps>().ConfigFilesPath;
+        static string LogFolderPath => DependencyService.Get<IFileOps>().ConfigFilesPath;
 
         public override bool FinishedLaunching(UIApplication app, NSDictionary options)
         {
@@ -51,13 +51,13 @@ namespace SafeMessages.iOS
 
         #region Error Handling
 
-        private static void TaskSchedulerOnUnobservedTaskException(object sender, UnobservedTaskExceptionEventArgs exEventArgs)
+        static void TaskSchedulerOnUnobservedTaskException(object sender, UnobservedTaskExceptionEventArgs exEventArgs)
         {
             var newExc = new Exception("TaskSchedulerOnUnobservedTaskException", exEventArgs.Exception);
             LogUnhandledException(newExc);
         }
 
-        private static void CurrentDomainOnUnhandledException(object sender, UnhandledExceptionEventArgs exEventArgs)
+        static void CurrentDomainOnUnhandledException(object sender, UnhandledExceptionEventArgs exEventArgs)
         {
             var newExc = new Exception("CurrentDomainOnUnhandledException", exEventArgs.ExceptionObject as Exception);
             LogUnhandledException(newExc);
@@ -78,7 +78,7 @@ namespace SafeMessages.iOS
             }
         }
 
-        private static void DisplayCrashReport()
+        static void DisplayCrashReport()
         {
             const string errorFilename = "Fatal.log";
             var errorFilePath = Path.Combine(LogFolderPath, errorFilename);
