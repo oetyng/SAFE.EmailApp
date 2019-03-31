@@ -15,7 +15,7 @@ namespace SafeMessages.ViewModels
         }
 
         public AppService AppService => DependencyService.Get<AppService>();
-        public EmailIdManager EmailIdManager => DependencyService.Get<EmailIdManager>();
-        public EmailInbox EmailInbox => DependencyService.Get<EmailInbox>();
+        public EmailIdManager EmailIdManager => AppService.EmailIdManager;
+        public EmailInbox EmailInbox => AppService.EmailInbox;
     }
 }

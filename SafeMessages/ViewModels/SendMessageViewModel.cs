@@ -16,7 +16,7 @@ namespace SafeMessages.ViewModels
         public SendMessageViewModel(UserId userId, string subject, string inReplyTo)
         {
             IsUiEnabled = true;
-            Body = "\n\n\n" + inReplyTo;
+            Body = inReplyTo;
             Subject = subject;
             To = userId == null ? string.Empty : userId.Name;
             SendCommand = new Command(OnSendCommand);

@@ -24,7 +24,7 @@ namespace SafeMessages.Droid
     [IntentFilter(
         new[] { Intent.ActionView },
         Categories = new[] { Intent.CategoryDefault, Intent.CategoryBrowsable },
-        DataScheme = AppConstants.AppId)]
+        DataScheme = AppConstants.AppIdLowerCase)]
     public class MainActivity : FormsAppCompatActivity
     {
         static string LogFolderPath => DependencyService.Get<IFileOps>().ConfigFilesPath;

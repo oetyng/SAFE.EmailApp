@@ -29,9 +29,13 @@ namespace SafeMessages.Views
                         return;
                     }
 
-                    await Navigation.PushAsync(new SendMessageView(new UserId(message.From), subject, message.Body));
+                    var inReplyTo = FormatInReplyTo(message);
+                    await Navigation.PushAsync(new SendMessageView(new UserId(message.From), subject, inReplyTo));
                 });
         }
+
+        string FormatInReplyTo(Message message)
+            => $"\n\nAt {message.LocalTime}, {message.From} wrote:\n" + message.Body;
 
         public void MessageCenterUnsubscribe()
             => MessagingCenter.Unsubscribe<DisplayMessageViewModel, string>(this, MessengerConstants.NavSendMessagePage);

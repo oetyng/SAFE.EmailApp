@@ -36,6 +36,8 @@ namespace SafeMessages.Services
         CredentialCacheService CredentialCache { get; }
 
         public UserId Self { get; set; }
+        public EmailIdManager EmailIdManager { get; private set; }
+        public EmailInbox EmailInbox { get; private set; }
 
         public bool IsLogInitialised
         {
@@ -86,6 +88,8 @@ namespace SafeMessages.Services
                         var encodedAuthRsp = await CredentialCache.Retrieve();
                         var authGranted = JsonConvert.DeserializeObject<AuthGranted>(encodedAuthRsp);
                         _session = await Session.AppRegisteredAsync(AppConstants.AppId, authGranted);
+                        EmailIdManager = new EmailIdManager(_session);
+                        EmailInbox = new EmailInbox(_session);
                     }
 
                     try
@@ -148,6 +152,8 @@ namespace SafeMessages.Services
                     if (ipcMsg != null)
                     {
                         _session = await Session.AppRegisteredAsync(AppConstants.AppId, ipcMsg.AuthGranted);
+                        EmailIdManager = new EmailIdManager(_session);
+                        EmailInbox = new EmailInbox(_session);
                         if (AuthReconnect)
                         {
                             var encodedAuthRsp = JsonConvert.SerializeObject(ipcMsg.AuthGranted);

@@ -10,8 +10,6 @@ using SafeMessages.Models;
 using SafeMessages.Services;
 using Xamarin.Forms;
 
-[assembly: Dependency(typeof(EmailInbox))]
-
 namespace SafeMessages.Services
 {
     public class EmailIdManager : IDisposable
